@@ -277,8 +277,60 @@ findall_candidate_values(_, Template, select(Value, List, Rest), Values) :-
     is_list(List),
     select_candidate_values(List, Value, Rest, Template, Values).
 findall_candidate_values(Predicates, Template, Generator, Values) :-
+    generator_parts(Generator, Goal, Filters),
+    Filters \= [],
+    maplist(supported_arithmetic_filter, Filters),
+    fact_generator_clauses(Predicates, Goal, Clauses),
+    fact_candidate_values(Clauses, Goal, Template, Filters, Values).
+findall_candidate_values(Predicates, Template, Generator, Values) :-
     fact_generator_clauses(Predicates, Generator, Clauses),
     fact_candidate_values(Clauses, Generator, Template, Values).
+
+generator_parts(conj(Goal, Filters), Generator, Conditions) :-
+    !,
+    flatten_generator_conjunction(conj(Goal, Filters), Goals),
+    Goals = [Generator|Conditions].
+generator_parts(Generator, Generator, []).
+
+flatten_generator_conjunction(conj(Left, Right), Goals) :-
+    !,
+    flatten_generator_conjunction(Left, LeftGoals),
+    flatten_generator_conjunction(Right, RightGoals),
+    append(LeftGoals, RightGoals, Goals).
+flatten_generator_conjunction(Goal, [Goal]).
+
+supported_arithmetic_filter(Filter) :-
+    nonvar(Filter),
+    functor(Filter, Name, 2),
+    memberchk(Name, [>, >=, <, =<, =:=, =\=]),
+    arg(1, Filter, Left),
+    arg(2, Filter, Right),
+    arithmetic_expression(Left),
+    arithmetic_expression(Right).
+
+arithmetic_expression(Expression) :-
+    number(Expression),
+    !.
+arithmetic_expression(Expression) :-
+    var(Expression),
+    !.
+arithmetic_expression(Expression) :-
+    compound(Expression),
+    compound_name_arguments(Expression, Name, Arguments),
+    arithmetic_operator(Name, Arity),
+    length(Arguments, Arity),
+    maplist(arithmetic_expression, Arguments).
+
+arithmetic_operator(+, 1).
+arithmetic_operator(-, 1).
+arithmetic_operator(abs, 1).
+arithmetic_operator(+, 2).
+arithmetic_operator(-, 2).
+arithmetic_operator(*, 2).
+arithmetic_operator(/, 2).
+arithmetic_operator(//, 2).
+arithmetic_operator(mod, 2).
+arithmetic_operator(rem, 2).
 
 fact_generator_clauses(Predicates, Generator, Clauses) :-
     nonvar(Generator),
@@ -307,6 +359,55 @@ fact_candidate_values([mnn_clause(_, Head, true, _)|Clauses],
     ;   Values = Rest
     ),
     fact_candidate_values(Clauses, Generator, Template, Rest).
+
+fact_candidate_values([], _, _, _, []).
+fact_candidate_values([mnn_clause(_, Head, true, _)|Clauses],
+                      Generator, Template, Filters, Values) :-
+    copy_term((Generator, Template, Filters),
+              (GeneratorCopy, TemplateCopy, FiltersCopy)),
+    (   GeneratorCopy = Head
+    ->  checked_filters_result(FiltersCopy, FilterResult),
+        fact_candidate_values(Clauses, Generator, Template, Filters, Rest),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|Rest]
+        ;   Values = Rest
+        )
+    ;   fact_candidate_values(Clauses, Generator, Template, Filters, Values)
+    ).
+
+checked_filters_result([], true).
+checked_filters_result([Filter|Filters], Result) :-
+    checked_filter_result(Filter, FilterResult),
+    (   FilterResult == true
+    ->  checked_filters_result(Filters, Result)
+    ;   Result = false
+    ).
+
+checked_filter_result(Filter, Result) :-
+    Filter =.. [Name, Left, Right],
+    ground((Left, Right)),
+    checked_arithmetic_value(Left, LeftValue),
+    checked_arithmetic_value(Right, RightValue),
+    checked_comparison(Name, LeftValue, RightValue, Result).
+
+checked_arithmetic_value(Expression, Value) :-
+    arithmetic_expression(Expression),
+    ground(Expression),
+    catch(Value is Expression, _, fail).
+
+checked_comparison(>, Left, Right, Result) :-
+    (Left > Right -> Result = true ; Result = false).
+checked_comparison(>=, Left, Right, Result) :-
+    (Left >= Right -> Result = true ; Result = false).
+checked_comparison(<, Left, Right, Result) :-
+    (Left < Right -> Result = true ; Result = false).
+checked_comparison(=<, Left, Right, Result) :-
+    (Left =< Right -> Result = true ; Result = false).
+checked_comparison(=:=, Left, Right, Result) :-
+    (Left =:= Right -> Result = true ; Result = false).
+checked_comparison(=\=, Left, Right, Result) :-
+    (Left =\= Right -> Result = true ; Result = false).
 
 between_candidate_numbers(Low, High, Numbers) :-
     (   Low > High

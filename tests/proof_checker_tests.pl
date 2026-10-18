@@ -224,6 +224,35 @@ test(accept_ground_fact_findall_to_fold_preserving_patterns_and_duplicates) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_fact_findall_to_fold_with_arithmetic_filter) :-
+    Original = mnn_program(
+                   sample,
+                   meta(source, [clause(1), clause(2), clause(3), clause(4)]),
+                   [mnn_pred(pair/2, ['?', '?'], [any, any],
+                             [mnn_clause(1, pair(a, 1), true, source(source, 1)),
+                              mnn_clause(2, pair(b, 2), true, source(source, 2)),
+                              mnn_clause(3, pair(a, 3), true, source(source, 3))],
+                             original),
+                    mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(
+                                  4, numbers(Results),
+                                  findall(Value,
+                                          conj(pair(a, Value), Value > 1),
+                                          Results),
+                                  source(source, 4))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _),
+    Program = mnn_program(_, _,
+                          [_, mnn_pred(_, _, _,
+                                       [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                   _)],
+                                       _)|_],
+                          _, _),
+    assertion(Values == [3]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
 test(reject_ground_fact_findall_to_fold_with_changed_values) :-
     fact_findall_to_fold_programs(Value, pair(a, Value), Original, Program0),
     Program0 = mnn_program(Name, Meta,
