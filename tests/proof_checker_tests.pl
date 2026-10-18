@@ -226,7 +226,10 @@ test(render_checked_goal_reordering) :-
     program_with_body(conj(atom(ok), integer(3)), Program),
     reorder_proof(Proof),
     mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
-    assertion(sub_string(Markdown, _, _, _, '**Independent check:** `accepted`.')).
+    assertion(sub_string(Markdown, _, _, _, '**Independent check:** accepted.')),
+    assertion(sub_string(Markdown, _, _, _, '## Step 1: `reorder_goals`')),
+    assertion(sub_string(Markdown, _, _, _, 'One adjacent pair')),
+    assertion(sub_string(Markdown, _, _, _, 'certifies no other changes')).
 
 test(render_checked_unfold) :-
     definition_rewrite_program(integer(3), positive(3), Original),
