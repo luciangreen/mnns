@@ -48,7 +48,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   call (including mutual recursion). Other arithmetic measures and unsupported
   forms are explicitly reported as unavailable. The templates do not verify
   full termination or user specifications, and user-declared measures remain
-  unsupported.
+  unsupported. A syntactic tail-recursion report now identifies tail calls and
+  lists recursive calls that are followed by more work.
 - **Stage 4 — loop2: in progress.** `mnn_loop2:convert_program/3` converts
   `findall/3` over a predicate consisting only of ground facts, including calls
   with bound or partially instantiated arguments, or `member/2`, `nth0/3`, and
@@ -77,7 +78,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
-| 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, and schematic measure-backed clause obligations; user specifications and broader measure forms remain) |
+| 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `nth0/3`, `nth1/3`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode; general mode inference, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |

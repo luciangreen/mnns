@@ -26,8 +26,9 @@ the current implementation and remaining work.
   rules are rejected. See [`docs/proof_rules.md`](docs/proof_rules.md).
 - **PID analysis:** classifies recursive predicates, checks a limited set of
   shared structural and guarded natural-number decreases, and emits schematic
-  induction obligations for supported measures. These are not proofs of a
-  specification. See [`docs/pid.md`](docs/pid.md).
+  induction obligations for supported measures; it also identifies syntactic
+  tail recursion. These analyses are not proofs of a specification or full
+  termination. See [`docs/pid.md`](docs/pid.md).
 - **Detlog analysis:** conservatively classifies success counts for a limited
   set of normalized goals when all predicate arguments are unbound. Unsupported
   goals are reported rather than guessed; choicepoint and cut transformations

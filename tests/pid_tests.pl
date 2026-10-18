@@ -398,4 +398,46 @@ test(induction_report_marks_non_recursive_predicate) :-
         Program,
         pid_induction_report([predicate(identity/1, non_recursive)])).
 
+test(classifies_direct_tail_recursion) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(drop/1, ['?'], [any],
+                            [mnn_clause(1, drop([_|Tail]), drop(Tail),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_tail_recursion(
+        Program,
+        pid_tail_recursion_report(
+            [predicate(drop/1, tail_recursion(tail_recursive))])).
+
+test(reports_recursive_call_before_later_goal_as_non_tail) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(loop/1, ['?'], [any],
+                            [mnn_clause(1, loop([_|Tail]),
+                                        conj(loop(Tail), true),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_tail_recursion(
+        Program,
+        pid_tail_recursion_report(
+            [predicate(loop/1,
+                       tail_recursion(non_tail_recursive(
+                           [recursive_call(1, loop(_))])))])).
+
+test(classifies_non_recursive_tail_recursion_target) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(identity/1, ['?'], [any],
+                            [mnn_clause(1, identity(_), true,
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_tail_recursion(
+        Program,
+        pid_tail_recursion_report(
+            [predicate(identity/1, non_recursive)])).
+
 :- end_tests(mnn_pid).
