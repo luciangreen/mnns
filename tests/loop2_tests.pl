@@ -246,6 +246,59 @@ test(converts_member_with_arithmetic_filter_and_template, [nondet]) :-
                                                        deterministic_loop))])),
     run_converted(Converted, values(Values), [[[pair(3), pair(4)]]]).
 
+test(converts_ground_select_generator_preserving_order_and_duplicates, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :-
+              findall(Selected-Remaining,
+                      select(Selected, [a, b, a], Remaining),
+                      Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_select(3),
+                                        safe_arithmetic_filters(0),
+                                        deterministic_loop))])),
+    run_converted(
+        Converted,
+        values(Values),
+        [[[a-[b, a], b-[a, a], a-[a, b]]]]).
+
+test(converts_select_generator_with_pattern_and_filter, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :-
+              findall(Value,
+                      (select(Value, [1, 2, 2, 3], [1, 2, 3]),
+                       Value > 1),
+                      Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_select(4),
+                                        safe_arithmetic_filters(1),
+                                        deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[2, 2]]]).
+
+test(leaves_select_generator_on_unbound_or_improper_list_unchanged, [nondet]) :-
+    with_converted_program(
+        [(unbound(Values, List) :-
+              findall(Value, select(Value, List, _), Values)),
+         (improper(Values) :-
+              findall(Value, select(Value, [a|tail], _), Values))],
+        Converted, loop2_report([])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(
+                  mnn_pred(unbound/2, _, _,
+                           [mnn_clause(_, _,
+                                       findall(_, select(_, _, _), _), _)],
+                           original),
+                  Predicates)),
+    assertion(member(
+                  mnn_pred(improper/1, _, _,
+                           [mnn_clause(_, _,
+                                       findall(_, select(_, _, _), _), _)],
+                           original),
+                  Predicates)).
+
 test(converts_nth0_and_preserves_indices_and_duplicates, [nondet]) :-
     with_converted_program(
         [(values(Values) :-

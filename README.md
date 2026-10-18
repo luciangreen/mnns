@@ -36,14 +36,15 @@ the current implementation and remaining work.
   distinct unbound arguments are analyzed recursively, and `once/1` caps reported
   successes at one. Choicepoint and cut transformations are not implemented yet.
   See [`docs/detlog.md`](docs/detlog.md).
-- **loop2 conversion:** converts `findall/3` over ground facts, `member/2` on a
-  ground proper list, `nth0/3` or `nth1/3` on a ground proper list, bounded
-  `between/3` ranges, or `length/2` on a ground proper list, optionally with
-  supported arithmetic filters, into
-  deterministic list-copy loops. Bound or partially instantiated arguments are
-  matched against fact and rule heads. List order, indices, and duplicates are
-  preserved; unsupported generators remain unchanged, and the conversion report
-  is an obligation—not an independently checked proof.
+- **loop2 conversion:** converts `findall/3` over ground facts, `member/2` or
+  `select/3` on a ground proper list, `nth0/3` or `nth1/3` on a ground proper
+  list, bounded `between/3` ranges, or `length/2` on a ground proper list,
+  optionally with supported arithmetic filters, into deterministic list-copy
+  loops. Bound or partially instantiated arguments are matched against fact and
+  rule heads or list-generator patterns. List order, selection remainders,
+  indices, and duplicates are preserved; unsupported generators remain
+  unchanged, and the conversion report is an obligation—not an independently
+  checked proof.
   See [`docs/loop2.md`](docs/loop2.md).
 
 ## Requirements
