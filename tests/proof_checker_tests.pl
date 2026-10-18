@@ -2,6 +2,7 @@
 
 :- use_module('../prolog/proof/proof_checker').
 :- use_module('../prolog/proof/proof_renderer').
+:- use_module('../prolog/loop2/loop2').
 
 test(accept_identity_proof_for_alpha_equivalent_programs) :-
     Program = mnn_program(sample, meta(file, []),
@@ -111,6 +112,59 @@ test(accept_definition_introduction_in_proof_sequence) :-
     definition_introduction_program(Original, Program),
     Proof = proof([
         proof_step(1, introduce_definition, [],
+                   equivalent(domain(any), modes([]))),
+        proof_step(2, identity, [],
+                   equivalent(domain(any), modes([])))
+    ]),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_direct_ground_member_findall_to_fold) :-
+    findall_to_fold_programs(Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_findall_to_fold_with_changed_values) :-
+    findall_to_fold_programs(Original, Program0),
+    Program0 = mnn_program(Name, Meta, [Predicate, Helper], Proof, Trace),
+    Predicate = mnn_pred(numbers/1, Modes, Domains,
+                         [mnn_clause(1, numbers(Results),
+                                     mnn_loop2_1([a, b], Results),
+                                     source(source, 1))],
+                         original),
+    Program = mnn_program(Name, Meta,
+                          [mnn_pred(numbers/1, Modes, Domains,
+                                    [mnn_clause(1, numbers(Results),
+                                                mnn_loop2_1([a], Results),
+                                                source(source, 1))],
+                                    original),
+                           Helper],
+                          Proof, Trace),
+    findall_to_fold_proof(ProofTerm),
+    mnn_proof_checker:check_proof(
+        Program, Original, ProofTerm,
+        rejected(invalid_or_unsupported_proof)).
+
+test(reject_findall_to_fold_with_filter) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                         findall(Value,
+                                                 (member(Value, [a, b]),
+                                                  Value \= b),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    Program = Original,
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(accept_findall_to_fold_in_proof_sequence) :-
+    findall_to_fold_programs(Original, Program),
+    Proof = proof([
+        proof_step(1, findall_to_fold, [],
                    equivalent(domain(any), modes([]))),
         proof_step(2, identity, [],
                    equivalent(domain(any), modes([])))
@@ -492,6 +546,14 @@ test(render_checked_definition_introduction) :-
     assertion(sub_string(Markdown, _, _, _, 'introduce_definition')),
     assertion(sub_string(Markdown, _, _, _, 'helper predicate')).
 
+test(render_checked_findall_to_fold) :-
+    findall_to_fold_programs(Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
+    assertion(sub_string(Markdown, _, _, _, 'findall_to_fold')),
+    assertion(sub_string(Markdown, _, _, _, 'ground proper-list')),
+    assertion(sub_string(Markdown, _, _, _, 'Independent check:** accepted.')).
+
 test(render_checked_rewrite_sequence) :-
     sequence_program(conj(positive(3), true),
                      conj(integer(3), atom(ok)), Original),
@@ -616,5 +678,23 @@ multiple_reordering_programs(
                                       source(file, 2))],
                           original)],
                 proof([]), trace([]))).
+
+findall_to_fold_programs(
+    Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                   [mnn_clause(1, numbers(Results),
+                               findall(Value,
+                                       member(Value, [a, b]),
+                                       Results),
+                               source(source, 1))],
+                   original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+findall_to_fold_proof(
+    proof([proof_step(1, findall_to_fold, [],
+                      equivalent(domain(any), modes([])))])).
 
 :- end_tests(mnn_proof_checker).
