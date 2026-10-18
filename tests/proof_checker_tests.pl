@@ -52,6 +52,33 @@ test(accept_fold_of_ground_pure_definition) :-
     definition_rewrite_proof(fold, Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_sequence_of_checked_rewrites) :-
+    sequence_program(
+        conj(conj(integer(3), atom(ok)), positive(3)), Original),
+    sequence_program(
+        conj(conj(atom(ok), integer(3)), integer(3)), Program),
+    Proof = proof([
+        proof_step(1, reorder_goals, [],
+                   equivalent(domain(any), modes([]))),
+        proof_step(2, unfold, [],
+                   equivalent(domain(any), modes([])))
+    ]),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_sequence_with_invalid_intermediate_rewrite) :-
+    sequence_program(
+        conj(conj(integer(3), atom(ok)), positive(3)), Original),
+    sequence_program(
+        conj(conj(atom(ok), integer(3)), positive(3)), Program),
+    Proof = proof([
+        proof_step(1, reorder_goals, [],
+                   equivalent(domain(any), modes([]))),
+        proof_step(2, unfold, [],
+                   equivalent(domain(any), modes([])))
+    ]),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_unfold_with_variable_definition) :-
     Original = mnn_program(
                    sample, meta(file, []),
@@ -240,6 +267,22 @@ test(render_checked_unfold) :-
     assertion(sub_string(Markdown, _, _, _, 'single-clause definition')),
     assertion(sub_string(Markdown, _, _, _, 'pure built-ins')).
 
+test(render_checked_rewrite_sequence) :-
+    sequence_program(
+        conj(conj(integer(3), atom(ok)), positive(3)), Original),
+    sequence_program(
+        conj(conj(atom(ok), integer(3)), integer(3)), Program),
+    Proof = proof([
+        proof_step(1, reorder_goals, [],
+                   equivalent(domain(any), modes([]))),
+        proof_step(2, unfold, [],
+                   equivalent(domain(any), modes([])))
+    ]),
+    mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
+    assertion(sub_string(Markdown, _, _, _, '## Step 1: `reorder_goals`')),
+    assertion(sub_string(Markdown, _, _, _, '## Step 2: `unfold`')),
+    assertion(sub_string(Markdown, _, _, _, '**Independent check:** accepted.')).
+
 test(render_unsupported_proof_as_rejected) :-
     Program = mnn_program(sample, meta(file, []), [], proof([]), trace([])),
     Proof = proof([proof_step(1, unfold, [], equivalent)]),
@@ -280,6 +323,20 @@ definition_rewrite_program(DefinitionBody, CallerBody,
                                                       source(file, 2))],
                                                  original)],
                                        proof([]), trace([]))).
+
+sequence_program(CallerBody,
+                 mnn_program(sample, meta(file, []),
+                             [mnn_pred(positive/1, ['?'], [any],
+                                       [mnn_clause(
+                                           1, positive(3), integer(3),
+                                           source(file, 1))],
+                                       original),
+                              mnn_pred(result/0, [], [],
+                                       [mnn_clause(
+                                           2, result, CallerBody,
+                                           source(file, 2))],
+                                       original)],
+                             proof([]), trace([]))).
 
 program_with_body(Body,
                   mnn_program(sample, meta(file, []),

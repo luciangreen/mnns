@@ -59,3 +59,10 @@ Markdown report and includes the independent checker's result. Accepted identity
 proofs are explained as alpha-equivalence of the complete IR terms; rejected or
 unsupported proofs are shown as quoted Prolog terms and are clearly marked as
 rejected.
+
+Several checked rewrites may be composed in one proof by listing their steps in
+order. For a multi-step proof, each step is independently validated against the
+IR produced by the preceding step; every step must be a supported rule with
+ground domain and mode annotations. The final IR must be alpha-equivalent to
+`Program`. This permits checked rewrite chains without treating a later step as
+evidence for an earlier one.

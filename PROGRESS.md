@@ -20,13 +20,14 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 - Current validation command: `swipl -q -s tests/run.pl` (the new CI job runs this
   command).
 - **Stage 2 — proof system: in progress.** The independent checker accepts
-  identity proofs, one narrowly scoped `reorder_goals` rewrite (swapping one
-  adjacent pair of ground, pure unary type tests), and one-occurrence `unfold`
-  and `fold` rewrites for matching single-clause definitions with ground heads
-  and bodies made only of pure built-ins, `true`, `fail`, conjunction and
-  disjunction. General purity/determinism analysis, general goal/clause
-  reordering, and the other proof rules remain unsupported. Checked proofs can
-  be rendered as Markdown reports.
+  identity proofs, narrowly scoped `reorder_goals` rewrites (swapping one
+  adjacent pair of ground, pure unary type tests per step), and one-occurrence
+  `unfold` and `fold` rewrites for matching single-clause definitions with
+  ground heads and bodies made only of pure built-ins, `true`, `fail`,
+  conjunction and disjunction. Ordered sequences of these checked steps can be
+  independently verified and rendered as Markdown reports. General
+  purity/determinism analysis, general goal/clause reordering, and the other
+  proof rules remain unsupported.
 
 ## Remaining stages
 

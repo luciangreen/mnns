@@ -23,6 +23,8 @@ check_supported_proof(Program, Original, Proof, Result) :-
     ->  Result = accepted
     ;   valid_definition_rewrite_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_proof_sequence(Program, Original, Proof)
+    ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
     ).
 
@@ -121,6 +123,40 @@ valid_definition_rewrite_proof(Program, Original, Proof) :-
     copy_term(Original, OriginalCopy),
     rewrite_program(Rule, OriginalCopy, Rewritten),
     Program =@= Rewritten.
+
+valid_proof_sequence(Program, Original, proof(Steps)) :-
+    ground(Steps),
+    is_list(Steps),
+    Steps = [_,_|_],
+    apply_proof_steps(Steps, Original, Rewritten),
+    Program =@= Rewritten.
+
+apply_proof_steps([], Program, Program).
+apply_proof_steps([Step|Steps], Program0, Program) :-
+    apply_proof_step(Step, Program0, Program1),
+    apply_proof_steps(Steps, Program1, Program).
+
+apply_proof_step(
+    proof_step(Id, Rule, Premises,
+               equivalent(domain(Domain), modes(Modes))),
+    Program, Rewritten) :-
+    integer(Id),
+    Id > 0,
+    Premises == [],
+    ground(Domain),
+    ground(Modes),
+    apply_proof_rule(Rule, Program, Rewritten).
+
+apply_proof_rule(identity, Program, Program).
+apply_proof_rule(reorder_goals, Program, Rewritten) :-
+    valid_reordering_program(Program),
+    copy_term(Program, ProgramCopy),
+    reorder_program(ProgramCopy, Rewritten, 1).
+apply_proof_rule(Rule, Program, Rewritten) :-
+    memberchk(Rule, [unfold, fold]),
+    valid_rewrite_program(Program),
+    copy_term(Program, ProgramCopy),
+    rewrite_program(Rule, ProgramCopy, Rewritten).
 
 valid_rewrite_program(mnn_program(_, _, Predicates, _, _)) :-
     is_list(Predicates),
