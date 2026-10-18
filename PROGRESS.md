@@ -50,19 +50,21 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   full termination or user specifications, and user-declared measures remain
   unsupported.
 - **Stage 4 — loop2: in progress.** `mnn_loop2:convert_program/3` converts
-  `findall/3` over a predicate consisting only of ground facts, or `member/2`,
-  `nth0/3`, and `nth1/3` over ground proper lists, when each matching template
-  instance is ground. List order, duplicate answers, and zero-based or one-based
-  indices are preserved. It also handles `between/3` with integer literal bounds
-  and a variable or integer third argument, optionally followed by whitelisted
+  `findall/3` over a predicate consisting only of ground facts, including calls
+  with bound or partially instantiated arguments, or `member/2`, `nth0/3`, and
+  `nth1/3` over ground proper lists, when each matching template instance is
+  ground. List order, duplicate answers, and zero-based or one-based indices are
+  preserved. It also handles `between/3` with integer literal bounds and a
+  variable or integer third argument, optionally followed by whitelisted
   arithmetic comparisons; ranges are limited to 10,000 values and reversed
   bounds produce an empty result. The supported comparisons and arithmetic
   operators are listed in `docs/loop2.md`. Finite acyclic rule generators are
   supported when their bodies contain only conjunction, disjunction, `true`,
-  `fail`, supported source calls, and bound whitelisted arithmetic comparisons.
-  Arbitrary predicate filters, variable bounds, recursive dependencies,
-  unsupported rule bodies, nested `findall/3`, and independent checking of
-  conversion proofs remain unsupported. The converter
+  `fail`, supported source calls, and bound whitelisted arithmetic comparisons;
+  bound call arguments are matched against rule heads. Arbitrary predicate
+  filters, variable bounds, recursive dependencies, unsupported rule bodies,
+  nested `findall/3`, and independent checking of conversion proofs remain
+  unsupported. The converter
   emits a distinct deterministic recursive list-copy helper for each conversion.
   Its report cites the findall-to-fold lemma and
   records finiteness, safe-filter, and determinism side conditions as an

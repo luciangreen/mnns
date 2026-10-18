@@ -56,10 +56,12 @@ inference are not implemented; see [`detlog.md`](detlog.md).
 ## loop2 conversion
 
 `mnn_loop2:convert_program/3` currently handles a `findall/3` whose generator is
-a direct call to a predicate made entirely of ground facts, a call through a
-finite acyclic chain of supported facts and rules, or `member/2` over a ground
-proper list, `nth0/3` or `nth1/3` over a ground proper list, or `between/3` with
-integer literal bounds and a variable or integer generator argument. Rule bodies
+A direct call to a predicate made entirely of ground facts (including calls
+with bound or partially instantiated arguments), a call through a finite acyclic
+chain of supported facts and rules (also matching bound call arguments against
+rule heads), or `member/2` over a ground proper list, `nth0/3` or `nth1/3` over
+a ground proper list, or `between/3` with integer literal bounds and a variable
+or integer generator argument. Rule bodies
 are limited to conjunction, disjunction, `true`, `fail`, supported source
 predicate calls, and whitelisted arithmetic comparisons; recursive dependencies
 and other goals are left unchanged. These generators may be followed by

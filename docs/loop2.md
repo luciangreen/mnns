@@ -5,12 +5,16 @@ program and returns a `loop2_report/1`.
 
 The current supported subset is deliberately narrow:
 
-- A direct call to a predicate whose clauses are all ground facts, optionally
-  followed by arithmetic comparisons in a conjunction.
+- A direct call to a predicate whose clauses are all ground facts, including
+  calls with bound or partially instantiated arguments, optionally followed by
+  arithmetic comparisons in a conjunction. Each fact is matched against a copy
+  of the call, so nonmatching facts are excluded and source order is preserved.
 - A call to a finite, acyclic chain of facts and rules. Rule bodies may use
   conjunction, disjunction, `true`, `fail`, other supported source-predicate
   calls, and supported arithmetic comparisons. Clause order and answer order
-  are preserved, including answers from multi-clause rules.
+  are preserved, including answers from multi-clause rules. Bound or partially
+  instantiated arguments on the generator call are matched against rule heads
+  and act as filters.
 - `member/2` over a ground proper list, optionally followed by arithmetic
   comparisons. List order and duplicate elements are preserved.
 - `nth0/3` or `nth1/3` over a ground proper list, optionally followed by
