@@ -36,9 +36,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   wrappers. The separate measure analysis identifies a structural measure when
   every direct self-recursive call passes a strict subterm of the same compound
   argument (including nested compound subterms); it reports per-call decrease
-  obligations. Mutual recursion, arithmetic measures and other unsupported
-  forms are explicitly reported as unavailable. It does not yet verify full
-  termination, generate induction obligations, or check user specifications.
+  obligations. It also recognizes a narrow natural-number decrease pattern
+  with an integer type test, a positive guard, and a direct subtraction before
+  each recursive call. Mutual recursion, other arithmetic measures and other
+  unsupported forms are explicitly reported as unavailable. It does not yet
+  verify full termination, generate induction proofs, or check user
+  specifications.
 
 ## Remaining stages
 
@@ -46,7 +49,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground definition introduction, and narrow ground unfold/fold only) |
-| 3 | PID termination measures and induction obligations | In progress (call-graph classification and strict structural subterm measures; induction obligations and broader measure forms remain) |
+| 3 | PID termination measures and induction obligations | In progress (call-graph classification, strict structural subterm measures, and a guarded natural-number decrement subset; induction proofs and broader measure forms remain) |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |

@@ -9,8 +9,13 @@ nested compound subterms. A result such as
 `measure(structural(2), Obligations)` identifies the argument and records the
 recursive clause and call for each checked decrease.
 
+It also recognizes a narrow natural-number pattern: the clause must test
+`integer(N)` and `N > 0`, then compute `N1 is N - K` for a positive integer
+constant `K`, and recurse directly on `N1`. These four goals must occur in that
+order in a conjunction; this restriction ensures the guards hold before the
+decrease and excludes unbound and non-integer inputs.
+
 The measure analysis does not claim full termination. Mutual recursion,
-arithmetic measures, unbound arguments, and recursive calls that do not use a
-strict subterm of the identified argument are reported as unavailable. The
-analysis does not yet produce induction proofs or check a user-supplied
-specification.
+other arithmetic measures, unbound arguments, and recursive calls that do not
+match a supported decrease pattern are reported as unavailable. It does not
+yet produce full induction proofs or check a user-supplied specification.
