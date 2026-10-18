@@ -35,6 +35,15 @@ analyze_predicate_measure(Predicates, _, Key,
     between(1, Arity, Argument),
     maplist(decreases_structurally(Argument), Calls, Obligations),
     !.
+analyze_predicate_measure(Predicates, _, Key,
+                          predicate(Key, measure(natural(Argument),
+                                                 Obligations))) :-
+    recursive_calls(Predicates, Key, Calls),
+    Calls = [_|_],
+    Key = _/Arity,
+    between(1, Arity, Argument),
+    maplist(decreases_naturally(Argument), Calls, Obligations),
+    !.
 analyze_predicate_measure(_, _, Key,
                           predicate(Key,
                                     unavailable(no_decreasing_structural_measure))).
@@ -49,11 +58,12 @@ recursive_calls_in_clauses([], _, []).
 recursive_calls_in_clauses(
     [mnn_clause(Id, Head, Body, _)|Clauses], Key, Calls) :-
     goal_recursive_calls(Body, Key, ClauseCalls),
-    maplist(add_recursive_site(Id, Head), ClauseCalls, IdentifiedCalls),
+    maplist(add_recursive_site(Id, Head, Body), ClauseCalls, IdentifiedCalls),
     recursive_calls_in_clauses(Clauses, Key, OtherCalls),
     append(IdentifiedCalls, OtherCalls, Calls).
 
-add_recursive_site(Id, Head, Call, recursive_site(Id, Head, Call)).
+add_recursive_site(Id, Head, Body, Call,
+                   recursive_site(Id, Head, Body, Call)).
 
 goal_recursive_calls(conj(Left, Right), Key, Calls) :-
     !,
@@ -83,13 +93,43 @@ goal_recursive_calls(Goal, Key, [Goal]) :-
 goal_recursive_calls(_, _, []).
 
 decreases_structurally(
-    Argument, recursive_site(Id, Head, Call),
+    Argument, recursive_site(Id, Head, _, Call),
     decrease(Id, Call, structural(Argument))) :-
     arg(Argument, Head, HeadArgument),
     nonvar(HeadArgument),
     acyclic_term(HeadArgument),
     arg(Argument, Call, CallArgument),
     strict_subterm(CallArgument, HeadArgument).
+
+decreases_naturally(
+    Argument, recursive_site(Id, Head, Body, Call),
+    decrease(Id, Call, natural(Argument))) :-
+    arg(Argument, Head, Measure),
+    var(Measure),
+    arg(Argument, Call, Next),
+    var(Next),
+    Measure \== Next,
+    conjunction_goals(Body, Goals),
+    append(_, [integer(GuardedMeasure), PositiveGuard,
+               is(AssignedNext, -(DecrementedMeasure, Step)),
+               RecursiveCall|_], Goals),
+    GuardedMeasure == Measure,
+    PositiveGuard = >(PositiveMeasure, 0),
+    PositiveMeasure == Measure,
+    AssignedNext == Next,
+    DecrementedMeasure == Measure,
+    integer(Step),
+    Step > 0,
+    RecursiveCall == Call.
+
+conjunction_goals(conj(Left, Right), Goals) :-
+    !,
+    conjunction_goals(Left, LeftGoals),
+    conjunction_goals(Right, RightGoals),
+    append(LeftGoals, RightGoals, Goals).
+conjunction_goals(true, []) :-
+    !.
+conjunction_goals(Goal, [Goal]).
 
 strict_subterm(Subterm, Term) :-
     compound(Term),

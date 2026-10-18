@@ -86,6 +86,62 @@ test(finds_measure_for_nested_compound_subterm) :-
                       measure(structural(1),
                               [decrease(1, walk(_), structural(1))]))])).
 
+test(finds_guarded_natural_number_decrease) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(count/1, ['?'], [any],
+                           [mnn_clause(1, count(0), true, source(sample, 1)),
+                            mnn_clause(
+                               2, count(N),
+                               conj(integer(N),
+                                    conj(>(N, 0),
+                                         conj(is(Next, -(N, 1)),
+                                              count(Next)))),
+                               source(sample, 2))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(count/1,
+                       measure(natural(1),
+                              [decrease(2, count(_), natural(1))]))])).
+
+test(rejects_natural_decrease_without_integer_guard) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(count/1, ['?'], [any],
+                           [mnn_clause(
+                               1, count(N),
+                               conj(>(N, 0),
+                                    conj(is(Next, -(N, 1)), count(Next))),
+                               source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(count/1,
+                       unavailable(no_decreasing_structural_measure))])).
+
+test(rejects_natural_decrease_with_guard_after_recursive_call) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(count/1, ['?'], [any],
+                           [mnn_clause(
+                               1, count(N),
+                               conj(is(Next, -(N, 1)),
+                                    conj(count(Next),
+                                         conj(integer(N), >(N, 0)))),
+                               source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(count/1,
+                       unavailable(no_decreasing_structural_measure))])).
+
 test(rejects_recursive_call_that_does_not_use_list_tail) :-
     Program = mnn_program(
                   sample, meta(sample, []),
