@@ -428,10 +428,7 @@ fold_definition(Goal, Head, Body, RewrittenHead) :-
 safe_variable_definition(Head, Body) :-
     Head =.. [_Name, Argument],
     var(Argument),
-<<<<<<< HEAD
-=======
     nonvar(Body),
->>>>>>> origin/main
     safe_variable_pure_goal(Body, Argument).
 
 safe_variable_pure_goal(true, _).
