@@ -129,7 +129,8 @@ source_body(Goal, Goal).
 check_goal(Goal) :-
     (   sub_term(Subgoal, Goal),
         nonvar(Subgoal),
-        Subgoal = call(_)
+        functor(Subgoal, call, Arity),
+        Arity > 0
     ->  throw(error(domain_error(call_free_goal, Goal), _))
     ;   true
     ).
