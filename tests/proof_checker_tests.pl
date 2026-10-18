@@ -212,6 +212,56 @@ test(accept_bounded_between_findall_to_fold_with_bound_value) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_fact_findall_to_fold_preserving_patterns_and_duplicates) :-
+    fact_findall_to_fold_programs(Value, pair(a, Value), Original, Program),
+    Program = mnn_program(_, _,
+                          [_, mnn_pred(_, _, _,
+                                       [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                   _)],
+                                       _)|_],
+                          _, _),
+    assertion(Values == [1, 1]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_ground_fact_findall_to_fold_with_changed_values) :-
+    fact_findall_to_fold_programs(Value, pair(a, Value), Original, Program0),
+    Program0 = mnn_program(Name, Meta,
+                           [Facts, Predicate, Helper], ProofData, Trace),
+    Predicate = mnn_pred(numbers/1, Modes, Domains,
+                          [mnn_clause(4, numbers(Results),
+                                      mnn_loop2_1([1, 1], Results), Source)],
+                          Status),
+    Program = mnn_program(
+                  Name, Meta,
+                  [Facts,
+                   mnn_pred(numbers/1, Modes, Domains,
+                            [mnn_clause(4, numbers(Results),
+                                        mnn_loop2_1([1], Results), Source)],
+                            Status),
+                   Helper],
+                  ProofData, Trace),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_non_ground_fact_generator_findall_to_fold) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1), clause(2)]),
+                   [mnn_pred(pair/2, ['?', '?'], [any, any],
+                             [mnn_clause(1, pair(a, _), true, source(source, 1))],
+                             original),
+                    mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(2, numbers(Results),
+                                         findall(Value, pair(a, Value), Results),
+                                         source(source, 2))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, loop2_report([])),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_reversed_between_findall_to_fold_as_empty) :-
     between_findall_to_fold_programs(4, 2, Value, Value, Original, Program),
     Program = mnn_program(_, _,
@@ -948,6 +998,24 @@ findall_to_fold_programs(
                                        Results),
                                source(source, 1))],
                    original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+fact_findall_to_fold_programs(
+    Template, Generator, Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1), clause(2), clause(3),
+                                         clause(4)]),
+                   [mnn_pred(pair/2, ['?', '?'], [any, any],
+                             [mnn_clause(1, pair(a, 1), true, source(source, 1)),
+                              mnn_clause(2, pair(b, 2), true, source(source, 2)),
+                              mnn_clause(3, pair(a, 1), true, source(source, 3))],
+                             original),
+                    mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(4, numbers(Results),
+                                         findall(Template, Generator, Results),
+                                         source(source, 4))],
+                             original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
 

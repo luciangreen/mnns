@@ -228,13 +228,13 @@ findall_candidate(Predicates, PredicateIndex, ClauseIndex, Values, Results) :-
     arg(3, Clause, Body),
     nonvar(Body),
     Body = findall(Template, Generator, Results),
-    findall_candidate_values(Template, Generator, Values).
+    findall_candidate_values(Predicates, Template, Generator, Values).
 
-findall_candidate_values(Template, member(Value, List), List) :-
+findall_candidate_values(_, Template, member(Value, List), List) :-
     Template == Value,
     ground(List),
     is_list(List).
-findall_candidate_values(Template, nth0(Index, List, Value), Indices) :-
+findall_candidate_values(_, Template, nth0(Index, List, Value), Indices) :-
     Template == Index,
     var(Index),
     var(Value),
@@ -242,7 +242,7 @@ findall_candidate_values(Template, nth0(Index, List, Value), Indices) :-
     ground(List),
     is_list(List),
     list_indices(List, Indices).
-findall_candidate_values(Template, nth1(Index, List, Value), Indices) :-
+findall_candidate_values(_, Template, nth1(Index, List, Value), Indices) :-
     Template == Index,
     var(Index),
     var(Value),
@@ -250,7 +250,7 @@ findall_candidate_values(Template, nth1(Index, List, Value), Indices) :-
     ground(List),
     is_list(List),
     list_indices(List, 1, Indices).
-findall_candidate_values(Template, length(List, Length), Values) :-
+findall_candidate_values(_, Template, length(List, Length), Values) :-
     ground(List),
     is_list(List),
     (   var(Length)
@@ -264,7 +264,7 @@ findall_candidate_values(Template, length(List, Length), Values) :-
         Values = [TemplateCopy]
     ;   Values = []
     ).
-findall_candidate_values(Template, between(Low, High, Value), Values) :-
+findall_candidate_values(_, Template, between(Low, High, Value), Values) :-
     integer(Low),
     integer(High),
     (   var(Value)
@@ -272,10 +272,41 @@ findall_candidate_values(Template, between(Low, High, Value), Values) :-
     ),
     between_candidate_numbers(Low, High, Numbers),
     between_candidate_values(Numbers, Value, Template, Values).
-findall_candidate_values(Template, select(Value, List, Rest), Values) :-
+findall_candidate_values(_, Template, select(Value, List, Rest), Values) :-
     ground(List),
     is_list(List),
     select_candidate_values(List, Value, Rest, Template, Values).
+findall_candidate_values(Predicates, Template, Generator, Values) :-
+    fact_generator_clauses(Predicates, Generator, Clauses),
+    fact_candidate_values(Clauses, Generator, Template, Values).
+
+fact_generator_clauses(Predicates, Generator, Clauses) :-
+    nonvar(Generator),
+    callable(Generator),
+    \+ predicate_property(system:Generator, built_in),
+    functor(Generator, Name, Arity),
+    Key = Name/Arity,
+    findall(FoundClauses,
+            ( member(mnn_pred(FoundKey, _, _, FoundClauses, _), Predicates),
+              FoundKey == Key
+            ),
+            [Clauses]),
+    Clauses \= [],
+    maplist(ground_fact_clause, Clauses).
+
+ground_fact_clause(mnn_clause(_, Head, true, _)) :-
+    ground(Head).
+
+fact_candidate_values([], _, _, []).
+fact_candidate_values([mnn_clause(_, Head, true, _)|Clauses],
+                      Generator, Template, Values) :-
+    copy_term((Generator, Template), (GeneratorCopy, TemplateCopy)),
+    (   GeneratorCopy = Head
+    ->  ground(TemplateCopy),
+        Values = [TemplateCopy|Rest]
+    ;   Values = Rest
+    ),
+    fact_candidate_values(Clauses, Generator, Template, Rest).
 
 between_candidate_numbers(Low, High, Numbers) :-
     (   Low > High
