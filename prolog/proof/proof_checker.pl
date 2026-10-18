@@ -276,10 +276,12 @@ introduce_definition(
     ;   max_list(Ids, MaxId),
         HelperId is MaxId + 1
     ),
-    introduce_in_predicates(Predicates, HelperName, Introduced, Goal),
+    introduce_in_predicates(Predicates, HelperName, Introduced, Call, Goal),
+    introduced_definition(HelperName, Goal, HelperKey, HelperModes,
+                         HelperDomains, HelperHead, HelperBody),
     append(Introduced,
-           [mnn_pred(HelperName/0, [], [],
-                     [mnn_clause(HelperId, HelperName, Goal,
+           [mnn_pred(HelperKey, HelperModes, HelperDomains,
+                     [mnn_clause(HelperId, HelperHead, HelperBody,
                                  source(generated, 0))],
                      introduced)],
            IntroducedPredicates).
@@ -299,11 +301,15 @@ clause_ids_in_clauses([mnn_clause(Id, _, _, _)|Clauses], [Id|Ids]) :-
 
 helper_name(Predicates, Index, Name) :-
     format(atom(Name), 'mnn_definition_~d', [Index]),
-    Key = Name/0,
-    (   predicate_key_exists(Predicates, Key)
+    (   helper_name_exists(Predicates, Name)
     ->  Next is Index + 1,
         helper_name(Predicates, Next, Name)
     ;   true
+    ).
+
+helper_name_exists(Predicates, Name) :-
+    (   predicate_key_exists(Predicates, Name/0)
+    ;   predicate_key_exists(Predicates, Name/1)
     ).
 
 predicate_key_exists([Predicate|_], Key) :-
@@ -314,58 +320,75 @@ predicate_key_exists([_|Predicates], Key) :-
     predicate_key_exists(Predicates, Key).
 
 introduce_in_predicates([Predicate|Predicates], Name,
-                        [Introduced|Predicates], Goal) :-
-    introduce_in_predicate(Predicate, Name, Introduced, Goal),
+                        [Introduced|Predicates], Call, Goal) :-
+    introduce_in_predicate(Predicate, Name, Introduced, Call, Goal),
     !.
 introduce_in_predicates([Predicate|Predicates], Name,
-                        [Predicate|Introduced], Goal) :-
-    introduce_in_predicates(Predicates, Name, Introduced, Goal).
+                        [Predicate|Introduced], Call, Goal) :-
+    introduce_in_predicates(Predicates, Name, Introduced, Call, Goal).
 
 introduce_in_predicate(
     mnn_pred(Key, Modes, Domains, Clauses, Status), Name,
-    mnn_pred(Key, Modes, Domains, IntroducedClauses, Status), Goal) :-
-    introduce_in_clauses(Clauses, Name, IntroducedClauses, Goal).
+    mnn_pred(Key, Modes, Domains, IntroducedClauses, Status), Call, Goal) :-
+    introduce_in_clauses(Clauses, Name, IntroducedClauses, Call, Goal).
 
 introduce_in_clauses([Clause|Clauses], Name,
-                     [Introduced|Clauses], Goal) :-
-    introduce_in_clause(Clause, Name, Introduced, Goal),
+                     [Introduced|Clauses], Call, Goal) :-
+    introduce_in_clause(Clause, Name, Introduced, Call, Goal),
     !.
 introduce_in_clauses([Clause|Clauses], Name,
-                     [Clause|Introduced], Goal) :-
-    introduce_in_clauses(Clauses, Name, Introduced, Goal).
+                     [Clause|Introduced], Call, Goal) :-
+    introduce_in_clauses(Clauses, Name, Introduced, Call, Goal).
 
 introduce_in_clause(
     mnn_clause(Id, Head, Body, Source), Name,
-    mnn_clause(Id, Head, IntroducedBody, Source), Goal) :-
-    introduce_in_goal(Body, Name, IntroducedBody, Goal).
+    mnn_clause(Id, Head, IntroducedBody, Source), Call, Goal) :-
+    introduce_in_goal(Body, Name, IntroducedBody, Call, Goal).
 
-introduce_in_goal(Goal, Name, Name, Goal) :-
+introduce_in_goal(Goal, Name, Name, Goal, Goal) :-
     ground(Goal),
     safe_pure_goal(Goal),
     !.
-introduce_in_goal(conj(Left, Right), Name, conj(Introduced, Right), Goal) :-
-    introduce_in_goal(Left, Name, Introduced, Goal),
+introduce_in_goal(Goal, Name, Call, Goal, Goal) :-
+    term_variables(Goal, [Argument]),
+    safe_variable_pure_goal(Goal, Argument),
+    Call =.. [Name, Argument],
     !.
-introduce_in_goal(conj(Left, Right), Name, conj(Left, Introduced), Goal) :-
-    introduce_in_goal(Right, Name, Introduced, Goal).
-introduce_in_goal(disj(Left, Right), Name, disj(Introduced, Right), Goal) :-
-    introduce_in_goal(Left, Name, Introduced, Goal),
+introduce_in_goal(conj(Left, Right), Name,
+                  conj(Introduced, Right), Call, Goal) :-
+    introduce_in_goal(Left, Name, Introduced, Call, Goal),
     !.
-introduce_in_goal(disj(Left, Right), Name, disj(Left, Introduced), Goal) :-
-    introduce_in_goal(Right, Name, Introduced, Goal).
+introduce_in_goal(conj(Left, Right), Name,
+                  conj(Left, Introduced), Call, Goal) :-
+    introduce_in_goal(Right, Name, Introduced, Call, Goal).
+introduce_in_goal(disj(Left, Right), Name,
+                  disj(Introduced, Right), Call, Goal) :-
+    introduce_in_goal(Left, Name, Introduced, Call, Goal),
+    !.
+introduce_in_goal(disj(Left, Right), Name,
+                  disj(Left, Introduced), Call, Goal) :-
+    introduce_in_goal(Right, Name, Introduced, Call, Goal).
 introduce_in_goal(ite(If, Then, Else), Name,
-                  ite(Introduced, Then, Else), Goal) :-
-    introduce_in_goal(If, Name, Introduced, Goal),
+                  ite(Introduced, Then, Else), Call, Goal) :-
+    introduce_in_goal(If, Name, Introduced, Call, Goal),
     !.
 introduce_in_goal(ite(If, Then, Else), Name,
-                  ite(If, Introduced, Else), Goal) :-
-    introduce_in_goal(Then, Name, Introduced, Goal),
+                  ite(If, Introduced, Else), Call, Goal) :-
+    introduce_in_goal(Then, Name, Introduced, Call, Goal),
     !.
 introduce_in_goal(ite(If, Then, Else), Name,
-                  ite(If, Then, Introduced), Goal) :-
-    introduce_in_goal(Else, Name, Introduced, Goal).
-introduce_in_goal(not(Goal), Name, not(Introduced), Extracted) :-
-    introduce_in_goal(Goal, Name, Introduced, Extracted).
+                  ite(If, Then, Introduced), Call, Goal) :-
+    introduce_in_goal(Else, Name, Introduced, Call, Goal).
+introduce_in_goal(not(Goal), Name, not(Introduced), Call, Extracted) :-
+    introduce_in_goal(Goal, Name, Introduced, Call, Extracted).
+
+introduced_definition(Name, Goal, Name/0, [], [], Name, Goal) :-
+    term_variables(Goal, []),
+    !.
+introduced_definition(Name, Goal, Name/1, ['?'], [any], Head, Body) :-
+    term_variables(Goal, [Argument]),
+    copy_term(Argument-Goal, FreshArgument-Body),
+    Head =.. [Name, FreshArgument].
 
 safe_definition(Predicates, Key, Head, Body) :-
     member(mnn_pred(Key, _, _, [mnn_clause(_, Head, Body, _)], _),
