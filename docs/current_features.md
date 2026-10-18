@@ -51,10 +51,11 @@ by their syntactic tail position. See [`pid.md`](pid.md).
 
 `mnn_detlog:analyze_determinism/2` classifies success counts for a bounded set
 of normalized goals in the all-arguments-unbound mode. It reports unsupported
-goals rather than guessing; acyclic zero-arity calls within the program are
-analyzed recursively, while recursive zero-arity and argument-bearing calls
-remain unavailable. Choicepoint/cut conversion and general mode inference are
-not implemented; see [`detlog.md`](detlog.md).
+goals rather than guessing; acyclic user-predicate calls within the program are
+analyzed recursively when their arguments are distinct unbound variables, while
+recursive, bound-argument, and repeated-argument calls remain unavailable.
+Choicepoint/cut conversion and general mode inference are not implemented; see
+[`detlog.md`](detlog.md).
 
 ## loop2 conversion
 
