@@ -21,14 +21,15 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   command).
 - **Stage 2 — proof system: in progress.** An independent checker now accepts a
   narrow identity proof for alpha-equivalent IR programs and rejects malformed,
-  unsupported or inequivalent proofs. No rewrite rule is certified yet.
+  unsupported or inequivalent proofs. Identity proofs can be rendered as checked
+  Markdown reports. No rewrite rule is certified yet.
 
 ## Remaining stages
 
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity rule only) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity rule and rendering only) |
 | 3 | PID termination measures and induction obligations | Not started |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |
