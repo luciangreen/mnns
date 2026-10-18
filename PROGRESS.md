@@ -9,9 +9,10 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   The initial parser/emitter slice is in place for ordinary clauses, facts,
   directives and normalized conjunction, disjunction, if-then(-else) and
   negation. Source locations and source order are retained, and `call/1` is
-  rejected. Stage 1 is not complete: the sandboxed runner, CI, full supported
-  syntax coverage and the complete acceptance corpus remain to be implemented and
-  validated.
+  rejected. A round-trip corpus now covers recursive rules, cuts, control flow,
+  generators, lists, arithmetic, strings and terms. Stage 1 is not complete: the
+  sandboxed runner, CI, full supported syntax coverage and the complete acceptance
+  corpus remain to be implemented and validated.
 - Current validation command: `swipl -q -s tests/run.pl` (not run in this
   environment because SWI-Prolog is unavailable).
 
