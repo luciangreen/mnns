@@ -90,6 +90,17 @@ goal_outcomes(Goal, _, _, Outcomes) :-
     ),
     !,
     between_outcomes(Low, High, Value, Outcomes).
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    nonvar(Goal),
+    Goal = member(Value, List),
+    ground(List),
+    is_list(List),
+    (   var(Value)
+    ;   ground(Value)
+    ),
+    \+ member(mnn_pred(member/2, _, _, _, _), Predicates),
+    !,
+    member_outcomes(Value, List, Outcomes).
 goal_outcomes(Goal, _, _, Outcomes) :-
     semidet_builtin(Goal),
     ground(Goal),
@@ -302,6 +313,28 @@ between_outcomes(Low, High, Value, Outcomes) :-
         Value =< High
     ->  Outcomes = [1]
     ;   Outcomes = [0]
+    ).
+
+member_outcomes(Value, List, [0]) :-
+    member_success_count(Value, List, 0, 0),
+    !.
+member_outcomes(Value, List, [1]) :-
+    member_success_count(Value, List, 0, 1),
+    !.
+member_outcomes(Value, List, [2]) :-
+    member_success_count(Value, List, 0, 2).
+
+member_success_count(_, [], Count, Count).
+member_success_count(Value, [Element|Elements], Count0, Count) :-
+    (   var(Value)
+    ->  Count1 is min(2, Count0 + 1)
+    ;   Value == Element
+    ->  Count1 is min(2, Count0 + 1)
+    ;   Count1 = Count0
+    ),
+    (   Count1 =:= 2
+    ->  Count = 2
+    ;   member_success_count(Value, Elements, Count1, Count)
     ).
 
 outcomes_determinism([0], failure) :-
