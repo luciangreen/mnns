@@ -158,6 +158,16 @@ finite_generator_values(_, Generator, Template, Values,
     length(List, Count),
     !.
 finite_generator_values(_, Generator, Template, Values,
+                        finite_ground_select, Count, FilterCount) :-
+    generator_parts(Generator, select(Value, List, Rest), Filters),
+    ground(List),
+    is_list(List),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
+    select_candidate_values(List, Value, Rest, Template, Filters, Values),
+    length(List, Count),
+    !.
+finite_generator_values(_, Generator, Template, Values,
                         finite_ground_between, Count, FilterCount) :-
     generator_parts(Generator, between(Low, High, Value), Filters),
     integer(Low),
@@ -450,6 +460,29 @@ member_candidate_values([Candidate|Candidates], Value, Template, Filters, Values
         )
     ;   member_candidate_values(Candidates, Value, Template, Filters, Values)
     ).
+
+select_candidate_values(List, Value, Rest, Template, Filters, Values) :-
+    select_candidate_values(List, [], Value, Rest, Template, Filters, Values).
+
+select_candidate_values([], _, _, _, _, _, []).
+select_candidate_values([Candidate|Candidates], Prefix, Value, Rest,
+                        Template, Filters, Values) :-
+    copy_term((Value, Rest, Template, Filters),
+              (ValueCopy, RestCopy, TemplateCopy, FiltersCopy)),
+    reverse(Prefix, PrefixInOrder),
+    append(PrefixInOrder, Candidates, SelectedRest),
+    (   ValueCopy = Candidate,
+        RestCopy = SelectedRest
+    ->  evaluate_filters(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|RemainingValues]
+        ;   Values = RemainingValues
+        )
+    ;   Values = RemainingValues
+    ),
+    select_candidate_values(Candidates, [Candidate|Prefix], Value, Rest,
+                           Template, Filters, RemainingValues).
 
 evaluate_filters([], true).
 evaluate_filters([Filter|Filters], Result) :-

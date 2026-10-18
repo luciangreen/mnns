@@ -66,8 +66,8 @@ Choicepoint/cut conversion and general mode inference are not implemented; see
 A direct call to a predicate made entirely of ground facts (including calls
 with bound or partially instantiated arguments), a call through a finite acyclic
 chain of supported facts and rules (also matching bound call arguments against
-rule heads), or `member/2` over a ground proper list, `nth0/3` or `nth1/3` over
-a ground proper list, or `between/3` with integer literal bounds and a variable
+rule heads), or `member/2`, `select/3`, `nth0/3` or `nth1/3` over a ground proper
+list, or `between/3` with integer literal bounds and a variable
 or integer generator argument, or `length/2` over a ground proper list with a
 variable or nonnegative integer length. Rule bodies
 are limited to conjunction, disjunction, `true`, `fail`, supported source
@@ -75,9 +75,10 @@ predicate calls, and whitelisted arithmetic comparisons; recursive dependencies
 and other goals are left unchanged. These generators may be followed by
 arithmetic comparisons over values bound by the generator. Between ranges up to
 10,000 values are supported, including reversed and singleton ranges; larger
-ranges are left unchanged. Member and index-based generators preserve list order
-and duplicates, including the zero-based or one-based indices from `nth0/3` and
-`nth1/3`. The supported comparisons are `>`, `>=`, `<`, `=<`, `=:=`, and `=\=`;
+ranges are left unchanged. Member, selection, and index-based generators
+preserve list order and duplicates, including selection remainders and the
+zero-based or one-based indices from `nth0/3` and `nth1/3`. The supported
+comparisons are `>`, `>=`, `<`, `=<`, `=:=`, and `=\=`;
 arithmetic expressions allow numeric constants, unary `+`, `-`, `abs`, and
 binary `+`, `-`, `*`, `/`, `//`, `mod`, and `rem`. Ground templates are required
 for each result that passes its filter. Arbitrary predicates in filters,

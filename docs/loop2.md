@@ -17,6 +17,10 @@ The current supported subset is deliberately narrow:
   and act as filters.
 - `member/2` over a ground proper list, optionally followed by arithmetic
   comparisons. List order and duplicate elements are preserved.
+- `select/3` over a ground proper list, optionally followed by arithmetic
+  comparisons. Selection order, duplicate positions, and each resulting
+  remainder list are preserved; element and remainder arguments may be
+  constrained by term patterns.
 - `nth0/3` or `nth1/3` over a ground proper list, optionally followed by
   arithmetic comparisons. The index may be a variable or integer, and the
   element may be constrained by a term pattern. Zero-based and one-based index
@@ -46,7 +50,8 @@ non-ground or non-integer bounds, or ranges above the limit, also remains
 unchanged. `nth0/3` and `nth1/3` with a variable or improper list, or with an
 index that is neither a variable nor an integer, remain unchanged.
 `length/2` with a variable or improper list, or with a negative or non-integer
-length, remains unchanged.
+length, remains unchanged. `select/3` with a variable or improper list also
+remains unchanged.
 
 Rule bodies are interpreted only through this bounded pure subset; the
 converter does not execute arbitrary rule goals. A dependency cycle, cut,

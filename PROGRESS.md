@@ -53,11 +53,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   lists recursive calls that are followed by more work.
 - **Stage 4 — loop2: in progress.** `mnn_loop2:convert_program/3` converts
   `findall/3` over a predicate consisting only of ground facts, including calls
-  with bound or partially instantiated arguments, or `member/2`, `nth0/3`, and
-  `nth1/3` over ground proper lists, and `length/2` over a ground proper list
-  with a variable or nonnegative integer length, when each matching template
-  instance is ground. List order, duplicate answers, and zero-based or one-based indices are
-  preserved. It also handles `between/3` with integer literal bounds and a
+  with bound or partially instantiated arguments; `member/2`, `select/3`,
+  `nth0/3`, and `nth1/3` over ground proper lists; and `length/2` over a ground
+  proper list with a variable or nonnegative integer length. Each matching
+  template instance must be ground. List order, duplicate answers, indices, and
+  selection remainders are preserved. It also handles `between/3` with integer
+  literal bounds and a
   variable or integer third argument, optionally followed by whitelisted
   arithmetic comparisons; ranges are limited to 10,000 values and reversed
   bounds produce an empty result. The supported comparisons and arithmetic
@@ -81,7 +82,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
-| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and checked conversion proofs remain) |
+| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode, including acyclic calls with distinct unbound arguments and `once/1` count capping; general mode inference, bound/repeated-argument calls, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |
