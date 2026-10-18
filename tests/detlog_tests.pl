@@ -110,16 +110,16 @@ test(once_caps_multiple_successes_at_one) :-
 test(once_preserves_possible_failure) :-
     Program = mnn_program(
                   sample, meta(sample, []),
-                  [mnn_pred(maybe_once/0, [], [],
-                           [mnn_clause(1, maybe_once,
-                                       once(disj(fail, disj(true, true))),
+                  [mnn_pred(maybe_once/1, ['?'], [any],
+                           [mnn_clause(1, maybe_once(Value),
+                                       once(integer(Value)),
                                        source(sample, 1))],
                            original)],
                   proof([]), trace([])),
     mnn_detlog:analyze_determinism(
         Program,
         detlog_report(
-            [predicate(maybe_once/0, mode(all_arguments_unbound),
+            [predicate(maybe_once/1, mode(all_arguments_unbound),
                        determinism(semidet), success_counts([0, 1]))])).
 
 test(once_propagates_unsupported_inner_goals) :-

@@ -50,20 +50,22 @@ test(normalizes_and_emits_once_goal) :-
                              once((X = first ; X = second)))]),
           mnn_ir:parse_program(Source, Program),
           Program = mnn_program(_, _, Predicates, _, _),
-          assertion(Predicates = [
+          Predicates = [
               mnn_pred(once_example/1, ['?'], [any],
                        [mnn_clause(_, _,
                                    once(disj(First = first, Second = second)),
                                    _)],
                        original)
-          ]),
+          ],
           assertion(First == Second),
           setup_call_cleanup(
               temporary_source(Emitted),
               ( mnn_ir:emit_program(Program, Emitted),
                 mnn_ir:parse_program(Emitted, Reparsed),
                 Reparsed = mnn_program(_, _, ReparsedPredicates, _, _),
-                assertion(Predicates =@= ReparsedPredicates)
+              canonical_predicates(Predicates, Canonical),
+              canonical_predicates(ReparsedPredicates, ReparsedCanonical),
+              assertion(Canonical =@= ReparsedCanonical)
               ),
               delete_file(Emitted))
         ),
