@@ -208,7 +208,7 @@ test(converts_ground_length_with_matching_and_mismatched_integer) :-
                                        safe_arithmetic_filters(0),
                                        deterministic_loop))])),
     run_converted(Converted, matching(Values), [[[ok]]]),
-    run_converted(Converted, mismatching(Values), [[]]).
+    run_converted(Converted, mismatching(Values), [[[]]]).
 
 test(leaves_negative_length_unchanged) :-
     with_converted_program(
