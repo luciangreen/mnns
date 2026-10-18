@@ -30,21 +30,45 @@ test(generates_distinct_helpers_for_multiple_findalls, [nondet]) :-
     run_converted(Converted, numbers(_), [[[1, 2]]]),
     run_converted(Converted, red_colours(_), [[[x]]]).
 
-test(leaves_filtered_generators_unchanged, [nondet]) :-
+test(converts_supported_arithmetic_filters, [nondet]) :-
     with_converted_program(
         [num(1),
          num(2),
          num(3),
          (numbers(Values) :-
              findall(X, (num(X), X > 1), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_facts(3),
+                                        safe_arithmetic_filters(1),
+                                        deterministic_loop))])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(mnn_pred(mnn_loop2_1/2, _, _, _, generated(loop2)),
+                     Predicates)),
+    run_converted(Converted, numbers(Values), [[[2, 3]]]).
+
+test(leaves_unsupported_or_unbound_filters_unchanged, [nondet]) :-
+    with_converted_program(
+        [num(1),
+         num(2),
+         allowed(2),
+         (using_user_filter(Values) :-
+             findall(X, (num(X), allowed(X)), Values)),
+         (using_unbound_limit(Values, Limit) :-
+             findall(X, (num(X), X > Limit), Values))],
         Converted, loop2_report([])),
     Converted = mnn_program(_, _, Predicates, _, _),
     assertion(member(
-                  mnn_pred(numbers/1, _, _,
+                  mnn_pred(using_user_filter/1, _, _,
                            [mnn_clause(_, _, findall(_, (_, _), _), _)],
                            original),
                   Predicates)),
-    run_converted(Converted, numbers(_), [[[2, 3]]]).
+    assertion(member(
+                  mnn_pred(using_unbound_limit/2, _, _,
+                           [mnn_clause(_, _, findall(_, (_, _), _), _)],
+                           original),
+                  Predicates)).
 
 test(leaves_rule_generators_and_unrelated_cut_unchanged, [nondet]) :-
     with_converted_program(
