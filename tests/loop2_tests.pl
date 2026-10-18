@@ -15,6 +15,20 @@ test(converts_ground_fact_generator_and_preserves_answer_order, [nondet]) :-
                      Predicates)),
     run_converted(Converted, numbers(Values), [[[1, 2, 3]]]).
 
+test(converts_fact_generator_with_bound_arguments, [nondet]) :-
+    with_converted_program(
+        [pair(a, 1),
+         pair(b, 2),
+         pair(a, 3),
+         (values(Values) :- findall(Y, pair(a, Y), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_facts(3),
+                                        safe_arithmetic_filters(0),
+                                        deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[1, 3]]]).
+
 test(generates_distinct_helpers_for_multiple_findalls, [nondet]) :-
     with_converted_program(
         [num(1),
@@ -104,6 +118,21 @@ test(converts_finite_multiclause_rule_generator_in_clause_order, [nondet]) :-
                                         safe_arithmetic_filters(0),
                                         deterministic_loop))])),
     run_converted(Converted, numbers(Values), [[[2, 3, 0]]]).
+
+test(converts_rule_generator_with_bound_arguments, [nondet]) :-
+    with_converted_program(
+        [pair(a, 1),
+         pair(b, 2),
+         pair(a, 3),
+         (selected(X, Y) :- pair(X, Y)),
+         (values(Values) :- findall(Y, selected(a, Y), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_acyclic_rules(2),
+                                        safe_arithmetic_filters(0),
+                                        deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[1, 3]]]).
 
 test(leaves_recursive_and_unbound_rule_generators_unchanged, [nondet]) :-
     with_converted_program(
