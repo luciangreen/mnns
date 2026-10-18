@@ -50,7 +50,8 @@ valid_goal_reordering_proof(Program, Original, Proof) :-
     ground(Modes),
     valid_reordering_program(Original),
     copy_term(Original, OriginalCopy),
-    reorder_program(OriginalCopy, Reordered, 1),
+    reorder_program(OriginalCopy, Reordered, Count),
+    Count =:= 1,
     Program =@= Reordered.
 
 valid_reordering_program(mnn_program(_, _, Predicates, _, _)) :-
@@ -152,7 +153,8 @@ apply_proof_rule(identity, Program, Program).
 apply_proof_rule(reorder_goals, Program, Rewritten) :-
     valid_reordering_program(Program),
     copy_term(Program, ProgramCopy),
-    reorder_program(ProgramCopy, Rewritten, 1).
+    reorder_program(ProgramCopy, Rewritten, Count),
+    Count =:= 1.
 apply_proof_rule(Rule, Program, Rewritten) :-
     memberchk(Rule, [unfold, fold]),
     valid_rewrite_program(Program),

@@ -213,6 +213,23 @@ test(reject_program_difference_beyond_one_reordering) :-
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
+test(reject_multiple_reorderings_in_one_step) :-
+    multiple_reordering_programs(Original, Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_multiple_reorderings_in_proof_sequence) :-
+    multiple_reordering_programs(Original, Program),
+    Proof = proof([
+        proof_step(1, identity, [],
+                   equivalent(domain(any), modes([]))),
+        proof_step(2, reorder_goals, [],
+                   equivalent(domain(any), modes([])))
+    ]),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_malformed_program_without_binding_it) :-
     Original = mnn_program(sample, meta(file, []), Predicates,
                            proof([]), trace([])),
@@ -345,5 +362,27 @@ program_with_body(Body,
                                                     source(file, 1))],
                                         original)],
                               proof([]), trace([]))).
+
+multiple_reordering_programs(
+    mnn_program(sample, meta(file, []),
+                [mnn_pred(first/1, ['?'], [any],
+                          [mnn_clause(1, first(_), conj(integer(3), atom(ok)),
+                                      source(file, 1))],
+                          original),
+                 mnn_pred(second/1, ['?'], [any],
+                          [mnn_clause(2, second(_), conj(number(4), ground(foo)),
+                                      source(file, 2))],
+                          original)],
+                proof([]), trace([])),
+    mnn_program(sample, meta(file, []),
+                [mnn_pred(first/1, ['?'], [any],
+                          [mnn_clause(1, first(_), conj(atom(ok), integer(3)),
+                                      source(file, 1))],
+                          original),
+                 mnn_pred(second/1, ['?'], [any],
+                          [mnn_clause(2, second(_), conj(ground(foo), number(4)),
+                                      source(file, 2))],
+                          original)],
+                proof([]), trace([]))).
 
 :- end_tests(mnn_proof_checker).
