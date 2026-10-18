@@ -82,7 +82,7 @@ semidet_builtin(Goal) :-
     functor(Goal, Name, Arity),
     semidet_builtin_key(Name/Arity).
 
-semidet_builtin_key(=/2).
+semidet_builtin_key((=)/2).
 semidet_builtin_key((\=)/2).
 semidet_builtin_key((==)/2).
 semidet_builtin_key((\==)/2).

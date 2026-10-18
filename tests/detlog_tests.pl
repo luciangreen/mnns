@@ -40,7 +40,7 @@ test(classifies_supported_success_counts) :-
                                   determinism(multi), success_counts([2])),
                         Results)),
     assertion(memberchk(predicate(choice/1, mode(all_arguments_unbound),
-                                  determinism(nondet), success_counts([0, 2])),
+                                  determinism(multi), success_counts([2])),
                         Results)).
 
 test(classifies_disjoint_clause_heads_as_semidet) :-
