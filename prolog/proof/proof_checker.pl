@@ -264,10 +264,36 @@ findall_candidate_values(Template, length(List, Length), Values) :-
         Values = [TemplateCopy]
     ;   Values = []
     ).
+findall_candidate_values(Template, between(Low, High, Value), Values) :-
+    integer(Low),
+    integer(High),
+    (   var(Value)
+    ;   integer(Value)
+    ),
+    between_candidate_numbers(Low, High, Numbers),
+    between_candidate_values(Numbers, Value, Template, Values).
 findall_candidate_values(Template, select(Value, List, Rest), Values) :-
     ground(List),
     is_list(List),
     select_candidate_values(List, Value, Rest, Template, Values).
+
+between_candidate_numbers(Low, High, Numbers) :-
+    (   Low > High
+    ->  Numbers = []
+    ;   Count is High - Low + 1,
+        Count =< 10000,
+        findall(Number, between(Low, High, Number), Numbers)
+    ).
+
+between_candidate_values([], _, _, []).
+between_candidate_values([Number|Numbers], Value, Template, Values) :-
+    copy_term((Value, Template), (ValueCopy, TemplateCopy)),
+    (   ValueCopy = Number
+    ->  ground(TemplateCopy),
+        Values = [TemplateCopy|Rest]
+    ;   Values = Rest
+    ),
+    between_candidate_values(Numbers, Value, Template, Rest).
 
 select_candidate_values(List, Value, Rest, Template, Values) :-
     findall(candidate(TemplateCopy, Match),

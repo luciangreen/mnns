@@ -93,6 +93,11 @@ generator conversion:
   length produces the list's length once; a matching bound length produces one
   result, and a nonmatching bound length produces none. The template must be
   ground in every produced solution.
+- `findall(Template, between(Low, High, Value), Results)`, where the bounds are
+  integer literals and `Value` is a variable or integer. The inclusive range
+  must contain at most 10,000 integers; reversed bounds produce no results.
+  An integer `Value` produces a result only when it lies in the range, and the
+  template must be ground in every produced solution.
 
 For each case, it reconstructs the complete expected output IR: the source call
 must be replaced by a call to a fresh helper containing the independently
@@ -109,10 +114,10 @@ altered values, missing helper, or unrelated program change is rejected.
 
 These checks cover only no-filter, ground-list `member/2`, the stated
 distinct-variable `nth0/3` and `nth1/3` index forms, `select/3` with a grounded
-template, and the stated `length/2` form. They do not certify fact or rule
-generators, filters, nested findall, `between/3`, other list generators, or
-arbitrary `findall/3` rewrites. Ground domain and mode annotations are required
-but are not inferred.
+template, the stated `length/2` form, and bounded `between/3`. They do not
+certify fact or rule generators, filters, nested findall, other list generators,
+or arbitrary `findall/3` rewrites. Ground domain and mode annotations are
+required but are not inferred.
 The checker does not import or invoke the loop2 converter.
 
 The checker still does not implement general purity/determinism analysis,
