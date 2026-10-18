@@ -42,6 +42,35 @@ test(reject_call_goal, [throws(error(domain_error(call_free_goal, _), _))]) :-
         ),
         delete_file(Source)).
 
+test(normalizes_and_emits_once_goal) :-
+    setup_call_cleanup(
+        temporary_source(Source),
+        ( write_source(Source,
+                       [(once_example(X) :-
+                             once((X = first ; X = second)))]),
+          mnn_ir:parse_program(Source, Program),
+          Program = mnn_program(_, _, Predicates, _, _),
+          Predicates = [
+              mnn_pred(once_example/1, ['?'], [any],
+                       [mnn_clause(_, _,
+                                   once(disj(First = first, Second = second)),
+                                   _)],
+                       original)
+          ],
+          assertion(First == Second),
+          setup_call_cleanup(
+              temporary_source(Emitted),
+              ( mnn_ir:emit_program(Program, Emitted),
+                mnn_ir:parse_program(Emitted, Reparsed),
+                Reparsed = mnn_program(_, _, ReparsedPredicates, _, _),
+              canonical_predicates(Predicates, Canonical),
+              canonical_predicates(ReparsedPredicates, ReparsedCanonical),
+              assertion(Canonical =@= ReparsedCanonical)
+              ),
+              delete_file(Emitted))
+        ),
+        delete_file(Source)).
+
 test(reject_call_with_extra_arguments,
      [throws(error(domain_error(call_free_goal, _), _))]) :-
     setup_call_cleanup(

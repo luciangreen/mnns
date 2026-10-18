@@ -10,9 +10,10 @@ stage-by-stage status.
 `mnn_ir:parse_program/2` reads facts, rules, and directives into
 `mnn_program(Name, Meta, Predicates, Proof, Trace)`. Each clause retains its
 source order and source line; conjunction, disjunction, if-then(-else), and
-negation are normalized in clause bodies. `mnn_ir:ir_to_prolog/2` emits terms
-in source order, and `mnn_ir:emit_program/2` writes them to a file. Explicit
-`call/N` goals are rejected rather than admitted as unrestricted meta-calls.
+negation are normalized in clause bodies, as are the goals inside `once/1`.
+`mnn_ir:ir_to_prolog/2` emits terms in source order, and
+`mnn_ir:emit_program/2` writes them to a file. Explicit `call/N` goals are
+rejected rather than admitted as unrestricted meta-calls.
 
 The round-trip corpus is grouped into recursive rules, control flow, lists and
 generators, strings and terms, and built-ins and arithmetic. This verifies the
@@ -54,6 +55,8 @@ of normalized goals in the all-arguments-unbound mode. It reports unsupported
 goals rather than guessing; acyclic user-predicate calls within the program are
 analyzed recursively when their arguments are distinct unbound variables, while
 recursive, bound-argument, and repeated-argument calls remain unavailable.
+Supported `once/1` goals retain possible failure but cap every positive success
+count at one; unsupported inner goals remain unavailable.
 Choicepoint/cut conversion and general mode inference are not implemented; see
 [`detlog.md`](detlog.md).
 

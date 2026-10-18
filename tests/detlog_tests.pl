@@ -93,6 +93,49 @@ test(classifies_normalized_control_flow) :-
                                   determinism(det), success_counts([1])),
                         Results)).
 
+test(once_caps_multiple_successes_at_one) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(single/0, [], [],
+                           [mnn_clause(1, single, once(disj(true, true)),
+                                       source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(
+        Program,
+        detlog_report(
+            [predicate(single/0, mode(all_arguments_unbound),
+                       determinism(det), success_counts([1]))])).
+
+test(once_preserves_possible_failure) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(maybe_once/1, ['?'], [any],
+                           [mnn_clause(1, maybe_once(Value),
+                                       once(integer(Value)),
+                                       source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(
+        Program,
+        detlog_report(
+            [predicate(maybe_once/1, mode(all_arguments_unbound),
+                       determinism(semidet), success_counts([0, 1]))])).
+
+test(once_propagates_unsupported_inner_goals) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(committed_once/0, [], [],
+                           [mnn_clause(1, committed_once, once(!),
+                                       source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(
+        Program,
+        detlog_report(
+            [predicate(committed_once/0, mode(all_arguments_unbound),
+                       unavailable(unsupported_goal(!)), unsupported_body)])).
+
 test(universal_head_with_overlapping_clause_is_multi) :-
     Program = mnn_program(
                   sample, meta(sample, []),

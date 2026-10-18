@@ -73,6 +73,13 @@ goal_outcomes(not(Goal), Predicates, Stack, Outcomes) :-
     ->  Outcomes = unavailable(Reason)
     ;   negated_outcomes(GoalOutcomes, Outcomes)
     ).
+goal_outcomes(once(Goal), Predicates, Stack, Outcomes) :-
+    !,
+    goal_outcomes(Goal, Predicates, Stack, GoalOutcomes),
+    (   GoalOutcomes = unavailable(Reason)
+    ->  Outcomes = unavailable(Reason)
+    ;   once_outcomes(GoalOutcomes, Outcomes)
+    ).
 goal_outcomes(Goal, _, _, [0, 1]) :-
     semidet_builtin(Goal),
     !.
@@ -246,6 +253,17 @@ negated_outcomes(Outcomes, [0]) :-
     \+ memberchk(0, Outcomes),
     !.
 negated_outcomes(_, [0, 1]).
+
+once_outcomes(GoalOutcomes, Outcomes) :-
+    findall(Outcome,
+            ( member(Count, GoalOutcomes),
+              (   Count =:= 0
+              ->  Outcome = 0
+              ;   Outcome = 1
+              )
+            ),
+            Possible),
+    sort(Possible, Outcomes).
 
 outcomes_determinism([0], failure) :-
     !.
