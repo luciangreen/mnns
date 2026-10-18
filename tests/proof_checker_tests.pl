@@ -40,6 +40,131 @@ test(accept_reordering_nested_in_conjunction) :-
     reorder_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_unfold_of_ground_pure_definition) :-
+    definition_rewrite_program(integer(3), positive(3), Original),
+    definition_rewrite_program(integer(3), integer(3), Program),
+    definition_rewrite_proof(unfold, Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_fold_of_ground_pure_definition) :-
+    definition_rewrite_program(integer(3), integer(3), Original),
+    definition_rewrite_program(integer(3), positive(3), Program),
+    definition_rewrite_proof(fold, Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_unfold_with_variable_definition) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(positive/1, ['?'], [any],
+                             [mnn_clause(1, positive(X), integer(X),
+                                         source(file, 1))],
+                             original),
+                    mnn_pred(result/0, [], [],
+                             [mnn_clause(2, result, positive(3),
+                                         source(file, 2))],
+                             original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(positive/1, ['?'], [any],
+                            [mnn_clause(1, positive(Y), integer(Y),
+                                        source(file, 1))],
+                            original),
+                   mnn_pred(result/0, [], [],
+                            [mnn_clause(2, result, integer(3),
+                                        source(file, 2))],
+                            original)],
+                  proof([]), trace([])),
+    definition_rewrite_proof(unfold, Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_unfold_with_impure_definition) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(positive/1, ['?'], [any],
+                             [mnn_clause(1, positive(3), write(3),
+                                         source(file, 1))],
+                             original),
+                    mnn_pred(result/0, [], [],
+                             [mnn_clause(2, result, positive(3),
+                                         source(file, 2))],
+                             original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(positive/1, ['?'], [any],
+                            [mnn_clause(1, positive(3), write(3),
+                                        source(file, 1))],
+                            original),
+                   mnn_pred(result/0, [], [],
+                            [mnn_clause(2, result, write(3),
+                                        source(file, 2))],
+                            original)],
+                  proof([]), trace([])),
+    definition_rewrite_proof(unfold, Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_unfold_with_multiple_definition_clauses) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(positive/1, ['?'], [any],
+                             [mnn_clause(1, positive(3), integer(3),
+                                         source(file, 1)),
+                              mnn_clause(2, positive(4), integer(4),
+                                         source(file, 2))],
+                             original),
+                    mnn_pred(result/0, [], [],
+                             [mnn_clause(3, result, positive(3),
+                                         source(file, 3))],
+                             original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(positive/1, ['?'], [any],
+                            [mnn_clause(1, positive(3), integer(3),
+                                        source(file, 1)),
+                             mnn_clause(2, positive(4), integer(4),
+                                        source(file, 2))],
+                            original),
+                   mnn_pred(result/0, [], [],
+                            [mnn_clause(3, result, integer(3),
+                                        source(file, 3))],
+                            original)],
+                  proof([]), trace([])),
+    definition_rewrite_proof(unfold, Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_unfold_rewriting_multiple_occurrences) :-
+    definition_rewrite_program(
+        integer(3), conj(positive(3), positive(3)), Original),
+    definition_rewrite_program(
+        integer(3), conj(integer(3), integer(3)), Program),
+    definition_rewrite_proof(unfold, Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_fold_into_definition_itself) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(positive/1, ['?'], [any],
+                             [mnn_clause(1, positive(3), integer(3),
+                                         source(file, 1))],
+                             original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(positive/1, ['?'], [any],
+                            [mnn_clause(1, positive(3), positive(3),
+                                        source(file, 1))],
+                            original)],
+                  proof([]), trace([])),
+    definition_rewrite_proof(fold, Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_reordering_with_variable_goals) :-
     program_with_body(conj(integer(X), atom(ok)), Original),
     program_with_body(conj(atom(ok), integer(X)), Program),
@@ -103,6 +228,15 @@ test(render_checked_goal_reordering) :-
     mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
     assertion(sub_string(Markdown, _, _, _, '**Independent check:** `accepted`.')).
 
+test(render_checked_unfold) :-
+    definition_rewrite_program(integer(3), positive(3), Original),
+    definition_rewrite_program(integer(3), integer(3), Program),
+    definition_rewrite_proof(unfold, Proof),
+    mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
+    assertion(sub_string(Markdown, _, _, _, '## Step 1: `unfold`')),
+    assertion(sub_string(Markdown, _, _, _, 'single-clause definition')),
+    assertion(sub_string(Markdown, _, _, _, 'pure built-ins')).
+
 test(render_unsupported_proof_as_rejected) :-
     Program = mnn_program(sample, meta(file, []), [], proof([]), trace([])),
     Proof = proof([proof_step(1, unfold, [], equivalent)]),
@@ -124,6 +258,25 @@ identity_proof(
 reorder_proof(
     proof([proof_step(1, reorder_goals, [],
                       equivalent(domain(any), modes([])))])).
+
+definition_rewrite_proof(Rule,
+                         proof([proof_step(1, Rule, [],
+                                           equivalent(domain(any),
+                                                      modes([])))])).
+
+definition_rewrite_program(DefinitionBody, CallerBody,
+                           mnn_program(sample, meta(file, []),
+                                       [mnn_pred(positive/1, ['?'], [any],
+                                                 [mnn_clause(
+                                                      1, positive(3), DefinitionBody,
+                                                      source(file, 1))],
+                                                 original),
+                                        mnn_pred(result/0, [], [],
+                                                 [mnn_clause(
+                                                      2, result, CallerBody,
+                                                      source(file, 2))],
+                                                 original)],
+                                       proof([]), trace([]))).
 
 program_with_body(Body,
                   mnn_program(sample, meta(file, []),

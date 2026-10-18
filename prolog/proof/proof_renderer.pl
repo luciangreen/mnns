@@ -20,9 +20,27 @@ render_report(accepted, proof([proof_step(Id, identity, [],
     format('No program rewrite is claimed.~n~n', []),
     format('- Domain: `~q`~n', [Domain]),
     format('- Modes: `~q`~n', [Modes]).
+render_report(accepted, proof([proof_step(Id, Rule, [],
+                                          equivalent(domain(Domain),
+                                                     modes(Modes)))])) :-
+    memberchk(Rule, [unfold, fold]),
+    !,
+    format('# Proof report~n~n', []),
+    format('**Independent check:** accepted.~n~n', []),
+    format('## Step ~d: `~w`~n~n', [Id, Rule]),
+    render_definition_rewrite(Rule),
+    format('- Domain: `~q`~n', [Domain]),
+    format('- Modes: `~q`~n', [Modes]).
 render_report(Result, Proof) :-
     format('# Proof report~n~n', []),
     format('**Independent check:** `~q`.~n~n', [Result]),
     format('## Machine proof~n~n```prolog~n', []),
     write_term(Proof, [quoted(true), numbervars(true)]),
     format('~n```~n', []).
+
+render_definition_rewrite(unfold) :-
+    format('One ground call was expanded using its matching single-clause ', []),
+    format('definition with a ground body made only of pure built-ins.~n~n', []).
+render_definition_rewrite(fold) :-
+    format('One ground body was replaced by its matching single-clause call; ', []),
+    format('the definition body uses only pure built-ins.~n~n', []).
