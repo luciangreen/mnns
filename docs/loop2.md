@@ -63,8 +63,10 @@ cites the `findall_to_fold` lemma and records the generator-specific finiteness
 condition (ground facts, finite acyclic rules, a ground list, or a bounded
 `between/3` range), safe-arithmetic-filter condition, and deterministic-loop
 condition. The report is an obligation, not a checked proof: the independent
-proof checker does not yet validate this loop2 rule. Do not treat converted
-output as proof-certified.
+proof checker validates only direct no-filter conversions for ground-list
+`member/2`, `select/3`, `nth0/3`/`nth1/3` indices, `length/2`, and bounded
+`between/3`. Conversions involving filters, fact/rule generators, or other
+forms are not independently checked. Do not treat such output as proof-certified.
 
 Run the full suite, including loop2 tests, with:
 

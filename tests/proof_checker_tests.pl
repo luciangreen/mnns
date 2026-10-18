@@ -191,7 +191,7 @@ test(reject_length_findall_to_fold_with_changed_values) :-
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
 test(accept_bounded_between_findall_to_fold) :-
-    between_findall_to_fold_programs(2, 4, _, _, Original, Program),
+    between_findall_to_fold_programs(2, 4, Value, Value, Original, Program),
     Program = mnn_program(_, _,
                           [mnn_pred(_, _, _,
                                     [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
@@ -213,7 +213,7 @@ test(accept_bounded_between_findall_to_fold_with_bound_value) :-
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
 test(accept_reversed_between_findall_to_fold_as_empty) :-
-    between_findall_to_fold_programs(4, 2, _, _, Original, Program),
+    between_findall_to_fold_programs(4, 2, Value, Value, Original, Program),
     Program = mnn_program(_, _,
                           [mnn_pred(_, _, _,
                                     [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
@@ -231,7 +231,7 @@ test(reject_oversized_between_findall_to_fold) :-
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
 test(reject_between_findall_to_fold_with_changed_values) :-
-    between_findall_to_fold_programs(2, 4, _, _, Original, Program0),
+    between_findall_to_fold_programs(2, 4, Value, Value, Original, Program0),
     Program0 = mnn_program(Name, Meta, [Predicate, Helper], ProofData, Trace),
     Predicate = mnn_pred(numbers/1, Modes, Domains,
                           [mnn_clause(1, numbers(Results),

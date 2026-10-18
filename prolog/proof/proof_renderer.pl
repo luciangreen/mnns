@@ -117,7 +117,8 @@ render_step_summary(findall_to_fold) :-
     render_findall_to_fold.
 
 render_findall_to_fold :-
-    format('One direct findall over a variable and a ground proper-list ', []),
-    format('member/2 generator was replaced by a verified deterministic list ', []),
-    format('copy helper. No filters or other generator forms are certified.~n~n',
-           []).
+    format('One direct findall over a supported generator was replaced by a ', []),
+    format('verified deterministic list-copy helper. Supported forms include ', []),
+    format('ground proper-list member/2, select/3, nth0/3, nth1/3, and length/2, ', []),
+    format('plus bounded between/3. Filters and other generator forms are not ', []),
+    format('certified.~n~n', []).
