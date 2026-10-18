@@ -168,6 +168,18 @@ finite_generator_values(_, Generator, Template, Values,
     between_values(Low, High, Value, Template, Filters, Values, Count),
     !.
 finite_generator_values(_, Generator, Template, Values,
+                        finite_ground_length, Count, FilterCount) :-
+    generator_parts(Generator, length(List, Length), Filters),
+    ground(List),
+    is_list(List),
+    (var(Length) ; integer(Length)),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
+    length(List, ActualLength),
+    length_candidate_values(Length, ActualLength, Template, Filters,
+                           Values, Count),
+    !.
+finite_generator_values(_, Generator, Template, Values,
                         finite_ground_nth0, Count, FilterCount) :-
     generator_parts(Generator, nth0(Index, List, Value), Filters),
     ground(List),
@@ -340,6 +352,21 @@ between_candidate_values([Number|Numbers], Value, Template, Filters, Values) :-
     ;   Values = Rest
     ),
     between_candidate_values(Numbers, Value, Template, Filters, Rest).
+
+length_candidate_values(Length, ActualLength, Template, Filters, Values, Count) :-
+    copy_term((Length, Template, Filters),
+              (LengthCopy, TemplateCopy, FiltersCopy)),
+    (   LengthCopy = ActualLength
+    ->  Count = 1,
+        evaluate_filters(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy]
+        ;   Values = []
+        )
+    ;   Count = 0,
+        Values = []
+    ).
 
 generator_parts(Generator, Goal, Filters) :-
     flatten_conjunction(Generator, [Goal|Filters]).
