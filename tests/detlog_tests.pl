@@ -333,7 +333,7 @@ test(evaluates_ground_builtin_goals_and_reports_exceptions) :-
                                        source(sample, 2))],
                            original),
                   mnn_pred(ground_exception/0, [], [],
-                           [mnn_clause(3, ground_exception, is(example, 1),
+                           [mnn_clause(3, ground_exception, is(1, example),
                                        source(sample, 3))],
                            original)],
                  proof([]), trace([])),
@@ -348,7 +348,7 @@ test(evaluates_ground_builtin_goals_and_reports_exceptions) :-
                        Results)),
     assertion(memberchk(predicate(ground_exception/0,
                                 mode(all_arguments_unbound),
-                                unavailable(exceptional_goal(is(example, 1), _)),
+                                unavailable(exceptional_goal(is(1, example), _)),
                                 unsupported_body),
                        Results)).
 
