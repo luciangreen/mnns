@@ -32,8 +32,23 @@ test(run_required_builtins_and_arithmetic) :-
 test(run_nth0_string_atom_and_nested_terms) :-
     corpus_source('lists_and_generators.pl', ListsAndGenerators),
     mnn_sandbox_runner:run_program(
-        ListsAndGenerators, indexed_values([a, b, c], _Pairs), [],
+        ListsAndGenerators, indexed_values([a, b, c], _ZeroBasedPairs), [],
         answers([[[0-a, 1-b, 2-c]]])),
+    mnn_sandbox_runner:run_program(
+        ListsAndGenerators,
+        one_based_indexed_values([a, b, c], _OneBasedPairs), [],
+        answers([[[1-a, 2-b, 3-c]]])),
+    mnn_sandbox_runner:run_program(
+        ListsAndGenerators, nth1(2, [a, b, c], _PositionValue), [],
+        answers([[b]])),
+    mnn_sandbox_runner:run_program(
+        ListsAndGenerators, nth1(1, [], _MissingValue), [], answers([])),
+    mnn_sandbox_runner:run_program(
+        ListsAndGenerators, bounded_values(2, 4, _RangeValues), [],
+        answers([[[2, 3, 4]]])),
+    mnn_sandbox_runner:run_program(
+        ListsAndGenerators, bounded_values(4, 2, _EmptyRangeValues), [],
+        answers([[[]]])),
     corpus_source('strings_and_terms.pl', StringsAndTerms),
     mnn_sandbox_runner:run_program(
         StringsAndTerms, label('sample item', _Label), [],
