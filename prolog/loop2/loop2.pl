@@ -105,18 +105,21 @@ convert_goal(findall(Template, Goal, Results), Predicates,
              LoopCall, Generated,
              [conversion(findall_to_fold, helper(Loop/2),
                          side_conditions(finite_ground_facts(Count),
+                                         safe_arithmetic_filters(FilterCount),
                                          deterministic_loop))]) :-
-    finite_fact_values(Predicates, Goal, Template, Values),
+    finite_fact_values(Predicates, Goal, Template, Values, Count, FilterCount),
     !,
     fresh_loop_name(NextName0, Predicates, Loop, NextName),
     LoopCall =.. [Loop, Values, Results],
     make_loop_predicate(Loop, NextClauseId0, Generated),
-    NextClauseId is NextClauseId0 + 2,
-    length(Values, Count).
+    NextClauseId is NextClauseId0 + 2.
 convert_goal(Goal, _, NextClauseId, NextName,
              NextClauseId, NextName, Goal, [], []).
 
-finite_fact_values(Predicates, Goal, Template, Values) :-
+finite_fact_values(Predicates, Generator, Template, Values, Count, FilterCount) :-
+    generator_parts(Generator, Goal, Filters),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
     nonvar(Goal),
     callable(Goal),
     \+ predicate_property(system:Goal, built_in),
@@ -125,22 +128,114 @@ finite_fact_values(Predicates, Goal, Template, Values) :-
     member(mnn_pred(FoundKey, _, _, Clauses, _), Predicates),
     FoundKey == Key,
     maplist(ground_fact_clause, Clauses),
-    fact_clause_values(Clauses, Goal, Template, Values),
+    fact_clause_values(Clauses, Goal, Template, Filters, Values, Count),
     !.
+
+generator_parts(Generator, Goal, Filters) :-
+    flatten_conjunction(Generator, [Goal|Filters]).
+
+flatten_conjunction(conj(Left, Right), Goals) :-
+    !,
+    flatten_conjunction(Left, LeftGoals),
+    flatten_conjunction(Right, RightGoals),
+    append(LeftGoals, RightGoals, Goals).
+flatten_conjunction((Left, Right), Goals) :-
+    !,
+    flatten_conjunction(Left, LeftGoals),
+    flatten_conjunction(Right, RightGoals),
+    append(LeftGoals, RightGoals, Goals).
+flatten_conjunction(Goal, [Goal]).
 
 ground_fact_clause(mnn_clause(_, Head, true, _)) :-
     ground(Head).
 
-fact_clause_values([], _, _, []).
+supported_filter(Filter) :-
+    nonvar(Filter),
+    functor(Filter, Name, 2),
+    memberchk(Name, [>, >=, <, =<, =:=, =\=]),
+    arg(1, Filter, Left),
+    arg(2, Filter, Right),
+    arithmetic_expression(Left),
+    arithmetic_expression(Right).
+
+arithmetic_expression(Expression) :-
+    number(Expression),
+    !.
+arithmetic_expression(Expression) :-
+    var(Expression),
+    !.
+arithmetic_expression(Expression) :-
+    compound(Expression),
+    compound_name_arguments(Expression, Name, Arguments),
+    arithmetic_operator(Name, Arity),
+    length(Arguments, Arity),
+    maplist(arithmetic_expression, Arguments).
+
+arithmetic_operator(+, 1).
+arithmetic_operator(-, 1).
+arithmetic_operator(abs, 1).
+arithmetic_operator(+, 2).
+arithmetic_operator(-, 2).
+arithmetic_operator(*, 2).
+arithmetic_operator(/, 2).
+arithmetic_operator(//, 2).
+arithmetic_operator(mod, 2).
+arithmetic_operator(rem, 2).
+
+fact_clause_values([], _, _, _, [], 0).
 fact_clause_values([mnn_clause(_, Head, _, _)|Clauses],
-                   Goal, Template, Values) :-
-    copy_term((Goal, Template), (GoalCopy, TemplateCopy)),
+                   Goal, Template, Filters, Values, Count) :-
+    copy_term((Goal, Template, Filters),
+              (GoalCopy, TemplateCopy, FiltersCopy)),
     (   GoalCopy = Head
-    ->  ground(TemplateCopy),
-        Values = [TemplateCopy|Rest]
-    ;   Values = Rest
-    ),
-    fact_clause_values(Clauses, Goal, Template, Rest).
+    ->  evaluate_filters(FiltersCopy, FilterResult),
+        fact_clause_values(Clauses, Goal, Template, Filters, Rest, RestCount),
+        Count is RestCount + 1,
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|Rest]
+        ;   Values = Rest
+        )
+    ;   fact_clause_values(Clauses, Goal, Template, Filters, Values, Count)
+    ).
+
+evaluate_filters([], true).
+evaluate_filters([Filter|Filters], Result) :-
+    evaluate_filter(Filter, FilterResult),
+    (   FilterResult == true
+    ->  evaluate_filters(Filters, Result)
+    ;   Result = false
+    ).
+
+evaluate_filter(Filter, Result) :-
+    Filter =.. [Name, Left, Right],
+    arithmetic_value(Left, LeftValue),
+    arithmetic_value(Right, RightValue),
+    compare_values(Name, LeftValue, RightValue, Result).
+
+arithmetic_value(Expression, Value) :-
+    arithmetic_expression(Expression),
+    ground(Expression),
+    catch(Value is Expression, _, fail).
+
+compare_values(>, Left, Right, Result) :-
+    comparison_result(Left > Right, Result).
+compare_values(>=, Left, Right, Result) :-
+    comparison_result(Left >= Right, Result).
+compare_values(<, Left, Right, Result) :-
+    comparison_result(Left < Right, Result).
+compare_values(=<, Left, Right, Result) :-
+    comparison_result(Left =< Right, Result).
+compare_values(=:=, Left, Right, Result) :-
+    comparison_result(Left =:= Right, Result).
+compare_values(=\=, Left, Right, Result) :-
+    comparison_result(Left =\= Right, Result).
+
+comparison_result(Comparison, Result) :-
+    (   call(Comparison)
+    ->  Result = true
+    ;   Result = false
+    ).
 
 fresh_loop_name(Index, Predicates, Name, NextIndex) :-
     format(atom(Candidate), 'mnn_loop2_~d', [Index]),
