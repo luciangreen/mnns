@@ -50,13 +50,17 @@ user specification; see [`pid.md`](pid.md).
 
 `mnn_loop2:convert_program/3` currently handles a `findall/3` whose generator is
 a direct call to a predicate made entirely of ground facts, optionally followed
-by arithmetic comparisons over variables bound by those facts. The supported
-comparisons are `>`, `>=`, `<`, `=<`, `=:=`, and `=\=`; arithmetic expressions
-allow numeric constants, unary `+`, `-`, `abs`, and binary `+`, `-`, `*`, `/`,
-`//`, `mod`, and `rem`. Ground templates are required for each result that
-passes its filter. Filter expressions are interpreted through this restricted
-arithmetic whitelist; arbitrary predicates, unbound arithmetic, rules, built-in
-generators, and other forms are left unchanged.
+by arithmetic comparisons over variables bound by those facts. It also converts
+`between/3` with integer literal bounds and a variable or integer generator
+argument, optionally followed by the same arithmetic comparisons. Between ranges
+up to 10,000 values are supported, including reversed and singleton ranges;
+larger ranges are left unchanged. The supported comparisons are `>`, `>=`, `<`,
+`=<`, `=:=`, and `=\=`; arithmetic expressions allow numeric constants, unary
+`+`, `-`, `abs`, and binary `+`, `-`, `*`, `/`, `//`, `mod`, and `rem`. Ground
+templates are required for each result that passes its filter. Filter
+expressions are interpreted through this restricted arithmetic whitelist;
+arbitrary predicates, unbound arithmetic, rules, other built-in generators, and
+other forms are left unchanged.
 
 Each conversion creates a uniquely named recursive list-copy predicate and
 preserves the existing predicates and their clause order. The report records
