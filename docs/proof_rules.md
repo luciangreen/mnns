@@ -82,21 +82,23 @@ generator conversion:
 - `findall(Index, nth0(Index, List, _), Results)`, where `List` is a ground
   proper list, `Index` is the unbound index variable used as the template, and
   the element argument is a distinct unbound variable.
+- `findall(Index, nth1(Index, List, _), Results)`, with the same variable and
+  ground-list requirements; indices are one-based.
 
-For either case, it reconstructs the complete expected output IR: the source
-call must be replaced by a call to a fresh helper containing the independently
+For each case, it reconstructs the complete expected output IR: the source call
+must be replaced by a call to a fresh helper containing the independently
 derived values, and that helper must be the two-clause deterministic list-copy
-loop. The `nth0/3` case derives the zero-based indices in list order; an empty
-list therefore produces an empty values list. Existing clauses and predicates
-must be preserved; the generated helper's clause IDs and metadata events must
-also match. Thus a claimed conversion, altered values, missing helper, or
-unrelated program change is rejected.
+loop. The `nth0/3` case derives zero-based indices and the `nth1/3` case derives
+one-based indices, both in list order; an empty list produces an empty values
+list. Existing clauses and predicates must be preserved; the generated helper's
+clause IDs and metadata events must also match. Thus a claimed conversion,
+altered values, missing helper, or unrelated program change is rejected.
 
 These checks cover only no-filter, ground-list `member/2` and the stated
-zero-based `nth0/3` index form. They do not certify fact or rule generators,
-filters, nested findall, other list generators, or arbitrary `findall/3`
-rewrites. Ground domain and mode annotations are required but are not inferred.
-The checker does not import or invoke the loop2 converter.
+distinct-variable `nth0/3` and `nth1/3` index forms. They do not certify fact or
+rule generators, filters, nested findall, other list generators, or arbitrary
+`findall/3` rewrites. Ground domain and mode annotations are required but are
+not inferred. The checker does not import or invoke the loop2 converter.
 
 The checker still does not implement general purity/determinism analysis,
 general clause/goal reordering, or the other rules in §7.2. Domain and mode

@@ -59,13 +59,14 @@ unsupported goals are not run.
 the IR and does not import the optimizer. In addition to the rules described in
 [`proof_rules.md`](proof_rules.md), it verifies one direct
 `findall(Value, member(Value, GroundList), Results)` conversion and one
-`findall(Index, nth0(Index, GroundList, _), Results)` conversion, independently
-reconstructing the generated values, helper, and complete output IR. The `nth0/3`
-case emits zero-based indices and accepts an empty ground list. These proof
-subsets exclude filters, fact/rule generators, nested findall, and other list
-generators. The renderer creates Markdown explanations but does not certify
-proofs. General purity analysis, general clause/goal reordering, and most proof
-rules in the requirements remain unsupported.
+`findall(Index, nth0(Index, GroundList, _), Results)` or
+`findall(Index, nth1(Index, GroundList, _), Results)` conversion, independently
+reconstructing the generated values, helper, and complete output IR. The index
+cases emit zero-based or one-based indices, respectively, and accept an empty
+ground list. These proof subsets exclude filters, fact/rule generators, nested
+findall, and other list generators. The renderer creates Markdown explanations
+but does not certify proofs. General purity analysis, general clause/goal
+reordering, and most proof rules in the requirements remain unsupported.
 
 ## PID analysis
 

@@ -242,6 +242,14 @@ findall_candidate_values(Template, nth0(Index, List, Value), Indices) :-
     ground(List),
     is_list(List),
     list_indices(List, Indices).
+findall_candidate_values(Template, nth1(Index, List, Value), Indices) :-
+    Template == Index,
+    var(Index),
+    var(Value),
+    Index \== Value,
+    ground(List),
+    is_list(List),
+    list_indices(List, 1, Indices).
 
 list_indices(List, Indices) :-
     list_indices(List, 0, Indices).
