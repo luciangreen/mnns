@@ -9,6 +9,10 @@ The current supported subset is deliberately narrow:
   followed by arithmetic comparisons in a conjunction.
 - `member/2` over a ground proper list, optionally followed by arithmetic
   comparisons. List order and duplicate elements are preserved.
+- `nth0/3` or `nth1/3` over a ground proper list, optionally followed by
+  arithmetic comparisons. The index may be a variable or integer, and the
+  element may be constrained by a term pattern. Zero-based and one-based index
+  results, list order, and duplicate elements are preserved.
 - `between/3` with integer literal bounds and a variable or integer third
   argument, optionally followed by arithmetic comparisons. Ranges of at most
   10,000 values are converted; larger ranges are left unchanged. Reversed
@@ -27,7 +31,8 @@ loop. It preserves source predicates and clause order. Unsupported generators,
 rules, other built-ins, arbitrary filter predicates, unbound arithmetic, and
 generators with variable-valued templates remain unchanged. `between/3` with
 non-ground or non-integer bounds, or ranges above the limit, also remains
-unchanged.
+unchanged. `nth0/3` and `nth1/3` with a variable or improper list, or with an
+index that is neither a variable nor an integer, remain unchanged.
 
 Each conversion report cites the `findall_to_fold` lemma and records the
 generator-specific finiteness condition (ground facts, a ground list, or a

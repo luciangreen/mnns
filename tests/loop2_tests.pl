@@ -135,6 +135,42 @@ test(converts_member_with_arithmetic_filter_and_template, [nondet]) :-
                                                        deterministic_loop))])),
     run_converted(Converted, values(Values), [[[pair(3), pair(4)]]]).
 
+test(converts_nth0_and_preserves_indices_and_duplicates, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :-
+              findall(pair(Index, Value),
+                      nth0(Index, [a, b, a], Value),
+                      Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_nth0(3),
+                                                       safe_arithmetic_filters(0),
+                                                       deterministic_loop))])),
+    run_converted(Converted, values(Values),
+                  [[[pair(0, a), pair(1, b), pair(2, a)]]]).
+
+test(converts_nth1_with_bound_arguments_and_filter, [nondet]) :-
+    with_converted_program(
+        [(indices(Indices) :-
+              findall(Index,
+                      (nth1(Index, [a, b, a], a), Index > 1),
+                      Indices))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_nth1(3),
+                                                       safe_arithmetic_filters(1),
+                                                       deterministic_loop))])),
+    run_converted(Converted, indices(Indices), [[[3]]]).
+
+test(converts_nth0_with_bound_index, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :- findall(Value, nth0(1, [a, b], Value), Values))],
+        Converted, loop2_report(
+                       [conversion(findall_to_fold, helper(mnn_loop2_1/2), _)])),
+    run_converted(Converted, values(Values), [[[b]]]).
+
 test(leaves_member_with_variable_list_unchanged, [nondet]) :-
     with_converted_program(
         [(values(List, Values) :-
@@ -145,6 +181,18 @@ test(leaves_member_with_variable_list_unchanged, [nondet]) :-
                   mnn_pred(values/2, _, _,
                                           [mnn_clause(_, _, findall(_, member(_, _), _), _)],
                                           original),
+                  Predicates)).
+
+test(leaves_nth_generators_with_variable_lists_unchanged, [nondet]) :-
+    with_converted_program(
+        [(values(List, Values) :-
+              findall(X, nth0(_, List, X), Values))],
+        Converted, loop2_report([])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(
+                  mnn_pred(values/2, _, _,
+                          [mnn_clause(_, _, findall(_, nth0(_, _, _), _), _)],
+                          original),
                   Predicates)).
 
 test(converts_between_with_arithmetic_filters_and_template, [nondet]) :-
