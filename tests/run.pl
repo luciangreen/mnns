@@ -11,5 +11,7 @@ main :-
     load_files(CorpusTests, [silent(true)]),
     directory_file_path(Directory, 'runner_tests.pl', RunnerTests),
     load_files(RunnerTests, [silent(true)]),
+    directory_file_path(Directory, 'pid_tests.pl', PidTests),
+    load_files(PidTests, [silent(true)]),
     run_tests,
     halt.

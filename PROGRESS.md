@@ -31,6 +31,10 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   of these checked steps can be independently verified and rendered as Markdown
   reports. General purity/determinism analysis, general goal/clause reordering,
   and the other proof rules remain unsupported.
+- **Stage 3 — PID: in progress.** The initial call-graph analysis classifies
+  predicates as recursive or non-recursive, including mutual recursion and
+  non-recursive wrappers. It does not yet discover or verify termination
+  measures, generate induction obligations, or check user specifications.
 
 ## Remaining stages
 
@@ -38,7 +42,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground definition introduction, and narrow ground unfold/fold only) |
-| 3 | PID termination measures and induction obligations | Not started |
+| 3 | PID termination measures and induction obligations | In progress (call-graph recursion classification only) |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
