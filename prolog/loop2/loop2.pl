@@ -107,17 +107,16 @@ convert_goal(findall(Template, Goal, Results), Predicates,
                          side_conditions(finite_ground_facts(Count),
                                          safe_arithmetic_filters(FilterCount),
                                          deterministic_loop))]) :-
-    finite_fact_values(Predicates, Goal, Template, Values, FilterCount),
+    finite_fact_values(Predicates, Goal, Template, Values, Count, FilterCount),
     !,
     fresh_loop_name(NextName0, Predicates, Loop, NextName),
     LoopCall =.. [Loop, Values, Results],
     make_loop_predicate(Loop, NextClauseId0, Generated),
-    NextClauseId is NextClauseId0 + 2,
-    length(Values, Count).
+    NextClauseId is NextClauseId0 + 2.
 convert_goal(Goal, _, NextClauseId, NextName,
              NextClauseId, NextName, Goal, [], []).
 
-finite_fact_values(Predicates, Generator, Template, Values, FilterCount) :-
+finite_fact_values(Predicates, Generator, Template, Values, Count, FilterCount) :-
     generator_parts(Generator, Goal, Filters),
     maplist(supported_filter, Filters),
     length(Filters, FilterCount),
@@ -129,13 +128,18 @@ finite_fact_values(Predicates, Generator, Template, Values, FilterCount) :-
     member(mnn_pred(FoundKey, _, _, Clauses, _), Predicates),
     FoundKey == Key,
     maplist(ground_fact_clause, Clauses),
-    fact_clause_values(Clauses, Goal, Template, Filters, Values),
+    fact_clause_values(Clauses, Goal, Template, Filters, Values, Count),
     !.
 
 generator_parts(Generator, Goal, Filters) :-
     flatten_conjunction(Generator, [Goal|Filters]).
 
 flatten_conjunction(conj(Left, Right), Goals) :-
+    !,
+    flatten_conjunction(Left, LeftGoals),
+    flatten_conjunction(Right, RightGoals),
+    append(LeftGoals, RightGoals, Goals).
+flatten_conjunction((Left, Right), Goals) :-
     !,
     flatten_conjunction(Left, LeftGoals),
     flatten_conjunction(Right, RightGoals),
@@ -178,21 +182,22 @@ arithmetic_operator(//, 2).
 arithmetic_operator(mod, 2).
 arithmetic_operator(rem, 2).
 
-fact_clause_values([], _, _, _, []).
+fact_clause_values([], _, _, _, [], 0).
 fact_clause_values([mnn_clause(_, Head, _, _)|Clauses],
-                   Goal, Template, Filters, Values) :-
+                   Goal, Template, Filters, Values, Count) :-
     copy_term((Goal, Template, Filters),
               (GoalCopy, TemplateCopy, FiltersCopy)),
     (   GoalCopy = Head
     ->  evaluate_filters(FiltersCopy, FilterResult),
+        fact_clause_values(Clauses, Goal, Template, Filters, Rest, RestCount),
+        Count is RestCount + 1,
         (   FilterResult == true
         ->  ground(TemplateCopy),
             Values = [TemplateCopy|Rest]
         ;   Values = Rest
         )
-    ;   Values = Rest
-    ),
-    fact_clause_values(Clauses, Goal, Template, Filters, Rest).
+    ;   fact_clause_values(Clauses, Goal, Template, Filters, Values, Count)
+    ).
 
 evaluate_filters([], true).
 evaluate_filters([Filter|Filters], Result) :-
