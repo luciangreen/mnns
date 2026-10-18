@@ -50,8 +50,9 @@ general unfold/fold checker.
 The checker still does not implement general purity/determinism analysis,
 general clause/goal reordering, or the other rules in §7.2. Domain and mode
 annotations must be ground but are not inferred. `render_proof/4` reports the
-independent checker's result and summarizes accepted identity, unfold, and fold
-steps. Rendering is explanatory and does not itself certify a proof.
+independent checker's result and summarizes accepted identity, goal-reordering,
+unfold, and fold steps. Rendering is explanatory and does not itself certify a
+proof.
 
 `mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` renders a
 Markdown report and includes the independent checker's result. Accepted identity

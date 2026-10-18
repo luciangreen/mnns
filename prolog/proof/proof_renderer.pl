@@ -20,6 +20,18 @@ render_report(accepted, proof([proof_step(Id, identity, [],
     format('No program rewrite is claimed.~n~n', []),
     format('- Domain: `~q`~n', [Domain]),
     format('- Modes: `~q`~n', [Modes]).
+render_report(accepted, proof([proof_step(Id, reorder_goals, [],
+                                          equivalent(domain(Domain),
+                                                    modes(Modes)))])) :-
+    !,
+    format('# Proof report~n~n', []),
+    format('**Independent check:** accepted.~n~n', []),
+    format('## Step ~d: `reorder_goals`~n~n', [Id]),
+    format('One adjacent pair of ground calls to pure unary type tests ', []),
+    format('was swapped in a clause body. The checker does not infer domain ', []),
+    format('or mode annotations, and certifies no other changes.~n~n', []),
+    format('- Domain: `~q`~n', [Domain]),
+    format('- Modes: `~q`~n', [Modes]).
 render_report(accepted, proof([proof_step(Id, Rule, [],
                                           equivalent(domain(Domain),
                                                      modes(Modes)))])) :-
