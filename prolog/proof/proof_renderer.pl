@@ -32,6 +32,16 @@ render_report(accepted, proof([proof_step(Id, reorder_goals, [],
     format('or mode annotations, and certifies no other changes.~n~n', []),
     format('- Domain: `~q`~n', [Domain]),
     format('- Modes: `~q`~n', [Modes]).
+render_report(accepted, proof([proof_step(Id, introduce_definition, [],
+                                          equivalent(domain(Domain),
+                                                    modes(Modes)))])) :-
+    !,
+    format('# Proof report~n~n', []),
+    format('**Independent check:** accepted.~n~n', []),
+    format('## Step ~d: `introduce_definition`~n~n', [Id]),
+    render_definition_introduction,
+    format('- Domain: `~q`~n', [Domain]),
+    format('- Modes: `~q`~n', [Modes]).
 render_report(accepted, proof([proof_step(Id, Rule, [],
                                           equivalent(domain(Domain),
                                                      modes(Modes)))])) :-
@@ -65,6 +75,11 @@ render_definition_rewrite(fold) :-
     format('One ground body was replaced by its matching single-clause call; ', []),
     format('the definition body uses only pure built-ins.~n~n', []).
 
+render_definition_introduction :-
+    format('One ground pure goal was factored into a fresh zero-arity ', []),
+    format('helper predicate. The checker validates the helper body and ', []),
+    format('certifies no other changes.~n~n', []).
+
 render_steps([]).
 render_steps([proof_step(Id, Rule, _, equivalent(domain(Domain), modes(Modes)))
               |Steps]) :-
@@ -79,6 +94,8 @@ render_step_summary(identity) :-
 render_step_summary(reorder_goals) :-
     format('One adjacent pair of ground calls to pure unary type tests ', []),
     format('was swapped in the current IR.~n~n', []).
+render_step_summary(introduce_definition) :-
+    render_definition_introduction.
 render_step_summary(Rule) :-
     memberchk(Rule, [unfold, fold]),
     render_definition_rewrite(Rule).

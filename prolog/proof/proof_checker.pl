@@ -21,6 +21,8 @@ check_supported_proof(Program, Original, Proof, Result) :-
         )
     ;   valid_goal_reordering_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_definition_introduction_proof(Program, Original, Proof)
+    ->  Result = accepted
     ;   valid_definition_rewrite_proof(Program, Original, Proof)
     ->  Result = accepted
     ;   valid_proof_sequence(Program, Original, Proof)
@@ -50,8 +52,22 @@ valid_goal_reordering_proof(Program, Original, Proof) :-
     ground(Modes),
     valid_reordering_program(Original),
     copy_term(Original, OriginalCopy),
-    reorder_program(OriginalCopy, Reordered, 1),
+    reorder_program(OriginalCopy, Reordered, Count),
+    Count =:= 1,
     Program =@= Reordered.
+
+valid_definition_introduction_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, introduce_definition, [],
+                              equivalent(domain(Domain), modes(Modes)))]),
+    integer(Id),
+    Id > 0,
+    ground(Domain),
+    ground(Modes),
+    valid_rewrite_program(Original),
+    copy_term(Original, OriginalCopy),
+    introduce_definition(OriginalCopy, Introduced),
+    Program =@= Introduced.
 
 valid_reordering_program(mnn_program(_, _, Predicates, _, _)) :-
     is_list(Predicates),
@@ -152,7 +168,12 @@ apply_proof_rule(identity, Program, Program).
 apply_proof_rule(reorder_goals, Program, Rewritten) :-
     valid_reordering_program(Program),
     copy_term(Program, ProgramCopy),
-    reorder_program(ProgramCopy, Rewritten, 1).
+    reorder_program(ProgramCopy, Rewritten, Count),
+    Count =:= 1.
+apply_proof_rule(introduce_definition, Program, Rewritten) :-
+    valid_rewrite_program(Program),
+    copy_term(Program, ProgramCopy),
+    introduce_definition(ProgramCopy, Rewritten).
 apply_proof_rule(Rule, Program, Rewritten) :-
     memberchk(Rule, [unfold, fold]),
     valid_rewrite_program(Program),
@@ -243,6 +264,108 @@ rewrite_nonvar_goal(Rule, Definitions, Key, ite(If, Then, Else),
 rewrite_nonvar_goal(Rule, Definitions, Key, not(Goal),
                     not(RewrittenGoal)) :-
     rewrite_goal(Rule, Definitions, Key, Goal, RewrittenGoal).
+
+introduce_definition(
+    mnn_program(Name, Meta, Predicates, Proof, Trace),
+    mnn_program(Name, Meta, IntroducedPredicates, Proof, Trace)) :-
+    clause_ids(Predicates, Ids),
+    maplist(integer, Ids),
+    helper_name(Predicates, 1, HelperName),
+    (   Ids == []
+    ->  HelperId = 1
+    ;   max_list(Ids, MaxId),
+        HelperId is MaxId + 1
+    ),
+    introduce_in_predicates(Predicates, HelperName, Introduced, Goal),
+    append(Introduced,
+           [mnn_pred(HelperName/0, [], [],
+                     [mnn_clause(HelperId, HelperName, Goal,
+                                 source(generated, 0))],
+                     introduced)],
+           IntroducedPredicates).
+
+clause_ids([], []).
+clause_ids([mnn_pred(_, _, _, Clauses, _)|Predicates], Ids) :-
+    clause_ids_in_predicates(Predicates, Clauses, Ids).
+
+clause_ids_in_predicates(Predicates, Clauses, Ids) :-
+    clause_ids_in_clauses(Clauses, ClauseIds),
+    clause_ids(Predicates, PredicateIds),
+    append(ClauseIds, PredicateIds, Ids).
+
+clause_ids_in_clauses([], []).
+clause_ids_in_clauses([mnn_clause(Id, _, _, _)|Clauses], [Id|Ids]) :-
+    clause_ids_in_clauses(Clauses, Ids).
+
+helper_name(Predicates, Index, Name) :-
+    format(atom(Name), 'mnn_definition_~d', [Index]),
+    Key = Name/0,
+    (   predicate_key_exists(Predicates, Key)
+    ->  Next is Index + 1,
+        helper_name(Predicates, Next, Name)
+    ;   true
+    ).
+
+predicate_key_exists([Predicate|_], Key) :-
+    arg(1, Predicate, ExistingKey),
+    ExistingKey == Key,
+    !.
+predicate_key_exists([_|Predicates], Key) :-
+    predicate_key_exists(Predicates, Key).
+
+introduce_in_predicates([Predicate|Predicates], Name,
+                        [Introduced|Predicates], Goal) :-
+    introduce_in_predicate(Predicate, Name, Introduced, Goal),
+    !.
+introduce_in_predicates([Predicate|Predicates], Name,
+                        [Predicate|Introduced], Goal) :-
+    introduce_in_predicates(Predicates, Name, Introduced, Goal).
+
+introduce_in_predicate(
+    mnn_pred(Key, Modes, Domains, Clauses, Status), Name,
+    mnn_pred(Key, Modes, Domains, IntroducedClauses, Status), Goal) :-
+    introduce_in_clauses(Clauses, Name, IntroducedClauses, Goal).
+
+introduce_in_clauses([Clause|Clauses], Name,
+                     [Introduced|Clauses], Goal) :-
+    introduce_in_clause(Clause, Name, Introduced, Goal),
+    !.
+introduce_in_clauses([Clause|Clauses], Name,
+                     [Clause|Introduced], Goal) :-
+    introduce_in_clauses(Clauses, Name, Introduced, Goal).
+
+introduce_in_clause(
+    mnn_clause(Id, Head, Body, Source), Name,
+    mnn_clause(Id, Head, IntroducedBody, Source), Goal) :-
+    introduce_in_goal(Body, Name, IntroducedBody, Goal).
+
+introduce_in_goal(Goal, Name, Name, Goal) :-
+    ground(Goal),
+    safe_pure_goal(Goal),
+    !.
+introduce_in_goal(conj(Left, Right), Name, conj(Introduced, Right), Goal) :-
+    introduce_in_goal(Left, Name, Introduced, Goal),
+    !.
+introduce_in_goal(conj(Left, Right), Name, conj(Left, Introduced), Goal) :-
+    introduce_in_goal(Right, Name, Introduced, Goal).
+introduce_in_goal(disj(Left, Right), Name, disj(Introduced, Right), Goal) :-
+    introduce_in_goal(Left, Name, Introduced, Goal),
+    !.
+introduce_in_goal(disj(Left, Right), Name, disj(Left, Introduced), Goal) :-
+    introduce_in_goal(Right, Name, Introduced, Goal).
+introduce_in_goal(ite(If, Then, Else), Name,
+                  ite(Introduced, Then, Else), Goal) :-
+    introduce_in_goal(If, Name, Introduced, Goal),
+    !.
+introduce_in_goal(ite(If, Then, Else), Name,
+                  ite(If, Introduced, Else), Goal) :-
+    introduce_in_goal(Then, Name, Introduced, Goal),
+    !.
+introduce_in_goal(ite(If, Then, Else), Name,
+                  ite(If, Then, Introduced), Goal) :-
+    introduce_in_goal(Else, Name, Introduced, Goal).
+introduce_in_goal(not(Goal), Name, not(Introduced), Extracted) :-
+    introduce_in_goal(Goal, Name, Introduced, Extracted).
 
 safe_definition(Predicates, Key, Head, Body) :-
     member(mnn_pred(Key, _, _, [mnn_clause(_, Head, Body, _)], _),
