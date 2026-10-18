@@ -77,15 +77,17 @@ goal_outcomes(Goal, _, _, [0, 1]) :-
     semidet_builtin(Goal),
     !.
 goal_outcomes(Goal, Predicates, Stack, Outcomes) :-
-    zero_arity_user_goal(Goal, Predicates, Stack, Outcomes),
+    user_predicate_goal(Goal, Predicates, Stack, Outcomes),
     !.
 goal_outcomes(Goal, _, _, unavailable(unsupported_goal(Goal))).
 
-zero_arity_user_goal(Goal, Predicates, Stack, Outcomes) :-
+user_predicate_goal(Goal, Predicates, Stack, Outcomes) :-
     nonvar(Goal),
     callable(Goal),
-    functor(Goal, Name, 0),
-    Key = Name/0,
+    Goal =.. [Name|Arguments],
+    distinct_variables(Arguments),
+    length(Arguments, Arity),
+    Key = Name/Arity,
     member(mnn_pred(Key, _, _, Clauses, _), Predicates),
     !,
     (   memberchk(Key, Stack)

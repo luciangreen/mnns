@@ -138,6 +138,63 @@ test(analyzes_acyclic_zero_arity_user_calls) :-
                                  determinism(multi), success_counts([2])),
                        Results)).
 
+test(analyzes_acyclic_calls_with_distinct_unbound_arguments) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(always/1, ['?'], [any],
+                           [mnn_clause(1, always(_Value), true,
+                                       source(sample, 1))],
+                           original),
+                   mnn_pred(multiple/2, ['?', '?'], [any, any],
+                           [mnn_clause(2, multiple(_Left, _Right),
+                                       disj(true, true), source(sample, 2))],
+                           original),
+                   mnn_pred(nested/1, ['?'], [any],
+                           [mnn_clause(3, nested(Value), always(Value),
+                                       source(sample, 3))],
+                           original),
+                   mnn_pred(caller/2, ['?', '?'], [any, any],
+                           [mnn_clause(4, caller(Left, Right),
+                                       multiple(Left, Right),
+                                       source(sample, 4))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(nested/1, mode(all_arguments_unbound),
+                                determinism(det), success_counts([1])),
+                       Results)),
+    assertion(memberchk(predicate(caller/2, mode(all_arguments_unbound),
+                                determinism(multi), success_counts([2])),
+                       Results)).
+
+test(reports_bound_and_repeated_argument_calls_as_unsupported) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(source/2, ['?', '?'], [any, any],
+                           [mnn_clause(1, source(_Left, _Right), true,
+                                       source(sample, 1))],
+                           original),
+                   mnn_pred(bound_caller/1, ['?'], [any],
+                           [mnn_clause(2, bound_caller(Value),
+                                       source(fixed, Value),
+                                       source(sample, 2))],
+                           original),
+                   mnn_pred(repeated_caller/1, ['?'], [any],
+                           [mnn_clause(3, repeated_caller(Value),
+                                       source(Value, Value),
+                                       source(sample, 3))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(bound_caller/1,
+                                 mode(all_arguments_unbound),
+                                 unavailable(unsupported_goal(source(fixed, _))),
+                                 unsupported_body), Results)),
+    assertion(memberchk(predicate(repeated_caller/1,
+                                 mode(all_arguments_unbound),
+                                 unavailable(unsupported_goal(source(_, _))),
+                                 unsupported_body), Results)).
+
 test(reports_recursive_zero_arity_calls_as_unavailable) :-
     Program = mnn_program(
                   sample, meta(sample, []),
