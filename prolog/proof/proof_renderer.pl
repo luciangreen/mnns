@@ -43,6 +43,14 @@ render_report(accepted, proof([proof_step(Id, Rule, [],
     render_definition_rewrite(Rule),
     format('- Domain: `~q`~n', [Domain]),
     format('- Modes: `~q`~n', [Modes]).
+render_report(accepted, proof(Steps)) :-
+    is_list(Steps),
+    length(Steps, Count),
+    Count > 1,
+    !,
+    format('# Proof report~n~n', []),
+    format('**Independent check:** accepted.~n~n', []),
+    render_steps(Steps).
 render_report(Result, Proof) :-
     format('# Proof report~n~n', []),
     format('**Independent check:** `~q`.~n~n', [Result]),
@@ -56,3 +64,21 @@ render_definition_rewrite(unfold) :-
 render_definition_rewrite(fold) :-
     format('One ground body was replaced by its matching single-clause call; ', []),
     format('the definition body uses only pure built-ins.~n~n', []).
+
+render_steps([]).
+render_steps([proof_step(Id, Rule, _, equivalent(domain(Domain), modes(Modes)))
+              |Steps]) :-
+    format('## Step ~d: `~w`~n~n', [Id, Rule]),
+    render_step_summary(Rule),
+    format('- Domain: `~q`~n', [Domain]),
+    format('- Modes: `~q`~n~n', [Modes]),
+    render_steps(Steps).
+
+render_step_summary(identity) :-
+    format('The current IR is unchanged by this identity step.~n~n', []).
+render_step_summary(reorder_goals) :-
+    format('One adjacent pair of ground calls to pure unary type tests ', []),
+    format('was swapped in the current IR.~n~n', []).
+render_step_summary(Rule) :-
+    memberchk(Rule, [unfold, fold]),
+    render_definition_rewrite(Rule).
