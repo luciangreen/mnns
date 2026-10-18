@@ -84,21 +84,28 @@ generator conversion:
   the element argument is a distinct unbound variable.
 - `findall(Index, nth1(Index, List, _), Results)`, with the same variable and
   ground-list requirements; indices are one-based.
+- `findall(Template, select(Value, List, Rest), Results)`, where `List` is a
+  ground proper list and every selected solution grounds `Template`. Value and
+  remainder patterns are allowed; selection order and duplicate positions are
+  preserved.
 
 For each case, it reconstructs the complete expected output IR: the source call
 must be replaced by a call to a fresh helper containing the independently
 derived values, and that helper must be the two-clause deterministic list-copy
 loop. The `nth0/3` case derives zero-based indices and the `nth1/3` case derives
 one-based indices, both in list order; an empty list produces an empty values
-list. Existing clauses and predicates must be preserved; the generated helper's
-clause IDs and metadata events must also match. Thus a claimed conversion,
+list. For `select/3`, the checker independently enumerates each selected position,
+matches the value and remainder patterns, and collects the grounded templates in
+selection order. Existing clauses and predicates must be preserved; the generated
+helper's clause IDs and metadata events must also match. Thus a claimed conversion,
 altered values, missing helper, or unrelated program change is rejected.
 
-These checks cover only no-filter, ground-list `member/2` and the stated
-distinct-variable `nth0/3` and `nth1/3` index forms. They do not certify fact or
-rule generators, filters, nested findall, other list generators, or arbitrary
-`findall/3` rewrites. Ground domain and mode annotations are required but are
-not inferred. The checker does not import or invoke the loop2 converter.
+These checks cover only no-filter, ground-list `member/2`, the stated
+distinct-variable `nth0/3` and `nth1/3` index forms, and `select/3` with a
+grounded template. They do not certify fact or rule generators, filters, nested
+findall, `between/3`, `length/2`, other list generators, or arbitrary `findall/3`
+rewrites. Ground domain and mode annotations are required but are not inferred.
+The checker does not import or invoke the loop2 converter.
 
 The checker still does not implement general purity/determinism analysis,
 general clause/goal reordering, or the other rules in §7.2. Domain and mode

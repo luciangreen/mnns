@@ -61,7 +61,11 @@ the IR and does not import the optimizer. In addition to the rules described in
 `findall(Value, member(Value, GroundList), Results)` conversion and one
 `findall(Index, nth0(Index, GroundList, _), Results)` or
 `findall(Index, nth1(Index, GroundList, _), Results)` conversion, independently
-reconstructing the generated values, helper, and complete output IR. The index
+reconstructing the generated values, helper, and complete output IR. It also
+checks no-filter
+`findall(Template, select(Value, GroundList, Rest), Results)` conversions when
+every selected solution grounds the template, preserving selection order and
+duplicate positions while honoring value and remainder patterns. The index
 cases emit zero-based or one-based indices, respectively, and accept an empty
 ground list. These proof subsets exclude filters, fact/rule generators, nested
 findall, and other list generators. The renderer creates Markdown explanations

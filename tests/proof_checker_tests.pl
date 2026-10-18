@@ -143,6 +143,72 @@ test(accept_ground_nth1_index_findall_to_fold_on_empty_list) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_select_findall_to_fold_preserving_order_and_duplicates) :-
+    List = [a, b, a],
+    Template = pair(Value, Rest),
+    Generator = select(Value, List, Rest),
+    select_findall_to_fold_programs(Template, Generator, Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [pair(a, [b, a]), pair(b, [a, a]),
+                         pair(a, [a, b])]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_ground_select_findall_to_fold_with_pattern) :-
+    List = [a, b, a],
+    Template = Rest,
+    Generator = select(a, List, Rest),
+    select_findall_to_fold_programs(Template, Generator, Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [[b, a], [a, b]]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_ground_select_findall_to_fold_on_empty_list) :-
+    select_findall_to_fold_programs(Value, select(Value, [], _),
+                                    Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_select_findall_with_ungrounded_template) :-
+    select_findall_to_fold_programs(Template, select(Value, [a, b], Rest),
+                                    Original, Program),
+    assertion(Program =@= Original),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_ground_select_findall_to_fold_with_changed_values) :-
+    List = [a, b, a],
+    Template = pair(Value, Rest),
+    Generator = select(Value, List, Rest),
+    select_findall_to_fold_programs(Template, Generator, Original, Program0),
+    Program0 = mnn_program(Name, Meta, [Predicate, Helper], ProofData, Trace),
+    Predicate = mnn_pred(numbers/1, Modes, Domains,
+                          [mnn_clause(1, numbers(Results),
+                                      mnn_loop2_1(_, Results), Source)],
+                          Status),
+    Program = mnn_program(
+                  Name, Meta,
+                  [mnn_pred(numbers/1, Modes, Domains,
+                            [mnn_clause(1, numbers(Results),
+                                        mnn_loop2_1([pair(a, [b, a])], Results),
+                                        Source)],
+                            Status),
+                   Helper],
+                  ProofData, Trace),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_nth0_index_findall_to_fold_with_changed_indices) :-
     nth0_findall_to_fold_programs([a, b, a], Original, Program0),
     Program0 = mnn_program(Name, Meta,

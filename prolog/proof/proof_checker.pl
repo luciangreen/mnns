@@ -250,6 +250,42 @@ findall_candidate_values(Template, nth1(Index, List, Value), Indices) :-
     ground(List),
     is_list(List),
     list_indices(List, 1, Indices).
+findall_candidate_values(Template, select(Value, List, Rest), Values) :-
+    ground(List),
+    is_list(List),
+    select_candidate_values(List, Value, Rest, Template, Values).
+
+select_candidate_values(List, Value, Rest, Template, Values) :-
+    findall(candidate(TemplateCopy, Match),
+            ( selection(List, Selected, Remaining),
+              copy_term((Value, Rest, Template),
+                        (ValueCopy, RestCopy, TemplateCopy)),
+              (   ValueCopy = Selected,
+                  RestCopy = Remaining
+              ->  (   ground(TemplateCopy)
+                  ->  Match = selected
+                  ;   Match = unground
+                  )
+              ;   Match = excluded
+              )
+            ),
+            Candidates),
+    collect_select_values(Candidates, Values).
+
+collect_select_values([], []).
+collect_select_values([candidate(_, unground)|_], _) :-
+    !,
+    fail.
+collect_select_values([candidate(_, excluded)|Candidates], Values) :-
+    !,
+    collect_select_values(Candidates, Values).
+collect_select_values([candidate(Template, selected)|Candidates],
+                      [Template|Values]) :-
+    collect_select_values(Candidates, Values).
+
+selection([Value|Values], Value, Values).
+selection([Head|Values], Value, [Head|Rest]) :-
+    selection(Values, Value, Rest).
 
 list_indices(List, Indices) :-
     list_indices(List, 0, Indices).
