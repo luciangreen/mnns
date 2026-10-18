@@ -1,8 +1,9 @@
 # Proof rules
 
-The checker supports `identity`, restricted `reorder_goals`, and narrowly
-scoped `unfold` and `fold` rules. It certifies these transformations directly
-from the IR, without executing either program.
+The checker supports `identity`, restricted `reorder_goals` and
+`introduce_definition`, and narrowly scoped `unfold` and `fold` rules. It
+certifies these transformations directly from the IR, without executing either
+program.
 
 The accepted proof shape is:
 
@@ -47,12 +48,19 @@ does not fold a call into its own definition. The narrow ground-only condition
 avoids variable-binding, cut, meta-call, and side-effect hazards; it is not a
 general unfold/fold checker.
 
+`introduce_definition` accepts one change that replaces a ground goal composed
+only of the listed pure unary tests, `true`, `fail`, conjunction, or disjunction
+with a fresh zero-arity helper predicate whose sole clause contains that goal.
+The helper name and clause ID are generated without colliding with existing
+predicates or clauses. This limited rule does not infer general purity or
+determinism and does not support variable-bearing helper arguments.
+
 The checker still does not implement general purity/determinism analysis,
 general clause/goal reordering, or the other rules in §7.2. Domain and mode
 annotations must be ground but are not inferred. `render_proof/4` reports the
 independent checker's result and summarizes accepted identity, goal-reordering,
-unfold, and fold steps. Rendering is explanatory and does not itself certify a
-proof.
+definition-introduction, unfold, and fold steps. Rendering is explanatory and
+does not itself certify a proof.
 
 `mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` renders a
 Markdown report and includes the independent checker's result. Accepted identity

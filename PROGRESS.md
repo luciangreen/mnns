@@ -22,19 +22,20 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 - **Stage 2 — proof system: in progress.** The independent checker accepts
   identity proofs, narrowly scoped `reorder_goals` rewrites (swapping one
   adjacent pair of ground, pure unary type tests per step), and one-occurrence
-  `unfold` and `fold` rewrites for matching single-clause definitions with
-  ground heads and bodies made only of pure built-ins, `true`, `fail`,
-  conjunction and disjunction. Ordered sequences of these checked steps can be
-  independently verified and rendered as Markdown reports. General
-  purity/determinism analysis, general goal/clause reordering, and the other
-  proof rules remain unsupported.
+  `introduce_definition` rewrites that factor one ground pure goal into a fresh
+  zero-arity helper, plus one-occurrence `unfold` and `fold` rewrites for
+  matching single-clause definitions with ground heads and bodies made only of
+  pure built-ins, `true`, `fail`, conjunction and disjunction. Ordered sequences
+  of these checked steps can be independently verified and rendered as Markdown
+  reports. General purity/determinism analysis, general goal/clause reordering,
+  and the other proof rules remain unsupported.
 
 ## Remaining stages
 
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, and narrow ground unfold/fold only) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground definition introduction, and narrow ground unfold/fold only) |
 | 3 | PID termination measures and induction obligations | Not started |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |

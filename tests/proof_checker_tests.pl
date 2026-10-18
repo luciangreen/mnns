@@ -52,6 +52,45 @@ test(accept_fold_of_ground_pure_definition) :-
     definition_rewrite_proof(fold, Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_pure_definition_introduction) :-
+    definition_introduction_program(Original, Program),
+    definition_introduction_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_definition_introduction_in_proof_sequence) :-
+    definition_introduction_program(Original, Program),
+    Proof = proof([
+        proof_step(1, introduce_definition, [],
+                   equivalent(domain(any), modes([]))),
+        proof_step(2, identity, [],
+                   equivalent(domain(any), modes([])))
+    ]),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_impure_definition_introduction) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(sample/1, ['?'], [any],
+                             [mnn_clause(1, sample(X), conj(write(3), check(X)),
+                                         source(file, 1))],
+                             original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(sample/1, ['?'], [any],
+                            [mnn_clause(1, sample(Y),
+                                        conj(mnn_definition_1, check(Y)),
+                                        source(file, 1))],
+                            original),
+                   mnn_pred(mnn_definition_1/0, [], [],
+                            [mnn_clause(2, mnn_definition_1, write(3),
+                                        source(generated, 0))],
+                            introduced)],
+                  proof([]), trace([])),
+    definition_introduction_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_sequence_of_checked_rewrites) :-
     sequence_program(conj(positive(3), true),
                      conj(integer(3), atom(ok)), Original),
@@ -284,6 +323,13 @@ test(render_checked_unfold) :-
     assertion(sub_string(Markdown, _, _, _, 'single-clause definition')),
     assertion(sub_string(Markdown, _, _, _, 'pure built-ins')).
 
+test(render_checked_definition_introduction) :-
+    definition_introduction_program(Original, Program),
+    definition_introduction_proof(Proof),
+    mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
+    assertion(sub_string(Markdown, _, _, _, 'introduce_definition')),
+    assertion(sub_string(Markdown, _, _, _, 'fresh zero-arity helper predicate')).
+
 test(render_checked_rewrite_sequence) :-
     sequence_program(conj(positive(3), true),
                      conj(integer(3), atom(ok)), Original),
@@ -326,6 +372,30 @@ definition_rewrite_proof(Rule,
                          proof([proof_step(1, Rule, [],
                                            equivalent(domain(any),
                                                       modes([])))])).
+
+definition_introduction_proof(
+    proof([proof_step(1, introduce_definition, [],
+                      equivalent(domain(any), modes([])))])).
+
+definition_introduction_program(
+    mnn_program(sample, meta(file, []),
+                [mnn_pred(sample/1, ['?'], [any],
+                          [mnn_clause(1, sample(X),
+                                      conj(integer(3), check(X)),
+                                      source(file, 1))],
+                          original)],
+                proof([]), trace([])),
+    mnn_program(sample, meta(file, []),
+                [mnn_pred(sample/1, ['?'], [any],
+                          [mnn_clause(1, sample(Y),
+                                      conj(mnn_definition_1, check(Y)),
+                                      source(file, 1))],
+                          original),
+                 mnn_pred(mnn_definition_1/0, [], [],
+                          [mnn_clause(2, mnn_definition_1, integer(3),
+                                      source(generated, 0))],
+                          introduced)],
+                proof([]), trace([]))).
 
 definition_rewrite_program(DefinitionBody, CallerBody,
                            mnn_program(sample, meta(file, []),
