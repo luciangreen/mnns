@@ -66,24 +66,31 @@ run_isolated(Clauses, Goal, MaxAnswers, TimeLimit, Answers) :-
     term_variables(Goal, Variables),
     setup_call_cleanup(
         tmp_file_stream(text, File, Stream),
-        ( write_terms(Stream, Clauses),
+        ( write_terms(Stream,
+                      [(:- module(mnn_sandbox_runner_program, []))|Clauses]),
           close(Stream),
-          load_files(File, [module(mnn_sandbox_runner_program), silent(true)]),
+          file_name_extension(File, pl, SourceFile),
+          rename_file(File, SourceFile),
+          load_files(SourceFile,
+                     [module(mnn_sandbox_runner_program), silent(true)]),
           setup_call_cleanup(
               sandbox:safe_goal(mnn_sandbox_runner_program:Goal),
               call_with_time_limit(
                   TimeLimit,
                   findnsols(MaxAnswers, Variables,
                             mnn_sandbox_runner_program:Goal, Answers)),
-              unload_file(File))
+              unload_file(SourceFile))
         ),
         ( catch(close(Stream), _, true),
-          catch(unload_file(File), _, true),
+          catch(unload_file(SourceFile), _, true),
+          catch(delete_file(SourceFile), _, true),
           catch(delete_file(File), _, true)
         )).
 
-write_terms(_, []).
+write_terms(_, []) :-
+    !.
 write_terms(Stream, [Term|Terms]) :-
+    !,
     write_term(Stream, Term, [quoted(true), numbervars(true)]),
     write(Stream, '.\n\n'),
     write_terms(Stream, Terms).

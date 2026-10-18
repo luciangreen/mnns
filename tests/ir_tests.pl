@@ -15,7 +15,7 @@ test(parse_and_emit_round_trip) :-
     Program = mnn_program(sample, _, Predicates, proof([]), trace([])),
     assertion(Predicates = [
         mnn_pred(result/2, ['?', '?'], [any, any],
-                 [mnn_clause(2, _, conj(_, disj(_, _)), _),
+                 [mnn_clause(2, _, disj(conj(_, _), _), _),
                   mnn_clause(3, _, true, _)], original),
         mnn_pred(choose/2, ['?', '?'], [any, any],
                  [mnn_clause(4, _, ite(_, _, _), _)], original),
@@ -65,10 +65,9 @@ temporary_source(File) :-
     close(Stream).
 
 write_source(File, Terms) :-
-    setup_call_cleanup(
-        open(File, write, Stream),
-        write_source_terms(Stream, Terms),
-        close(Stream)).
+    open(File, write, Stream),
+    write_source_terms(Stream, Terms),
+    close(Stream).
 
 write_source_terms(_, []).
 write_source_terms(Stream, [Term|Terms]) :-

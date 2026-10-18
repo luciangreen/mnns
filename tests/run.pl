@@ -1,7 +1,8 @@
 :- initialization(main, main).
 
 main :-
-    prolog_load_context(directory, Directory),
+    source_file(main, RunnerFile),
+    file_directory_name(RunnerFile, Directory),
     directory_file_path(Directory, 'ir_tests.pl', Tests),
     load_files(Tests, [silent(true)]),
     directory_file_path(Directory, 'test_corpus.pl', CorpusTests),
