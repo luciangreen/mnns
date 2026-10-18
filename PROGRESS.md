@@ -19,17 +19,18 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   acceptance corpus and successful CI validation are still outstanding.
 - Current validation command: `swipl -q -s tests/run.pl` (the new CI job runs this
   command).
-- **Stage 2 — proof system: in progress.** An independent checker now accepts a
-  narrow identity proof for alpha-equivalent IR programs and rejects malformed,
-  unsupported or inequivalent proofs. Identity proofs can be rendered as checked
-  Markdown reports. No rewrite rule is certified yet.
+- **Stage 2 — proof system: in progress.** The independent checker accepts
+  identity proofs and one narrowly scoped `reorder_goals` rewrite: swapping one
+  adjacent pair of ground, pure unary type tests in a clause body. Other
+  rewrites, including general goal/clause reordering and unfold/fold, remain
+  unsupported. Checked proofs can be rendered as Markdown reports.
 
 ## Remaining stages
 
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity rule and rendering only) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity and restricted ground-test reordering only) |
 | 3 | PID termination measures and induction obligations | Not started |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |
