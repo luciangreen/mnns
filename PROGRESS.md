@@ -25,7 +25,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   identity proofs, narrowly scoped `reorder_goals` rewrites (swapping one
   adjacent pair of ground, pure unary type tests per step), and one-occurrence
   `introduce_definition` rewrites that factor one ground pure goal into a fresh
+<<<<<<< HEAD
   zero-arity helper. One-occurrence `unfold` and `fold` rewrites support matching
+=======
+  zero-arity helper or a one-variable pure goal into a fresh unary helper.
+  One-occurrence `unfold` and `fold` rewrites support matching
+>>>>>>> origin/main
   single-clause ground definitions and unary variable definitions whose bodies
   use only the listed pure type tests, `true`, `fail`, conjunction and
   disjunction; variable-bearing folds require variant body matching to preserve
@@ -54,7 +59,11 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
+<<<<<<< HEAD
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground definition introduction, and narrow ground or unary variable type-test unfold/fold) |
+=======
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
+>>>>>>> origin/main
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, and schematic measure-backed clause obligations; user specifications and broader measure forms remain) |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |

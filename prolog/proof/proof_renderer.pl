@@ -80,9 +80,9 @@ render_definition_rewrite(fold) :-
     format('conjunctions, or disjunctions.~n~n', []).
 
 render_definition_introduction :-
-    format('One ground pure goal was factored into a fresh zero-arity ', []),
-    format('helper predicate. The checker validates the helper body and ', []),
-    format('certifies no other changes.~n~n', []).
+    format('One ground or unary-variable pure goal was factored into a ', []),
+    format('fresh zero- or one-arity helper predicate. The checker validates ', []),
+    format('the helper body and certifies no other changes.~n~n', []).
 
 render_steps([]).
 render_steps([proof_step(Id, Rule, _, equivalent(domain(Domain), modes(Modes)))

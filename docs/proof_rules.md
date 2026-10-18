@@ -54,9 +54,14 @@ unfold/fold checking.
 `introduce_definition` accepts one change that replaces a ground goal composed
 only of the listed pure unary tests, `true`, `fail`, conjunction, or disjunction
 with a fresh zero-arity helper predicate whose sole clause contains that goal.
-The helper name and clause ID are generated without colliding with existing
-predicates or clauses. This limited rule does not infer general purity or
-determinism and does not support variable-bearing helper arguments.
+It also accepts a goal over exactly one variable when it consists only of `true`,
+`fail`, or the listed pure unary tests applied to that same variable, composed
+with conjunction or disjunction. This is factored into a fresh unary helper; the
+caller passes the variable through, and the generated helper clause uses a fresh
+variable shared only between its head and body. The helper name and clause ID are
+generated without colliding with existing predicates or clauses. This limited
+rule does not infer general purity or determinism and does not support goals over
+multiple variables.
 
 The checker still does not implement general purity/determinism analysis,
 general clause/goal reordering, or the other rules in §7.2. Domain and mode

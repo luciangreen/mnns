@@ -57,6 +57,56 @@ test(accept_ground_pure_definition_introduction) :-
     definition_introduction_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_unary_variable_definition_introduction) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(sample/1, ['?'], [any],
+                             [mnn_clause(1, sample(X),
+                                         conj(integer(X), check(X)),
+                                         source(file, 1))],
+                             original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(sample/1, ['?'], [any],
+                            [mnn_clause(1, sample(Y),
+                                        conj(mnn_definition_1(Y), check(Y)),
+                                        source(file, 1))],
+                            original),
+                   mnn_pred(mnn_definition_1/1, ['?'], [any],
+                            [mnn_clause(2, mnn_definition_1(Z), integer(Z),
+                                        source(generated, 0))],
+                            introduced)],
+                  proof([]), trace([])),
+    definition_introduction_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_multi_variable_definition_introduction) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(sample/2, ['?', '?'], [any, any],
+                             [mnn_clause(1, sample(X, Y),
+                                         conj(integer(X), atom(Y)),
+                                         source(file, 1))],
+                             original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(sample/2, ['?', '?'], [any, any],
+                            [mnn_clause(1, sample(A, B),
+                                        mnn_definition_1(A, B),
+                                        source(file, 1))],
+                            original),
+                   mnn_pred(mnn_definition_1/2, ['?', '?'], [any, any],
+                            [mnn_clause(2, mnn_definition_1(C, D),
+                                        conj(integer(C), atom(D)),
+                                        source(generated, 0))],
+                            introduced)],
+                  proof([]), trace([])),
+    definition_introduction_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_definition_introduction_in_proof_sequence) :-
     definition_introduction_program(Original, Program),
     Proof = proof([
@@ -440,7 +490,7 @@ test(render_checked_definition_introduction) :-
     definition_introduction_proof(Proof),
     mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
     assertion(sub_string(Markdown, _, _, _, 'introduce_definition')),
-    assertion(sub_string(Markdown, _, _, _, 'fresh zero-arity helper predicate')).
+    assertion(sub_string(Markdown, _, _, _, 'helper predicate')).
 
 test(render_checked_rewrite_sequence) :-
     sequence_program(conj(positive(3), true),
