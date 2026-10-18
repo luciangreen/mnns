@@ -1,8 +1,8 @@
 # Proof rules
 
-The checker supports `identity` and a restricted `reorder_goals` rule. It
-certifies these transformations directly from the IR, without executing either
-program.
+The checker supports `identity`, restricted `reorder_goals`, and narrowly
+scoped `unfold` and `fold` rules. It certifies these transformations directly
+from the IR, without executing either program.
 
 The accepted proof shape is:
 
@@ -37,11 +37,21 @@ variable-bearing goals, other predicates, extra changes, and unsupported proof
 rules. Domain and mode annotations must be ground, but this restricted rule does
 not infer them.
 
-This subset certifies only one such local reordering; it does not yet implement
-general purity/determinism analysis, unfold/fold, clause reordering, or other
-rules in §7.2. `render_proof/4` reports the independent checker's result for
-accepted and rejected proofs. Rendering is explanatory and does not itself
-certify a proof.
+The unfold and fold rules use the same proof-step shape, with `unfold` or `fold`
+as the rule name. They accept exactly one occurrence change in one clause body.
+The checker requires a matching predicate definition with exactly one clause,
+a ground head, and a ground body consisting only of `true`, `fail`, the listed
+pure unary tests, and conjunctions or disjunctions of those goals. Unfold
+replaces the matching ground call with that body. Fold performs the inverse and
+does not fold a call into its own definition. The narrow ground-only condition
+avoids variable-binding, cut, meta-call, and side-effect hazards; it is not a
+general unfold/fold checker.
+
+The checker still does not implement general purity/determinism analysis,
+general clause/goal reordering, or the other rules in §7.2. Domain and mode
+annotations must be ground but are not inferred. `render_proof/4` reports the
+independent checker's result and summarizes accepted identity, unfold, and fold
+steps. Rendering is explanatory and does not itself certify a proof.
 
 `mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` renders a
 Markdown report and includes the independent checker's result. Accepted identity

@@ -20,17 +20,20 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 - Current validation command: `swipl -q -s tests/run.pl` (the new CI job runs this
   command).
 - **Stage 2 — proof system: in progress.** The independent checker accepts
-  identity proofs and one narrowly scoped `reorder_goals` rewrite: swapping one
-  adjacent pair of ground, pure unary type tests in a clause body. Other
-  rewrites, including general goal/clause reordering and unfold/fold, remain
-  unsupported. Checked proofs can be rendered as Markdown reports.
+  identity proofs, one narrowly scoped `reorder_goals` rewrite (swapping one
+  adjacent pair of ground, pure unary type tests), and one-occurrence `unfold`
+  and `fold` rewrites for matching single-clause definitions with ground heads
+  and bodies made only of pure built-ins, `true`, `fail`, conjunction and
+  disjunction. General purity/determinism analysis, general goal/clause
+  reordering, and the other proof rules remain unsupported. Checked proofs can
+  be rendered as Markdown reports.
 
 ## Remaining stages
 
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity and restricted ground-test reordering only) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, and narrow ground unfold/fold only) |
 | 3 | PID termination measures and induction obligations | Not started |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |
