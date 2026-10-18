@@ -35,8 +35,11 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   conversions for
   `findall(Value, member(Value, GroundList), Results)`,
   `findall(Index, nth0(Index, GroundList, _), Results)`, and
-  `findall(Index, nth1(Index, GroundList, _), Results)` by rebuilding the
-  expected output and deterministic copy helper. Ordered sequences of
+  `findall(Index, nth1(Index, GroundList, _), Results)`, and no-filter
+  `findall(Template, select(Value, GroundList, Rest), Results)` when each
+  selected template is ground. Selection order, duplicate positions, and
+  value/remainder patterns are checked by rebuilding the expected output and
+  deterministic copy helper. Ordered sequences of
   these checked steps can be independently verified and rendered as Markdown
   reports. Other findall conversions, general purity/determinism analysis,
   general goal/clause reordering, and the other proof rules remain unsupported.
@@ -73,21 +76,22 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   bound call arguments are matched against rule heads. Arbitrary predicate
   filters, variable bounds, recursive dependencies, unsupported rule bodies,
   and nested `findall/3` remain unsupported. Most conversion proofs are not
-  independently checked; the proof checker validates only the direct no-filter
-  ground-list `member/2` subset. Conversion traverses supported `findall/3` goals
-  inside normalized conjunction, disjunction, if-then-else, negation, and
-  `once/1`, preserving the surrounding control structure. The converter emits a
-  distinct deterministic recursive list-copy helper for each conversion.
+  independently checked; the proof checker validates only direct no-filter
+  ground-list `member/2`, `select/3`, and `nth0/3`/`nth1/3` index subsets.
+  Conversion traverses supported `findall/3` goals inside normalized
+  conjunction, disjunction, if-then-else, negation, and `once/1`, preserving the
+  surrounding control structure. The converter emits a distinct deterministic
+  recursive list-copy helper for each conversion.
   Its report cites the findall-to-fold lemma and records finiteness, safe-filter,
   and determinism side conditions as an obligation; the independent checker
-  currently validates only the stated ground-list member subset.
+  currently validates only the stated ground-list subsets.
 
 ## Remaining stages
 
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, and direct no-filter ground-list member, nth0-index, and nth1-index findall conversions) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, and direct no-filter ground-list member, select, nth0-index, and nth1-index findall conversions) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and general checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode, including acyclic calls with distinct unbound arguments, ground whitelisted built-ins with exceptions reported unavailable, bounded literal `between/3`, and `once/1` count capping; general mode inference, bound/repeated-argument calls, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
