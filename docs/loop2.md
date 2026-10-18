@@ -7,6 +7,10 @@ The current supported subset is deliberately narrow:
 
 - A direct call to a predicate whose clauses are all ground facts, optionally
   followed by arithmetic comparisons in a conjunction.
+- A call to a finite, acyclic chain of facts and rules. Rule bodies may use
+  conjunction, disjunction, `true`, `fail`, other supported source-predicate
+  calls, and supported arithmetic comparisons. Clause order and answer order
+  are preserved, including answers from multi-clause rules.
 - `member/2` over a ground proper list, optionally followed by arithmetic
   comparisons. List order and duplicate elements are preserved.
 - `nth0/3` or `nth1/3` over a ground proper list, optionally followed by
@@ -28,18 +32,22 @@ execute arbitrary filter goals.
 The converter materializes the ordered template values that pass the filters
 and replaces the goal with a call to a fresh, deterministic recursive list-copy
 loop. It preserves source predicates and clause order. Unsupported generators,
-rules, other built-ins, arbitrary filter predicates, unbound arithmetic, and
+recursive rule dependencies, rule bodies containing unsupported goals, other
+built-ins, arbitrary filter predicates, unbound rule-body arithmetic, and
 generators with variable-valued templates remain unchanged. `between/3` with
 non-ground or non-integer bounds, or ranges above the limit, also remains
 unchanged. `nth0/3` and `nth1/3` with a variable or improper list, or with an
 index that is neither a variable nor an integer, remain unchanged.
 
-Each conversion report cites the `findall_to_fold` lemma and records the
-generator-specific finiteness condition (ground facts, a ground list, or a
-bounded `between/3` range), safe-arithmetic-filter condition, and
-deterministic-loop condition. The report is an obligation, not a checked proof:
-the independent proof checker does not yet validate this loop2 rule. Do not
-treat converted output as proof-certified.
+Rule bodies are interpreted only through this bounded pure subset; the
+converter does not execute arbitrary rule goals. A dependency cycle, cut,
+meta-call, or unsupported body goal prevents conversion. Each conversion report
+cites the `findall_to_fold` lemma and records the generator-specific finiteness
+condition (ground facts, finite acyclic rules, a ground list, or a bounded
+`between/3` range), safe-arithmetic-filter condition, and deterministic-loop
+condition. The report is an obligation, not a checked proof: the independent
+proof checker does not yet validate this loop2 rule. Do not treat converted
+output as proof-certified.
 
 Run the full suite, including loop2 tests, with:
 

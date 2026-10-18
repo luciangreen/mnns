@@ -70,11 +70,11 @@ test(leaves_unsupported_or_unbound_filters_unchanged, [nondet]) :-
                            original),
                   Predicates)).
 
-test(leaves_rule_generators_and_unrelated_cut_unchanged, [nondet]) :-
+test(leaves_unsupported_rule_generators_and_unrelated_cut_unchanged, [nondet]) :-
     with_converted_program(
         [num(1),
          num(2),
-         (positive(X) :- num(X), X > 1),
+         (positive(X) :- num(X), append([X], [], [2])),
          positive(0),
          (stop :- !),
          (numbers(Values) :- findall(X, positive(X), Values))],
@@ -88,6 +88,45 @@ test(leaves_rule_generators_and_unrelated_cut_unchanged, [nondet]) :-
                               original),
                      Predicates)),
     run_converted(Converted, numbers(_), [[[2, 0]]]).
+
+test(converts_finite_multiclause_rule_generator_in_clause_order, [nondet]) :-
+    with_converted_program(
+        [num(1),
+         num(2),
+         num(3),
+         (positive(X) :- num(X), X > 1),
+         positive(0),
+         (numbers(Values) :- findall(X, positive(X), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_acyclic_rules(3),
+                                        safe_arithmetic_filters(0),
+                                        deterministic_loop))])),
+    run_converted(Converted, numbers(Values), [[[2, 3, 0]]]).
+
+test(leaves_recursive_and_unbound_rule_generators_unchanged, [nondet]) :-
+    with_converted_program(
+        [(recursive(X) :- recursive(X)),
+         (unbound(X) :- X > _Limit),
+         (recursive_values(Values) :-
+             findall(X, recursive(X), Values)),
+         (unbound_values(Values) :-
+             findall(X, unbound(X), Values))],
+        Converted, loop2_report([])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(
+                  mnn_pred(recursive_values/1, _, _,
+                           [mnn_clause(_, _,
+                                       findall(_, recursive(_), _), _)],
+                           original),
+                  Predicates)),
+    assertion(member(
+                  mnn_pred(unbound_values/1, _, _,
+                           [mnn_clause(_, _,
+                                       findall(_, unbound(_), _), _)],
+                           original),
+                  Predicates)).
 
 test(leaves_unsupported_builtin_generators_unchanged, [nondet]) :-
     with_converted_program(
