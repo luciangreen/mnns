@@ -53,10 +53,10 @@ test(accept_fold_of_ground_pure_definition) :-
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
 test(accept_sequence_of_checked_rewrites) :-
-    sequence_program(
-        conj(conj(integer(3), atom(ok)), positive(3)), Original),
-    sequence_program(
-        conj(conj(atom(ok), integer(3)), integer(3)), Program),
+    sequence_program(conj(positive(3), true),
+                     conj(integer(3), atom(ok)), Original),
+    sequence_program(conj(conj(atom(ok), integer(3)), true),
+                     conj(atom(ok), integer(3)), Program),
     Proof = proof([
         proof_step(1, reorder_goals, [],
                    equivalent(domain(any), modes([]))),
@@ -66,10 +66,10 @@ test(accept_sequence_of_checked_rewrites) :-
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
 test(reject_sequence_with_invalid_intermediate_rewrite) :-
-    sequence_program(
-        conj(conj(integer(3), atom(ok)), positive(3)), Original),
-    sequence_program(
-        conj(conj(atom(ok), integer(3)), positive(3)), Program),
+    sequence_program(conj(positive(3), true),
+                     conj(integer(3), atom(ok)), Original),
+    sequence_program(conj(positive(3), true),
+                     conj(atom(ok), integer(3)), Program),
     Proof = proof([
         proof_step(1, reorder_goals, [],
                    equivalent(domain(any), modes([]))),
@@ -268,10 +268,10 @@ test(render_checked_unfold) :-
     assertion(sub_string(Markdown, _, _, _, 'pure built-ins')).
 
 test(render_checked_rewrite_sequence) :-
-    sequence_program(
-        conj(conj(integer(3), atom(ok)), positive(3)), Original),
-    sequence_program(
-        conj(conj(atom(ok), integer(3)), integer(3)), Program),
+    sequence_program(conj(positive(3), true),
+                     conj(integer(3), atom(ok)), Original),
+    sequence_program(conj(conj(atom(ok), integer(3)), true),
+                     conj(atom(ok), integer(3)), Program),
     Proof = proof([
         proof_step(1, reorder_goals, [],
                    equivalent(domain(any), modes([]))),
@@ -324,17 +324,17 @@ definition_rewrite_program(DefinitionBody, CallerBody,
                                                  original)],
                                        proof([]), trace([]))).
 
-sequence_program(CallerBody,
+sequence_program(CallerBody, DefinitionBody,
                  mnn_program(sample, meta(file, []),
-                             [mnn_pred(positive/1, ['?'], [any],
-                                       [mnn_clause(
-                                           1, positive(3), integer(3),
-                                           source(file, 1))],
-                                       original),
-                              mnn_pred(result/0, [], [],
+                             [mnn_pred(result/0, [], [],
                                        [mnn_clause(
                                            2, result, CallerBody,
                                            source(file, 2))],
+                                       original),
+                              mnn_pred(positive/1, ['?'], [any],
+                                       [mnn_clause(
+                                           1, positive(3), DefinitionBody,
+                                           source(file, 1))],
                                        original)],
                              proof([]), trace([]))).
 

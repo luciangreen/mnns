@@ -103,6 +103,7 @@ reorder_goal(conj(Left, Right), conj(ReorderedLeft, Right), Count) :-
     reorder_goal(Left, ReorderedLeft, Count).
 reorder_goal(conj(Left, Right), conj(Left, ReorderedRight), Count) :-
     reorder_goal(Right, ReorderedRight, Count).
+reorder_goal(Goal, Goal, 0).
 
 safe_ground_test(Goal) :-
     ground(Goal),
