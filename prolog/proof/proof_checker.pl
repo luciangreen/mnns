@@ -233,13 +233,13 @@ rewrite_goal(Rule, Definitions, Key, Goal, RewrittenGoal) :-
     nonvar(Goal),
     rewrite_nonvar_goal(Rule, Definitions, Key, Goal, RewrittenGoal).
 
-rewrite_nonvar_goal(unfold, Definitions, _, Goal, Body) :-
+rewrite_nonvar_goal(unfold, Definitions, _, Goal, RewrittenBody) :-
     safe_definition(Definitions, _, Head, Body),
-    Goal == Head.
-rewrite_nonvar_goal(fold, Definitions, CallerKey, Goal, Head) :-
+    unfold_definition(Goal, Head, Body, RewrittenBody).
+rewrite_nonvar_goal(fold, Definitions, CallerKey, Goal, RewrittenHead) :-
     safe_definition(Definitions, DefinitionKey, Head, Body),
     CallerKey \== DefinitionKey,
-    Goal == Body.
+    fold_definition(Goal, Head, Body, RewrittenHead).
 rewrite_nonvar_goal(Rule, Definitions, Key, conj(Left, Right),
                     conj(RewrittenLeft, Right)) :-
     rewrite_goal(Rule, Definitions, Key, Left, RewrittenLeft).
@@ -370,16 +370,57 @@ introduce_in_goal(not(Goal), Name, not(Introduced), Extracted) :-
 safe_definition(Predicates, Key, Head, Body) :-
     member(mnn_pred(Key, _, _, [mnn_clause(_, Head, Body, _)], _),
            Predicates),
-    ground(Head),
-    ground(Body),
     functor(Head, Name, Arity),
     Key == Name/Arity,
-    safe_pure_goal(Body),
+    (   ground(Head),
+        ground(Body),
+        safe_pure_goal(Body)
+    ;   safe_variable_definition(Head, Body)
+    ),
     findall(Clauses,
             ( member(mnn_pred(OtherKey, _, _, Clauses, _), Predicates),
               OtherKey == Key
             ),
             [[mnn_clause(_, _, _, _)]]).
+
+unfold_definition(Goal, Head, Body, Body) :-
+    ground(Head),
+    Goal == Head.
+unfold_definition(Goal, Head, Body, RewrittenBody) :-
+    safe_variable_definition(Head, Body),
+    copy_term(Head-Body, FreshHead-FreshBody),
+    Goal = FreshHead,
+    RewrittenBody = FreshBody.
+
+fold_definition(Goal, Head, Body, Head) :-
+    ground(Body),
+    Goal == Body.
+fold_definition(Goal, Head, Body, RewrittenHead) :-
+    safe_variable_definition(Head, Body),
+    copy_term(Head-Body, FreshHead-FreshBody),
+    Goal =@= FreshBody,
+    Goal = FreshBody,
+    RewrittenHead = FreshHead.
+
+safe_variable_definition(Head, Body) :-
+    Head =.. [_Name, Argument],
+    var(Argument),
+    nonvar(Body),
+    safe_variable_pure_goal(Body, Argument).
+
+safe_variable_pure_goal(true, _).
+safe_variable_pure_goal(fail, _).
+safe_variable_pure_goal(Goal, Argument) :-
+    nonvar(Goal),
+    Goal =.. [Name, GoalArgument],
+    GoalArgument == Argument,
+    memberchk(Name, [atom, atomic, compound, ground, integer, is_list, number]).
+safe_variable_pure_goal(conj(Left, Right), Argument) :-
+    safe_variable_pure_goal(Left, Argument),
+    safe_variable_pure_goal(Right, Argument).
+safe_variable_pure_goal(disj(Left, Right), Argument) :-
+    safe_variable_pure_goal(Left, Argument),
+    safe_variable_pure_goal(Right, Argument).
 
 safe_pure_goal(true).
 safe_pure_goal(fail).

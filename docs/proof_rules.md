@@ -40,13 +40,16 @@ not infer them.
 
 The unfold and fold rules use the same proof-step shape, with `unfold` or `fold`
 as the rule name. They accept exactly one occurrence change in one clause body.
-The checker requires a matching predicate definition with exactly one clause,
-a ground head, and a ground body consisting only of `true`, `fail`, the listed
-pure unary tests, and conjunctions or disjunctions of those goals. Unfold
-replaces the matching ground call with that body. Fold performs the inverse and
-does not fold a call into its own definition. The narrow ground-only condition
-avoids variable-binding, cut, meta-call, and side-effect hazards; it is not a
-general unfold/fold checker.
+The checker requires a matching single-clause definition. Ground heads with
+ground bodies remain supported when the body consists only of `true`, `fail`,
+the listed pure unary tests, and conjunctions or disjunctions of those goals.
+It also supports unary variable heads such as `positive(X)` when the body uses
+only `true`, `fail`, or those same pure unary tests applied to that head
+argument, composed with conjunction or disjunction. Unfold instantiates such a
+body from the matched call. Fold requires the occurrence to be a variant of the
+variable-bearing body, so it cannot introduce variable aliasing. Both rules
+exclude cuts, meta-calls, and side effects, and do not implement general
+unfold/fold checking.
 
 `introduce_definition` accepts one change that replaces a ground goal composed
 only of the listed pure unary tests, `true`, `fail`, conjunction, or disjunction
