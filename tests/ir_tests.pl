@@ -42,6 +42,24 @@ test(reject_call_goal, [throws(error(domain_error(call_free_goal, _), _))]) :-
         ),
         delete_file(Source)).
 
+test(preserves_clause_source_lines) :-
+    setup_call_cleanup(
+        temporary_source(Source),
+        ( write_source(Source, [
+              (:- module(located, [])),
+              first_fact,
+              (second_rule :- true)
+          ]),
+          mnn_ir:parse_program(Source, mnn_program(_, _, Predicates, _, _)),
+          assertion(Predicates = [
+              mnn_pred(first_fact/0, [], [], [mnn_clause(2, _, true,
+                                                        source(Source, 2))], original),
+              mnn_pred(second_rule/0, [], [], [mnn_clause(3, _, true,
+                                                          source(Source, 3))], original)
+          ])
+        ),
+        delete_file(Source)).
+
 temporary_source(File) :-
     tmp_file_stream(text, File, Stream),
     close(Stream).

@@ -12,12 +12,13 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   rejected. The sandboxed runner strips source directives before loading clauses,
   validates queries with SWI-Prolog's sandbox, and bounds time and answer count.
   A round-trip corpus now covers recursive rules, cuts, control flow, generators,
-  lists, arithmetic, strings and terms. Stage 1 is not complete: CI, full
-  supported syntax coverage and the complete acceptance corpus remain to be
-  implemented and validated. The runner has only been tested against its focused
-  tests; SWI-Prolog is unavailable in the current environment.
-- Current validation command: `swipl -q -s tests/run.pl` (not run in this
-  environment because SWI-Prolog is unavailable).
+  lists, arithmetic, strings, terms, and required list/generator built-ins; the
+  runner now has execution checks for list operations, arithmetic, and finite
+  generators. CI runs the Prolog test suite on pushes and pull requests. Stage 1
+  remains in progress: the full supported-syntax acceptance corpus and successful
+  CI validation are still outstanding.
+- Current validation command: `swipl -q -s tests/run.pl` (not run locally because
+  SWI-Prolog is unavailable; the new CI job runs it).
 
 ## Remaining stages
 

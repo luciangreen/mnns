@@ -14,6 +14,20 @@ test(run_clause_program) :-
         ),
         delete_file(Source)).
 
+test(run_required_builtins_and_arithmetic) :-
+    source_file(run_required_builtins_and_arithmetic, TestFile),
+    file_directory_name(TestFile, TestDirectory),
+    directory_file_path(TestDirectory, corpus, CorpusDirectory),
+    directory_file_path(CorpusDirectory, 'builtins_and_arithmetic.pl', Source),
+    mnn_sandbox_runner:run_program(
+        Source,
+        summarize([2, 3, 5], Length, First, Last, Extended, Total, Doubled),
+        [],
+        answers([[3, 2, 5, [2, 3, 5, tail], 10, 20]])),
+    mnn_sandbox_runner:run_program(
+        Source, selected([1, 2, 3, 4, 11], Selected), [],
+        answers([[2, 4]])).
+
 test(ignore_source_directives) :-
     setup_call_cleanup(
         temporary_source(Source),
