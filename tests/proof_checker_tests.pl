@@ -156,7 +156,7 @@ test(reject_findall_to_fold_with_filter) :-
                                          source(source, 1))],
                              original)],
                    proof([]), trace([])),
-    Program = Original,
+    findall_to_fold_programs(_, Program),
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).

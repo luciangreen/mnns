@@ -23,8 +23,10 @@ the current implementation and remaining work.
   [`prolog/runner/sandbox_runner.pl`](prolog/runner/sandbox_runner.pl).
 - **Proof checker and renderer:** independently checks identity, one adjacent
   reordering of restricted ground type tests, restricted definition
-  introduction, and narrow single-occurrence unfold/fold steps. Unsupported
-  rules are rejected. See [`docs/proof_rules.md`](docs/proof_rules.md).
+  introduction, narrow single-occurrence unfold/fold steps, and a direct
+  no-filter `findall/3` over `member/2` on a ground proper list. Unsupported
+  rules and broader findall conversions are rejected. See
+  [`docs/proof_rules.md`](docs/proof_rules.md).
 - **PID analysis:** classifies recursive predicates, checks a limited set of
   shared structural and guarded natural-number decreases, and emits schematic
   induction obligations for supported measures; it also identifies syntactic
