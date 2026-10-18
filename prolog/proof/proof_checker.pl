@@ -206,11 +206,10 @@ findall_to_fold_program(
     is_list(Events),
     is_list(Predicates),
     findall(PredicateIndex-ClauseIndex,
-            member_findall_candidate(Predicates, PredicateIndex, ClauseIndex,
-                                     _, _),
+            findall_candidate(Predicates, PredicateIndex, ClauseIndex, _, _),
             [PredicateIndex-ClauseIndex]),
-    member_findall_candidate(Predicates, PredicateIndex, ClauseIndex,
-                             Values, Results),
+            findall_candidate(Predicates, PredicateIndex, ClauseIndex,
+                              Values, Results),
     fresh_loop_name(Predicates, Loop),
     max_clause_id(Predicates, MaxClauseId),
     FirstGeneratedId is MaxClauseId + 1,
@@ -222,18 +221,35 @@ findall_to_fold_program(
     append(Events, [clause(FirstGeneratedId), clause(SecondGeneratedId)],
            UpdatedEvents).
 
-member_findall_candidate(Predicates, PredicateIndex, ClauseIndex, Values,
-                         Results) :-
+findall_candidate(Predicates, PredicateIndex, ClauseIndex, Values, Results) :-
     nth1(PredicateIndex, Predicates, Predicate),
     arg(4, Predicate, Clauses),
     nth1(ClauseIndex, Clauses, Clause),
     arg(3, Clause, Body),
     nonvar(Body),
-    Body = findall(Template, member(Value, List), Results),
+    Body = findall(Template, Generator, Results),
+    findall_candidate_values(Template, Generator, Values).
+
+findall_candidate_values(Template, member(Value, List), List) :-
     Template == Value,
     ground(List),
+    is_list(List).
+findall_candidate_values(Template, nth0(Index, List, Value), Indices) :-
+    Template == Index,
+    var(Index),
+    var(Value),
+    Index \== Value,
+    ground(List),
     is_list(List),
-    Values = List.
+    list_indices(List, Indices).
+
+list_indices(List, Indices) :-
+    list_indices(List, 0, Indices).
+
+list_indices([], _, []).
+list_indices([_|Values], Index, [Index|Indices]) :-
+    NextIndex is Index + 1,
+    list_indices(Values, NextIndex, Indices).
 
 replace_findall_candidate(
     [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],

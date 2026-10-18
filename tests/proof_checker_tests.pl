@@ -123,6 +123,54 @@ test(accept_direct_ground_member_findall_to_fold) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_nth0_index_findall_to_fold) :-
+    nth0_findall_to_fold_programs([a, b, a], Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_ground_nth0_index_findall_to_fold_on_empty_list) :-
+    nth0_findall_to_fold_programs([], Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_nth0_index_findall_to_fold_with_changed_indices) :-
+    nth0_findall_to_fold_programs([a, b, a], Original, Program0),
+    Program0 = mnn_program(Name, Meta,
+                           [Predicate, Helper], Proof, Trace),
+    Predicate = mnn_pred(numbers/1, Modes, Domains,
+                         [mnn_clause(1, numbers(Results),
+                                     mnn_loop2_1([0, 1, 2], Results),
+                                     source(source, 1))],
+                         original),
+    Program = mnn_program(
+                  Name, Meta,
+                  [mnn_pred(numbers/1, Modes, Domains,
+                            [mnn_clause(1, numbers(Results),
+                                        mnn_loop2_1([0, 2], Results),
+                                        source(source, 1))],
+                            original),
+                   Helper],
+                  Proof, Trace),
+    findall_to_fold_proof(ProofTerm),
+    mnn_proof_checker:check_proof(
+        Program, Original, ProofTerm, rejected(invalid_or_unsupported_proof)).
+
+test(reject_nth0_index_findall_to_fold_with_shared_index_and_element) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                         findall(Index,
+                                                 nth0(Index, [a, 1, c], Index),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_findall_to_fold_with_changed_values) :-
     findall_to_fold_programs(Original, Program0),
     Program0 = mnn_program(Name, Meta, [Predicate, Helper], Proof, Trace),
@@ -554,6 +602,13 @@ test(render_checked_findall_to_fold) :-
     assertion(sub_string(Markdown, _, _, _, 'ground proper-list')),
     assertion(sub_string(Markdown, _, _, _, 'Independent check:** accepted.')).
 
+test(render_checked_nth0_index_findall_to_fold) :-
+    nth0_findall_to_fold_programs([a, b], Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
+    assertion(sub_string(Markdown, _, _, _, 'findall_to_fold')),
+    assertion(sub_string(Markdown, _, _, _, '**Independent check:** accepted.')).
+
 test(render_checked_rewrite_sequence) :-
     sequence_program(conj(positive(3), true),
                      conj(integer(3), atom(ok)), Original),
@@ -690,6 +745,20 @@ findall_to_fold_programs(
                                        Results),
                                source(source, 1))],
                    original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+nth0_findall_to_fold_programs(
+    List, Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                         findall(Index,
+                                                 nth0(Index, List, _),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
 
