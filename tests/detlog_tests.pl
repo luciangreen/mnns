@@ -238,6 +238,53 @@ test(reports_bound_and_repeated_argument_calls_as_unsupported) :-
                                  unavailable(unsupported_goal(source(_, _))),
                                  unsupported_body), Results)).
 
+test(classifies_append_with_distinct_unbound_arguments_as_multi) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(joined/1, ['?'], [any],
+                           [mnn_clause(1, joined(_Result),
+                                      append(_Prefix, _Suffix, _List),
+                                      source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(joined/1, mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                        Results)).
+
+test(repeated_arguments_to_append_remain_unsupported) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(joined/1, ['?'], [any],
+                           [mnn_clause(1, joined(Value),
+                                      append(Value, Value, Value),
+                                      source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(joined/1, mode(all_arguments_unbound),
+                                 unavailable(unsupported_goal(
+                                     append(_, _, _))),
+                                 unsupported_body), Results)).
+
+test(local_append_definition_is_not_treated_as_builtin) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(append/3, ['?', '?', '?'], [any, any, any],
+                           [mnn_clause(1, append(_, _, _), true,
+                                      source(sample, 1))],
+                           original),
+                   mnn_pred(joined/1, ['?'], [any],
+                           [mnn_clause(2, joined(_Result),
+                                      append(_Prefix, _Suffix, _List),
+                                      source(sample, 2))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(joined/1, mode(all_arguments_unbound),
+                                 determinism(det), success_counts([1])),
+                        Results)).
+
 test(reports_recursive_user_calls_as_unavailable) :-
     Program = mnn_program(
                   sample, meta(sample, []),

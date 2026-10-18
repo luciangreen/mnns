@@ -135,6 +135,12 @@ goal_outcomes(Goal, _, _, Outcomes) :-
 goal_outcomes(Goal, _, _, [0, 1]) :-
     semidet_builtin(Goal),
     !.
+goal_outcomes(Goal, Predicates, _, [2]) :-
+    nonvar(Goal),
+    Goal = append(Prefix, Suffix, List),
+    distinct_variables([Prefix, Suffix, List]),
+    \+ member(mnn_pred(append/3, _, _, _, _), Predicates),
+    !.
 goal_outcomes(Goal, Predicates, Stack, Outcomes) :-
     user_predicate_goal(Goal, Predicates, Stack, Outcomes),
     !.
