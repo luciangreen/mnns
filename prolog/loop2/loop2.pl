@@ -133,6 +133,20 @@ finite_generator_values(Predicates, Generator, Template, Values,
     maplist(ground_fact_clause, Clauses),
     fact_clause_values(Clauses, Goal, Template, Filters, Values, Count),
     !.
+finite_generator_values(Predicates, Generator, Template, Values,
+                        finite_acyclic_rules, Count, FilterCount) :-
+    generator_parts(Generator, Goal, Filters),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
+    nonvar(Goal),
+    callable(Goal),
+    \+ predicate_property(system:Goal, built_in),
+    rule_goal_supported(Predicates, Goal, []),
+    catch(rule_generator_values(Predicates, Goal, Template, Filters,
+                                Values, Count),
+          unsupported_rule_generator,
+          fail),
+    !.
 finite_generator_values(_, Generator, Template, Values,
                         finite_ground_member, Count, FilterCount) :-
     generator_parts(Generator, member(Value, List), Filters),
@@ -175,6 +189,107 @@ finite_generator_values(_, Generator, Template, Values,
     length(List, Count),
     nth_candidate_values(List, 1, Index, Value, Template, Filters, Values),
     !.
+
+rule_generator_values(Predicates, Goal, Template, Filters, Values, Count) :-
+    copy_term((Goal, Template, Filters),
+              (GoalCopy, TemplateCopy, FiltersCopy)),
+    findall(candidate(TemplateCopy, FiltersCopy),
+            rule_goal(Predicates, GoalCopy, []),
+            Candidates),
+    length(Candidates, Count),
+    rule_candidate_values(Candidates, Values).
+
+rule_candidate_values([], []).
+rule_candidate_values([candidate(Template, Filters)|Candidates], Values) :-
+    rule_filters_result(Filters, FilterResult),
+    (   FilterResult == true
+    ->  (   ground(Template)
+        ->  Values = [Template|Rest]
+        ;   throw(unsupported_rule_generator)
+        )
+    ;   Values = Rest
+    ),
+    rule_candidate_values(Candidates, Rest).
+
+rule_goal_supported(_, true, _) :-
+    !.
+rule_goal_supported(_, fail, _) :-
+    !.
+rule_goal_supported(Predicates, conj(Left, Right), Visited) :-
+    !,
+    rule_goal_supported(Predicates, Left, Visited),
+    rule_goal_supported(Predicates, Right, Visited).
+rule_goal_supported(Predicates, disj(Left, Right), Visited) :-
+    !,
+    rule_goal_supported(Predicates, Left, Visited),
+    rule_goal_supported(Predicates, Right, Visited).
+rule_goal_supported(_, Goal, _) :-
+    supported_filter(Goal),
+    !.
+rule_goal_supported(Predicates, Goal, Visited) :-
+    nonvar(Goal),
+    callable(Goal),
+    \+ predicate_property(system:Goal, built_in),
+    functor(Goal, Name, Arity),
+    Key = Name/Arity,
+    \+ memberchk(Key, Visited),
+    member(mnn_pred(FoundKey, _, _, Clauses, _), Predicates),
+    FoundKey == Key,
+    Clauses \= [],
+    maplist(rule_clause_supported(Predicates, [Key|Visited]), Clauses).
+
+rule_clause_supported(_, _, mnn_clause(_, Head, true, _)) :-
+    ground(Head),
+    !.
+rule_clause_supported(Predicates, Visited,
+                      mnn_clause(_, _, Body, _)) :-
+    rule_goal_supported(Predicates, Body, Visited).
+
+rule_goal(Predicates, conj(Left, Right), Visited) :-
+    !,
+    rule_goal(Predicates, Left, Visited),
+    rule_goal(Predicates, Right, Visited).
+rule_goal(Predicates, disj(Left, Right), Visited) :-
+    !,
+    (   rule_goal(Predicates, Left, Visited)
+    ;   rule_goal(Predicates, Right, Visited)
+    ).
+rule_goal(_, true, _) :-
+    !.
+rule_goal(_, fail, _) :-
+    !,
+    fail.
+rule_goal(_, Filter, _) :-
+    supported_filter(Filter),
+    !,
+    rule_filter(Filter, true).
+rule_goal(Predicates, Goal, Visited) :-
+    functor(Goal, Name, Arity),
+    Key = Name/Arity,
+    \+ memberchk(Key, Visited),
+    member(mnn_pred(FoundKey, _, _, Clauses, _), Predicates),
+    FoundKey == Key,
+    member(mnn_clause(_, Head, Body, _), Clauses),
+    copy_term((Head, Body), (HeadCopy, BodyCopy)),
+    Goal = HeadCopy,
+    rule_goal(Predicates, BodyCopy, [Key|Visited]).
+
+rule_filters_result([], true).
+rule_filters_result([Filter|Filters], Result) :-
+    rule_filter(Filter, FilterResult),
+    (   FilterResult == true
+    ->  rule_filters_result(Filters, Result)
+    ;   Result = false
+    ).
+
+rule_filter(Filter, Result) :-
+    Filter =.. [Name, Left, Right],
+    (   ground((Left, Right)),
+        arithmetic_value(Left, LeftValue),
+        arithmetic_value(Right, RightValue)
+    ->  compare_values(Name, LeftValue, RightValue, Result)
+    ;   throw(unsupported_rule_generator)
+    ).
 
 supported_nth_index(Index) :-
     var(Index),

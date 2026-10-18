@@ -57,12 +57,12 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-and loop2 tests. To run one PlUnit group in isolation, for example:
+loop2, and Detlog tests. Focused commands for every PlUnit group are listed in
+[`docs/current_features.md`](docs/current_features.md). For example:
 
 ```sh
-swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
-swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"
 swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"
+swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
 ```
 
 The full suite is also run on pushes and pull requests by

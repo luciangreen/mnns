@@ -56,20 +56,23 @@ inference are not implemented; see [`detlog.md`](detlog.md).
 ## loop2 conversion
 
 `mnn_loop2:convert_program/3` currently handles a `findall/3` whose generator is
-a direct call to a predicate made entirely of ground facts, or `member/2` over a
-ground proper list, `nth0/3` or `nth1/3` over a ground proper list, or `between/3`
-with integer literal bounds and a variable or integer generator argument. These
-generators may be followed by arithmetic comparisons over values bound by the
-generator. Between ranges up to 10,000 values are supported, including reversed
-and singleton ranges; larger ranges are left unchanged. Member and index-based
-generators preserve list order and duplicates, including the zero-based or
-one-based indices from `nth0/3` and `nth1/3`. The supported comparisons are `>`,
-`>=`, `<`, `=<`, `=:=`, and `=\=`; arithmetic expressions allow numeric
-constants, unary `+`, `-`, `abs`, and binary `+`, `-`, `*`, `/`, `//`, `mod`, and
-`rem`. Ground templates are required for each result that passes its filter.
-Filter expressions are interpreted through this restricted arithmetic
-whitelist; arbitrary predicates, unbound arithmetic, variable bounds or lists,
-rules, other built-in generators, and other forms are left unchanged.
+a direct call to a predicate made entirely of ground facts, a call through a
+finite acyclic chain of supported facts and rules, or `member/2` over a ground
+proper list, `nth0/3` or `nth1/3` over a ground proper list, or `between/3` with
+integer literal bounds and a variable or integer generator argument. Rule bodies
+are limited to conjunction, disjunction, `true`, `fail`, supported source
+predicate calls, and whitelisted arithmetic comparisons; recursive dependencies
+and other goals are left unchanged. These generators may be followed by
+arithmetic comparisons over values bound by the generator. Between ranges up to
+10,000 values are supported, including reversed and singleton ranges; larger
+ranges are left unchanged. Member and index-based generators preserve list order
+and duplicates, including the zero-based or one-based indices from `nth0/3` and
+`nth1/3`. The supported comparisons are `>`, `>=`, `<`, `=<`, `=:=`, and `=\=`;
+arithmetic expressions allow numeric constants, unary `+`, `-`, `abs`, and
+binary `+`, `-`, `*`, `/`, `//`, `mod`, and `rem`. Ground templates are required
+for each result that passes its filter. Arbitrary predicates in filters,
+variable bounds or lists, unsupported rule bodies, other built-in generators,
+and other forms are left unchanged.
 
 Each conversion creates a uniquely named recursive list-copy predicate and
 preserves the existing predicates and their clause order. The report records
@@ -108,5 +111,5 @@ generation and cut/choicepoint transformations remain unimplemented. Stages
 interface, quantum-inspired search/export, AMNN/ANN/manual gradient descent,
 Neuroprolog, core/chatbot/agent, and benchmarks. Stages 1–4 are also incomplete;
 consult `PROGRESS.md` for their limitations and next acceptance criteria. In
-Stage 4, rule-based generators, nested `findall/3`, and independent proof
-checking for conversions remain.
+Stage 4, nested `findall/3` and independent proof checking for conversions
+remain.

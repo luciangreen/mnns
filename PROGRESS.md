@@ -57,10 +57,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   and a variable or integer third argument, optionally followed by whitelisted
   arithmetic comparisons; ranges are limited to 10,000 values and reversed
   bounds produce an empty result. The supported comparisons and arithmetic
-  operators are listed in `docs/loop2.md`. Arbitrary predicate filters, unbound
-  arithmetic, variable bounds, and other generators remain unchanged. Rule-based
-  generators, nested `findall/3`, and independent checking of conversion proofs
-  remain unsupported. The converter
+  operators are listed in `docs/loop2.md`. Finite acyclic rule generators are
+  supported when their bodies contain only conjunction, disjunction, `true`,
+  `fail`, supported source calls, and bound whitelisted arithmetic comparisons.
+  Arbitrary predicate filters, variable bounds, recursive dependencies,
+  unsupported rule bodies, nested `findall/3`, and independent checking of
+  conversion proofs remain unsupported. The converter
   emits a distinct deterministic recursive list-copy helper for each conversion.
   Its report cites the findall-to-fold lemma and
   records finiteness, safe-filter, and determinism side conditions as an
@@ -74,7 +76,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, and schematic measure-backed clause obligations; user specifications and broader measure forms remain) |
-| 4 | loop2 finite-generator loop conversions | In progress (ground facts, ground proper-list `member/2`, `nth0/3`, `nth1/3`, and bounded ground `between/3` ranges with restricted arithmetic filters; rules, nested findall, and checked conversion proofs remain) |
+| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `nth0/3`, `nth1/3`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode; general mode inference, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |
