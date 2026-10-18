@@ -27,6 +27,12 @@ so duplicate matching elements correctly make the call multi; an empty list or
 an unmatched ground value fails. Variable lists, improper or non-ground lists,
 and partially instantiated element arguments remain unavailable. A program that
 defines its own `member/2` is not treated as using the built-in generator.
+The built-in `select/3` is classified for a ground proper list when the selected
+value and remainder are each either unbound or ground. Counts are capped at two;
+duplicate positions remain distinct successes, and ground value or remainder
+patterns constrain the counted solutions. Variable or improper lists,
+partially instantiated value or remainder patterns, and a program-defined
+`select/3` remain unavailable.
 The built-in `length/2` is also classified when its first argument is a ground
 proper list and its length argument is unbound or a nonnegative integer. An
 unbound length succeeds exactly once; a matching nonnegative integer succeeds

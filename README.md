@@ -47,8 +47,10 @@ the current implementation and remaining work.
   calls are classified, and `once/1` caps reported successes at one. Choicepoint
   and cut transformations are not implemented yet. Finite built-in
   `member/2` calls over ground proper lists are also classified, preserving
-  duplicate successes, and `length/2` calls over ground proper lists are
-  classified when the length is unbound or a nonnegative integer. See
+  duplicate successes; `select/3` over ground proper lists counts duplicate
+  positions and honors ground value/remainder patterns; and `length/2` calls
+  over ground proper lists are classified when the length is unbound or a
+  nonnegative integer. See
   [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` or
   `select/3` on a ground proper list, `nth0/3` or `nth1/3` on a ground proper
