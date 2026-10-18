@@ -1,7 +1,7 @@
 # Proof rules
 
-The initial checker supports one proof rule: `identity`. It certifies that an
-MNN program and its original are alpha-equivalent, without executing either
+The checker supports `identity` and a restricted `reorder_goals` rule. It
+certifies these transformations directly from the IR, without executing either
 program.
 
 The accepted proof shape is:
@@ -17,12 +17,34 @@ proof([
 the identity rule proves equality of the complete programs, it is sound for any
 such annotations. The checker compares programs with variant equivalence, so
 renamed clause variables are accepted while changed clauses are rejected.
-Proofs containing other rules are rejected until an independent checker for
-those rules is implemented. In particular, this subset does not certify any
-program rewrite.
+The `reorder_goals` rule uses the same proof-step shape:
+
+```prolog
+proof([
+    proof_step(1, reorder_goals, [],
+               equivalent(domain(Domain), modes(Modes)))
+])
+```
+
+For this rule, `Original` is the source program and `Program` is the proposed
+result. The checker accepts only if it can derive the result by swapping exactly
+one adjacent pair of conjunction goals in one clause body. Both goals must be
+ground calls to one of `atom/1`, `atomic/1`, `compound/1`, `ground/1`,
+`integer/1`, `is_list/1` or `number/1`, with a ground argument. These built-ins
+are pure and do not bind variables or raise instantiation errors in this
+restricted use, so their order does not affect answers. The checker rejects
+variable-bearing goals, other predicates, extra changes, and unsupported proof
+rules. Domain and mode annotations must be ground, but this restricted rule does
+not infer them.
+
+This subset certifies only one such local reordering; it does not yet implement
+general purity/determinism analysis, unfold/fold, clause reordering, or other
+rules in §7.2. `render_proof/4` reports the independent checker's result for
+accepted and rejected proofs. Rendering is explanatory and does not itself
+certify a proof.
 
 `mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` renders a
 Markdown report and includes the independent checker's result. Accepted identity
 proofs are explained as alpha-equivalence of the complete IR terms; rejected or
 unsupported proofs are shown as quoted Prolog terms and are clearly marked as
-rejected. Rendering is explanatory and does not itself certify a proof.
+rejected.
