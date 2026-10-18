@@ -129,6 +129,42 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     list_length_outcomes(List, Length, Outcomes).
 goal_outcomes(Goal, Predicates, _, Outcomes) :-
     nonvar(Goal),
+    Goal = nth0(Index, List, Element),
+    ground(List),
+    is_list(List),
+    (   var(Index)
+    ;   integer(Index)
+    ),
+    (   var(Element)
+    ;   ground(Element)
+    ),
+    (   var(Index)
+    ->  Index \== Element
+    ;   true
+    ),
+    \+ member(mnn_pred(nth0/3, _, _, _, _), Predicates),
+    !,
+    nth_list_outcomes(0, Index, List, Element, Outcomes).
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    nonvar(Goal),
+    Goal = nth1(Index, List, Element),
+    ground(List),
+    is_list(List),
+    (   var(Index)
+    ;   integer(Index)
+    ),
+    (   var(Element)
+    ;   ground(Element)
+    ),
+    (   var(Index)
+    ->  Index \== Element
+    ;   true
+    ),
+    \+ member(mnn_pred(nth1/3, _, _, _, _), Predicates),
+    !,
+    nth_list_outcomes(1, Index, List, Element, Outcomes).
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    nonvar(Goal),
     Goal = append(Prefix, Suffix, List),
     \+ member(mnn_pred(append/3, _, _, _, _), Predicates),
     append_ground_mode(Prefix, Suffix, List, Outcomes),
@@ -272,6 +308,30 @@ append_supported_list_mode([Prefix, Suffix, List]) :-
     ;   ground_proper_list(Prefix),
         ground_proper_list(Suffix),
         var(List)
+    ).
+
+nth_list_outcomes(Offset, Index, List, Element, Outcomes) :-
+    nth_list_success_count(List, Offset, Index, Element, 0, Count),
+    (   Count =:= 0
+    ->  Outcomes = [0]
+    ;   Count =:= 1
+    ->  Outcomes = [1]
+    ;   Outcomes = [2]
+    ).
+
+nth_list_success_count([], _, _, _, Count, Count).
+nth_list_success_count([Candidate|Candidates], Position, Index, Element,
+                       Count0, Count) :-
+    (   (var(Index) -> true ; Position =:= Index),
+        (var(Element) -> true ; Element == Candidate)
+    ->  Count1 is min(2, Count0 + 1)
+    ;   Count1 = Count0
+    ),
+    (   Count1 =:= 2
+    ->  Count = 2
+    ;   NextPosition is Position + 1,
+        nth_list_success_count(Candidates, NextPosition, Index, Element,
+                               Count1, Count)
     ).
 
 ground_proper_list(List) :-

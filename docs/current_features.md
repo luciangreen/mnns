@@ -117,6 +117,11 @@ treated as this built-in case. Built-in `select/3` is classified for ground
 proper lists when its selected value and remainder are unbound or ground;
 duplicate positions count separately, and ground patterns constrain the result.
 Other list/value shapes and locally defined `select/3` predicates are unsupported.
+Ground proper-list `nth0/3` and `nth1/3` calls are classified when the index is
+variable or integer and the element is variable or ground; zero-/one-based
+indexing and duplicate matching elements are accounted for. Shared unbound
+index/element variables, partially instantiated elements, improper or
+non-ground lists, and local definitions remain unsupported.
 Built-in `append/3` is classified as multi only when all three arguments are
 distinct unbound variables; repeated-argument calls and locally defined
 `append/3` predicates are not treated as the built-in. `append/3` is also
