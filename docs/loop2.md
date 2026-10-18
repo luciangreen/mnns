@@ -25,6 +25,9 @@ The current supported subset is deliberately narrow:
   argument, optionally followed by arithmetic comparisons. Ranges of at most
   10,000 values are converted; larger ranges are left unchanged. Reversed
   bounds convert to an empty result.
+- `length/2` over a ground proper list with a variable or nonnegative integer
+  length, optionally followed by arithmetic comparisons. A variable length
+  yields the list's length; a mismatched integer length yields no result.
 
 Supported comparisons are `>`, `>=`, `<`, `=<`, `=:=`, and `=\=`. Their
 arithmetic expressions may use numeric constants, unary `+`, `-`, `abs`, and
@@ -42,6 +45,8 @@ generators with variable-valued templates remain unchanged. `between/3` with
 non-ground or non-integer bounds, or ranges above the limit, also remains
 unchanged. `nth0/3` and `nth1/3` with a variable or improper list, or with an
 index that is neither a variable nor an integer, remain unchanged.
+`length/2` with a variable or improper list, or with a negative or non-integer
+length, remains unchanged.
 
 Rule bodies are interpreted only through this bounded pure subset; the
 converter does not execute arbitrary rule goals. A dependency cycle, cut,

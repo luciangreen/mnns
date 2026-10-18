@@ -35,8 +35,9 @@ the current implementation and remaining work.
   are analyzed recursively, while choicepoint and cut transformations are not
   implemented yet. See [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` on a
-  ground proper list, `nth0/3` or `nth1/3` on a ground proper list, or bounded
-  `between/3` ranges, optionally with supported arithmetic filters, into
+  ground proper list, `nth0/3` or `nth1/3` on a ground proper list, bounded
+  `between/3` ranges, or `length/2` on a ground proper list, optionally with
+  supported arithmetic filters, into
   deterministic list-copy loops. Bound or partially instantiated arguments are
   matched against fact and rule heads. List order, indices, and duplicates are
   preserved; unsupported generators remain unchanged, and the conversion report

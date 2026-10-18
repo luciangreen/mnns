@@ -64,7 +64,8 @@ with bound or partially instantiated arguments), a call through a finite acyclic
 chain of supported facts and rules (also matching bound call arguments against
 rule heads), or `member/2` over a ground proper list, `nth0/3` or `nth1/3` over
 a ground proper list, or `between/3` with integer literal bounds and a variable
-or integer generator argument. Rule bodies
+or integer generator argument, or `length/2` over a ground proper list with a
+variable or nonnegative integer length. Rule bodies
 are limited to conjunction, disjunction, `true`, `fail`, supported source
 predicate calls, and whitelisted arithmetic comparisons; recursive dependencies
 and other goals are left unchanged. These generators may be followed by
