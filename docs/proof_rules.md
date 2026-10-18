@@ -108,9 +108,9 @@ helper's clause IDs and metadata events must also match. Thus a claimed conversi
 altered values, missing helper, or unrelated program change is rejected.
 
 These checks cover only no-filter, ground-list `member/2`, the stated
-distinct-variable `nth0/3` and `nth1/3` index forms, and `select/3` with a
-grounded template, and the stated `length/2` form. They do not certify fact or
-rule generators, filters, nested findall, `between/3`, other list generators, or
+distinct-variable `nth0/3` and `nth1/3` index forms, `select/3` with a grounded
+template, and the stated `length/2` form. They do not certify fact or rule
+generators, filters, nested findall, `between/3`, other list generators, or
 arbitrary `findall/3` rewrites. Ground domain and mode annotations are required
 but are not inferred.
 The checker does not import or invoke the loop2 converter.

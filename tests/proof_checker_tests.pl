@@ -145,7 +145,7 @@ test(accept_ground_nth1_index_findall_to_fold_on_empty_list) :-
 
 test(accept_ground_length_findall_to_fold) :-
     length_findall_to_fold_programs(
-        Length, [a, b], Original, Program),
+        _, [a, b], Original, Program),
     Program = mnn_program(_, _,
                           [mnn_pred(_, _, _,
                                     [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
@@ -156,7 +156,7 @@ test(accept_ground_length_findall_to_fold) :-
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
 test(accept_ground_length_findall_to_fold_on_empty_list) :-
-    length_findall_to_fold_programs(Length, [], Original, Program),
+    length_findall_to_fold_programs(_, [], Original, Program),
     Program = mnn_program(_, _,
                           [mnn_pred(_, _, _,
                                     [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
@@ -184,7 +184,7 @@ test(accept_ground_length_findall_to_fold_with_mismatched_length) :-
 
 test(reject_length_findall_to_fold_with_changed_values) :-
     length_findall_to_fold_programs(
-        Length, [a, b], Original, Program0),
+        _, [a, b], Original, Program0),
     replace_length_loop_values(Program0, Program),
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(
