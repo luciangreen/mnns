@@ -39,6 +39,10 @@ unbound length succeeds exactly once; a matching nonnegative integer succeeds
 once and a mismatch fails. Variable or improper lists, negative or non-integer
 length arguments, and a program-defined `length/2` are not handled by this
 built-in case.
+The built-in `append/3` is classified as multi when all three arguments are
+distinct unbound variables: it has at least two successful list splits, so the
+reported count is capped at two. Repeated arguments and a program-defined
+`append/3` are not treated as this built-in case.
 Pairwise non-unifiable clause heads are treated as exclusive. Calls to acyclic
 user predicates in the same program are analyzed recursively when every call
 argument is a distinct unbound variable (zero-arity calls satisfy this condition).

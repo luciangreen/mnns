@@ -50,7 +50,8 @@ the current implementation and remaining work.
   duplicate successes; `select/3` over ground proper lists counts duplicate
   positions and honors ground value/remainder patterns; and `length/2` calls
   over ground proper lists are classified when the length is unbound or a
-  nonnegative integer. See
+  nonnegative integer. `append/3` is classified as multi when all three
+  arguments are distinct unbound variables. See
   [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` or
   `select/3` on a ground proper list, `nth0/3` or `nth1/3` on a ground proper
