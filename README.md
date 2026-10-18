@@ -44,7 +44,9 @@ the current implementation and remaining work.
   distinct unbound arguments are analyzed recursively, ground whitelisted
   built-ins are evaluated for success or failure, bounded literal `between/3`
   calls are classified, and `once/1` caps reported successes at one. Choicepoint
-  and cut transformations are not implemented yet. See
+  and cut transformations are not implemented yet. Finite built-in
+  `member/2` calls over ground proper lists are also classified, preserving
+  duplicate successes. See
   [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` or
   `select/3` on a ground proper list, `nth0/3` or `nth1/3` on a ground proper

@@ -21,6 +21,12 @@ values receive a success count capped at two, while integer values are checked
 against the inclusive range. `once(Goal)` preserves whether `Goal` may fail and
 maps every positive success count to one, so a multi-success inner goal is
 reported as at most one success. Unsupported inner goals remain unavailable.
+It also classifies the built-in `member/2` for a ground proper list when its
+element argument is a variable or ground term. Successes are counted up to two,
+so duplicate matching elements correctly make the call multi; an empty list or
+an unmatched ground value fails. Variable lists, improper or non-ground lists,
+and partially instantiated element arguments remain unavailable. A program that
+defines its own `member/2` is not treated as using the built-in generator.
 Pairwise non-unifiable clause heads are treated as exclusive. Calls to acyclic
 user predicates in the same program are analyzed recursively when every call
 argument is a distinct unbound variable (zero-arity calls satisfy this condition).
