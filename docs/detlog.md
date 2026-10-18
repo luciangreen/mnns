@@ -21,12 +21,14 @@ values receive a success count capped at two, while integer values are checked
 against the inclusive range. `once(Goal)` preserves whether `Goal` may fail and
 maps every positive success count to one, so a multi-success inner goal is
 reported as at most one success. Unsupported inner goals remain unavailable.
-It also classifies the built-in `member/2` for a ground proper list when its
-element argument is a variable or ground term. Successes are counted up to two,
-so duplicate matching elements correctly make the call multi; an empty list or
-an unmatched ground value fails. Variable lists, improper or non-ground lists,
-and partially instantiated element arguments remain unavailable. A program that
-defines its own `member/2` is not treated as using the built-in generator.
+It also classifies the built-in `member/2` for a ground proper list with a
+variable, ground, or partially instantiated element pattern. Each candidate is
+matched against a copy of the pattern, so analysis does not bind variables in the
+program and repeated variables within a pattern retain their sharing constraints.
+Successes are counted up to two, so duplicate matching elements correctly make
+the call multi; an empty list or a pattern with no matches fails. Variable lists,
+improper or non-ground lists, and program-defined `member/2` predicates remain
+unavailable.
 The built-in `select/3` is classified for a ground proper list when the selected
 value and remainder are each either unbound or ground. Counts are capped at two;
 duplicate positions remain distinct successes, and ground value or remainder
@@ -92,6 +94,8 @@ Run the focused tests from the repository root:
 swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 ```
 
-The focused suite covers the supported `nth0/3` and `nth1/3` modes, including
-duplicate values, out-of-range indices, and unsupported list or variable shapes.
-Run the complete suite with `swipl -q -s tests/run.pl`.
+The focused suite covers the supported `member/2` patterns, including partially
+instantiated and repeated-variable patterns, duplicate matches, no matches, and
+unsupported list shapes. It also covers `nth0/3` and `nth1/3`, including duplicate
+values, out-of-range indices, and unsupported list or variable shapes. Run the
+complete suite with `swipl -q -s tests/run.pl`.
