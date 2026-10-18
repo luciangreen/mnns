@@ -27,6 +27,12 @@ so duplicate matching elements correctly make the call multi; an empty list or
 an unmatched ground value fails. Variable lists, improper or non-ground lists,
 and partially instantiated element arguments remain unavailable. A program that
 defines its own `member/2` is not treated as using the built-in generator.
+The built-in `length/2` is also classified when its first argument is a ground
+proper list and its length argument is unbound or a nonnegative integer. An
+unbound length succeeds exactly once; a matching nonnegative integer succeeds
+once and a mismatch fails. Variable or improper lists, negative or non-integer
+length arguments, and a program-defined `length/2` are not handled by this
+built-in case.
 Pairwise non-unifiable clause heads are treated as exclusive. Calls to acyclic
 user predicates in the same program are analyzed recursively when every call
 argument is a distinct unbound variable (zero-arity calls satisfy this condition).
