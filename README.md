@@ -26,7 +26,8 @@ remaining work.
   reordering of restricted ground type tests, restricted definition
   introduction, narrow single-occurrence unfold/fold steps, and a direct
   no-filter `findall/3` over `member/2`, `nth0/3`, or `nth1/3` on a ground
-  proper list, plus `select/3` over a ground proper list when each selected
+  proper list, including supported arithmetic-comparison filters on
+  `member/2`, plus `select/3` over a ground proper list when each selected
   template is ground, and `length/2` over a ground proper list with a variable
   or nonnegative integer length, and bounded no-filter `between/3` with integer
   bounds and a variable or integer value (ranges up to 10,000 values). It also

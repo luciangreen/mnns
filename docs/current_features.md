@@ -58,7 +58,8 @@ unsupported goals are not run.
 `mnn_proof_checker:check_proof/4` checks supported proof terms directly against
 the IR and does not import the optimizer. In addition to the rules described in
 [`proof_rules.md`](proof_rules.md), it verifies one direct
-`findall(Value, member(Value, GroundList), Results)` conversion and one
+`findall(Value, member(Value, GroundList), Results)` conversion, including
+supported arithmetic-comparison filters on the member generator, and one
 `findall(Index, nth0(Index, GroundList, _), Results)` or
 `findall(Index, nth1(Index, GroundList, _), Results)` conversion, independently
 reconstructing the generated values, helper, and complete output IR. It also
@@ -76,9 +77,11 @@ It also verifies conversions over predicates made entirely of ground facts with
 supported arithmetic-comparison filters, matching bound or partially
 instantiated call arguments and preserving clause order and duplicate facts.
 Filters must be ground after matching each fact; arithmetic exceptions are not
-certified. Templates must be ground for every produced solution. These proof
-subsets exclude filters on built-in generators, rule generators, nested findall,
-oversized ranges, and other list generators. The renderer creates Markdown
+certified. For filtered member conversions, comparisons must be ground after
+matching each list element and templates must be ground for every passing
+solution. Arithmetic exceptions are not certified. These proof subsets exclude
+filters on other built-in generators, rule generators, nested findall, oversized
+ranges, and other list generators. The renderer creates Markdown
 explanations but does not certify proofs. General
 purity analysis, general clause/goal reordering, and most proof rules in the
 requirements remain unsupported.

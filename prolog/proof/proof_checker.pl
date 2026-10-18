@@ -276,6 +276,13 @@ findall_candidate_values(_, Template, select(Value, List, Rest), Values) :-
     ground(List),
     is_list(List),
     select_candidate_values(List, Value, Rest, Template, Values).
+findall_candidate_values(_, Template, Generator, Values) :-
+    generator_parts(Generator, member(Value, List), Filters),
+    Filters \= [],
+    ground(List),
+    is_list(List),
+    maplist(supported_arithmetic_filter, Filters),
+    member_candidate_values(List, Value, Template, Filters, Values).
 findall_candidate_values(Predicates, Template, Generator, Values) :-
     generator_parts(Generator, Goal, Filters),
     Filters \= [],
@@ -443,6 +450,22 @@ select_candidate_values(List, Value, Rest, Template, Values) :-
             ),
             Candidates),
     collect_select_values(Candidates, Values).
+
+member_candidate_values([], _, _, _, []).
+member_candidate_values([Candidate|Candidates], Value, Template, Filters,
+                        Values) :-
+    copy_term((Value, Template, Filters),
+              (ValueCopy, TemplateCopy, FiltersCopy)),
+    (   ValueCopy = Candidate
+    ->  checked_filters_result(FiltersCopy, FilterResult),
+        member_candidate_values(Candidates, Value, Template, Filters, Rest),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|Rest]
+        ;   Values = Rest
+        )
+    ;   member_candidate_values(Candidates, Value, Template, Filters, Values)
+    ).
 
 collect_select_values([], []).
 collect_select_values([candidate(_, unground)|_], _) :-
