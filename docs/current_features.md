@@ -5,6 +5,31 @@ This guide describes the implemented subset, not the complete target suite in
 specification for future work. [`PROGRESS.md`](../PROGRESS.md) tracks the current
 stage-by-stage status.
 
+## Feature and test map
+
+The following are the implemented subsystems and their focused PlUnit suites.
+Run commands from the repository root with SWI-Prolog 9.x or 10.x installed.
+The focused suites help isolate failures; always run the full suite before
+sharing a change.
+
+| Feature | Implementation | Focused test command | Details |
+| --- | --- | --- | --- |
+| Program IR, parser and emitter | `prolog/ir/ir.pl` | `swipl -q -g "load_files('tests/ir_tests.pl'), run_tests(mnn_ir), halt"` | [IR section](#program-ir) |
+| Round-trip corpus | `tests/corpus/` | `swipl -q -g "load_files('tests/test_corpus.pl'), run_tests(mnn_ir_corpus), halt"` | [IR section](#program-ir) |
+| Sandboxed execution | `prolog/runner/sandbox_runner.pl` | `swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"` | [Sandboxed execution](#sandboxed-execution) |
+| Proof checker and renderer | `prolog/proof/` | `swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"` | [Proof checking](proof_rules.md) |
+| PID analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
+| Detlog determinism analysis | `prolog/detlog/detlog.pl` | `swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"` | [Detlog analysis](detlog.md) |
+| loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
+
+Run the complete suite, including every group above, with:
+
+```sh
+swipl -q -s tests/run.pl
+```
+
+This is also the command used by [CI](../.github/workflows/prolog-tests.yml).
+
 ## Program IR
 
 `mnn_ir:parse_program/2` reads facts, rules, and directives into
@@ -116,11 +141,19 @@ groups are for focused iteration and do not replace the full suite.
 
 ## Not yet implemented
 
-Stage 5 has an initial conservative determinism-analysis slice; Detlog code
-generation and cut/choicepoint transformations remain unimplemented. Stages
-6–14 are unstarted: PLOp, AlgebraPLOp, S2A/Starlog, the AIOC pipeline and bundle
-interface, quantum-inspired search/export, AMNN/ANN/manual gradient descent,
-Neuroprolog, core/chatbot/agent, and benchmarks. Stages 1–4 are also incomplete;
-consult `PROGRESS.md` for their limitations and next acceptance criteria. In
-Stage 4, nested `findall/3` and independent proof checking for conversions
-remain.
+The current work is an initial subset, not a completed version 1 suite:
+
+- **Stages 1–5 are in progress.** Their implemented slices and limits are
+  documented above and in the subsystem guides. In particular, Stage 4 still
+  lacks nested `findall/3` conversion and independent checking of conversion
+  proofs. Stage 5 has only conservative success-count analysis; mode inference,
+  Detlog code generation, and choicepoint/cut transformations are not
+  implemented.
+- **Stages 6–14 are not started:** PLOp, AlgebraPLOp, S2A/Starlog, the AIOC
+  pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
+  gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
+
+See [`PROGRESS.md`](../PROGRESS.md) for the complete stage table and the
+acceptance work still outstanding for Stages 1–5. See
+[`PROGRAM_REQUIREMENTS.md`](../PROGRAM_REQUIREMENTS.md) for the full version 1
+specification.
