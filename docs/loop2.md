@@ -7,6 +7,8 @@ The current supported subset is deliberately narrow:
 
 - A direct call to a predicate whose clauses are all ground facts, optionally
   followed by arithmetic comparisons in a conjunction.
+- `member/2` over a ground proper list, optionally followed by arithmetic
+  comparisons. List order and duplicate elements are preserved.
 - `between/3` with integer literal bounds and a variable or integer third
   argument, optionally followed by arithmetic comparisons. Ranges of at most
   10,000 values are converted; larger ranges are left unchanged. Reversed
