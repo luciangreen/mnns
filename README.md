@@ -28,10 +28,11 @@ the current implementation and remaining work.
   shared structural and guarded natural-number decreases, and emits schematic
   induction obligations for supported measures. These are not proofs of a
   specification. See [`docs/pid.md`](docs/pid.md).
-- **loop2 conversion:** converts `findall/3` over ground facts, optionally with
-  supported arithmetic filters, into deterministic list-copy loops. Other
-  generators remain unchanged, and the conversion report is an obligation—not
-  an independently checked proof. See [`docs/loop2.md`](docs/loop2.md).
+- **loop2 conversion:** converts `findall/3` over ground facts or bounded
+  `between/3` ranges, optionally with supported arithmetic filters, into
+  deterministic list-copy loops. Unsupported generators remain unchanged, and
+  the conversion report is an obligation—not an independently checked proof.
+  See [`docs/loop2.md`](docs/loop2.md).
 
 ## Requirements
 

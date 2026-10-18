@@ -89,17 +89,73 @@ test(leaves_rule_generators_and_unrelated_cut_unchanged, [nondet]) :-
                      Predicates)),
     run_converted(Converted, numbers(_), [[[2, 0]]]).
 
-test(leaves_builtin_generators_unchanged, [nondet]) :-
+test(leaves_unsupported_builtin_generators_unchanged, [nondet]) :-
     with_converted_program(
-        [between(1, 2, 1),
-         between(1, 2, 2),
-         (values(Values) :- findall(X, between(1, 2, X), Values))],
+        [(values(Values) :- findall(X, member(X, [1, 2]), Values))],
         Converted, loop2_report([])),
     Converted = mnn_program(_, _, Predicates, _, _),
     assertion(member(
                   mnn_pred(values/1, _, _,
-                           [mnn_clause(_, _, findall(_, between(1, 2, _), _), _)],
+                           [mnn_clause(_, _, findall(_, member(_, _), _), _)],
                            original),
+                  Predicates)).
+
+test(converts_ground_between_generator, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :- findall(X, between(1, 3, X), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                       side_conditions(finite_ground_between(3),
+                                       safe_arithmetic_filters(0),
+                                       deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[1, 2, 3]]]).
+
+test(converts_between_with_arithmetic_filters_and_template, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :-
+              findall(pair(X), (between(1, 4, X), X > 2), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                       side_conditions(finite_ground_between(4),
+                                       safe_arithmetic_filters(1),
+                                       deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[pair(3), pair(4)]]]).
+
+test(converts_empty_and_singleton_between_ranges, [nondet]) :-
+    with_converted_program(
+        [(empty(Values) :- findall(X, between(5, 2, X), Values)),
+         (singleton(Values) :- findall(X, between(7, 7, X), Values))],
+        Converted, loop2_report(Conversions)),
+    assertion(Conversions =
+              [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                         side_conditions(finite_ground_between(0),
+                                         safe_arithmetic_filters(0),
+                                         deterministic_loop)),
+               conversion(findall_to_fold, helper(mnn_loop2_2/2),
+                         side_conditions(finite_ground_between(1),
+                                         safe_arithmetic_filters(0),
+                                         deterministic_loop))]),
+    run_converted(Converted, empty(Values), [[[]]]),
+    run_converted(Converted, singleton(Values), [[[7]]]).
+
+test(leaves_non_ground_or_oversized_between_unchanged, [nondet]) :-
+    with_converted_program(
+        [(variable_bounds(Values, Low, High) :-
+              findall(X, between(Low, High, X), Values)),
+         (oversized(Values) :- findall(X, between(1, 10001, X), Values))],
+        Converted, loop2_report([])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(
+                  mnn_pred(variable_bounds/3, _, _,
+                          [mnn_clause(_, _, findall(_, between(_, _, _), _), _)],
+                          original),
+                  Predicates)),
+    assertion(member(
+                  mnn_pred(oversized/1, _, _,
+                          [mnn_clause(_, _, findall(_, between(_, _, _), _), _)],
+                          original),
                   Predicates)).
 
 test(skips_generated_names_already_in_use, [nondet]) :-

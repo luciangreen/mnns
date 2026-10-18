@@ -51,15 +51,17 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   unsupported.
 - **Stage 4 — loop2: in progress.** `mnn_loop2:convert_program/3` converts
   `findall/3` over a predicate consisting only of ground facts when each
-  matching template instance is ground. A direct fact call may now be followed
-  by arithmetic comparisons in a conjunction; the supported comparisons and
-  arithmetic operators are listed in `docs/loop2.md`. Filters are interpreted
-  only through that arithmetic whitelist; arbitrary predicate filters and
-  unbound arithmetic remain unchanged. The converter emits a distinct
-  deterministic recursive list-copy helper for each conversion. Its report
-  cites the findall-to-fold lemma and records finiteness, safe-filter, and
-  determinism side conditions as an obligation; independent proof-checker
-  support for this rule is not yet implemented.
+  matching template instance is ground. It also handles `between/3` with
+  integer literal bounds and a variable or integer third argument, optionally
+  followed by whitelisted arithmetic comparisons; ranges are limited to 10,000
+  values and reversed bounds produce an empty result. The supported comparisons
+  and arithmetic operators are listed in `docs/loop2.md`. Arbitrary predicate
+  filters, unbound arithmetic, variable bounds, and other generators remain
+  unchanged. The converter emits a distinct deterministic recursive list-copy
+  helper for each conversion. Its report cites the findall-to-fold lemma and
+  records finiteness, safe-filter, and determinism side conditions as an
+  obligation; independent proof-checker support for this rule is not yet
+  implemented.
 
 ## Remaining stages
 
@@ -68,7 +70,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, and schematic measure-backed clause obligations; user specifications and broader measure forms remain) |
-| 4 | loop2 finite-generator loop conversions | In progress (ground facts with restricted arithmetic filters; member/between/nth generators, rules, nested findall, and checked conversion proofs remain) |
+| 4 | loop2 finite-generator loop conversions | In progress (ground facts and bounded ground `between/3` ranges with restricted arithmetic filters; `member/2`, `nth0/3`, `nth1/3`, rules, nested findall, and checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | Not started |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |

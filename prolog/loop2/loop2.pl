@@ -104,11 +104,13 @@ convert_goal(findall(Template, Goal, Results), Predicates,
              NextClauseId0, NextName0, NextClauseId, NextName,
              LoopCall, Generated,
              [conversion(findall_to_fold, helper(Loop/2),
-                         side_conditions(finite_ground_facts(Count),
+                         side_conditions(GeneratorCondition,
                                          safe_arithmetic_filters(FilterCount),
                                          deterministic_loop))]) :-
-    finite_fact_values(Predicates, Goal, Template, Values, Count, FilterCount),
+    finite_generator_values(Predicates, Goal, Template, Values,
+                            GeneratorKind, Count, FilterCount),
     !,
+    GeneratorCondition =.. [GeneratorKind, Count],
     fresh_loop_name(NextName0, Predicates, Loop, NextName),
     LoopCall =.. [Loop, Values, Results],
     make_loop_predicate(Loop, NextClauseId0, Generated),
@@ -116,7 +118,8 @@ convert_goal(findall(Template, Goal, Results), Predicates,
 convert_goal(Goal, _, NextClauseId, NextName,
              NextClauseId, NextName, Goal, [], []).
 
-finite_fact_values(Predicates, Generator, Template, Values, Count, FilterCount) :-
+finite_generator_values(Predicates, Generator, Template, Values,
+                        finite_ground_facts, Count, FilterCount) :-
     generator_parts(Generator, Goal, Filters),
     maplist(supported_filter, Filters),
     length(Filters, FilterCount),
@@ -130,6 +133,41 @@ finite_fact_values(Predicates, Generator, Template, Values, Count, FilterCount) 
     maplist(ground_fact_clause, Clauses),
     fact_clause_values(Clauses, Goal, Template, Filters, Values, Count),
     !.
+finite_generator_values(_, Generator, Template, Values,
+                        finite_ground_between, Count, FilterCount) :-
+    generator_parts(Generator, between(Low, High, Value), Filters),
+    integer(Low),
+    integer(High),
+    (var(Value) ; integer(Value)),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
+    between_values(Low, High, Value, Template, Filters, Values, Count),
+    !.
+
+between_values(Low, High, Value, Template, Filters, Values, Count) :-
+    (   Low > High
+    ->  Candidates = [],
+        Count = 0
+    ;   Count is High - Low + 1,
+        Count =< 10000,
+        findall(Number, between(Low, High, Number), Candidates)
+    ),
+    between_candidate_values(Candidates, Value, Template, Filters, Values).
+
+between_candidate_values([], _, _, _, []).
+between_candidate_values([Number|Numbers], Value, Template, Filters, Values) :-
+    copy_term((Value, Template, Filters),
+              (ValueCopy, TemplateCopy, FiltersCopy)),
+    (   ValueCopy = Number
+    ->  evaluate_filters(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|Rest]
+        ;   Values = Rest
+        )
+    ;   Values = Rest
+    ),
+    between_candidate_values(Numbers, Value, Template, Filters, Rest).
 
 generator_parts(Generator, Goal, Filters) :-
     flatten_conjunction(Generator, [Goal|Filters]).
