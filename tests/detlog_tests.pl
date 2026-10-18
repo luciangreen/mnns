@@ -195,15 +195,24 @@ test(reports_bound_and_repeated_argument_calls_as_unsupported) :-
                                  unavailable(unsupported_goal(source(_, _))),
                                  unsupported_body), Results)).
 
-test(reports_recursive_zero_arity_calls_as_unavailable) :-
+test(reports_recursive_user_calls_as_unavailable) :-
     Program = mnn_program(
                   sample, meta(sample, []),
                   [mnn_pred(loop/0, [], [],
                            [mnn_clause(1, loop, loop, source(sample, 1))],
                            original),
-                   mnn_pred(caller/1, ['?'], [any],
-                           [mnn_clause(2, caller(_X), loop,
+                   mnn_pred(loop_arg/1, ['?'], [any],
+                           [mnn_clause(2, loop_arg(Value), loop_arg(Value),
                                        source(sample, 2))],
+                           original),
+                   mnn_pred(caller/1, ['?'], [any],
+                           [mnn_clause(3, caller(_X), loop,
+                                       source(sample, 3))],
+                           original),
+                   mnn_pred(argument_caller/1, ['?'], [any],
+                           [mnn_clause(4, argument_caller(Value),
+                                       loop_arg(Value),
+                                       source(sample, 4))],
                            original)],
                   proof([]), trace([])),
     mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
@@ -212,6 +221,13 @@ test(reports_recursive_zero_arity_calls_as_unavailable) :-
                                  unsupported_body), Results)),
     assertion(memberchk(predicate(caller/1, mode(all_arguments_unbound),
                                  unavailable(recursive_call(loop/0)),
+                                 unsupported_body), Results)),
+    assertion(memberchk(predicate(loop_arg/1, mode(all_arguments_unbound),
+                                 unavailable(recursive_call(loop_arg/1)),
+                                 unsupported_body), Results)),
+    assertion(memberchk(predicate(argument_caller/1,
+                                 mode(all_arguments_unbound),
+                                 unavailable(recursive_call(loop_arg/1)),
                                  unsupported_body), Results)).
 
 :- end_tests(mnn_detlog).
