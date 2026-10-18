@@ -90,6 +90,11 @@ goal_outcomes(Goal, _, _, Outcomes) :-
     ),
     !,
     between_outcomes(Low, High, Value, Outcomes).
+goal_outcomes(Goal, _, _, Outcomes) :-
+    semidet_builtin(Goal),
+    ground(Goal),
+    !,
+    ground_builtin_outcomes(Goal, Outcomes).
 goal_outcomes(Goal, _, _, [0, 1]) :-
     semidet_builtin(Goal),
     !.
@@ -144,6 +149,14 @@ semidet_builtin_key(ground/1).
 semidet_builtin_key(integer/1).
 semidet_builtin_key(number/1).
 semidet_builtin_key(is_list/1).
+
+ground_builtin_outcomes(Goal, Outcomes) :-
+    catch((   call(Goal)
+          ->  Outcomes = [1]
+          ;   Outcomes = [0]
+          ),
+          Error,
+          Outcomes = unavailable(exceptional_goal(Goal, Error))).
 
 predicate_outcomes([], _, [0]).
 predicate_outcomes([_], [clause_outcome(Head, Outcomes)],
