@@ -32,3 +32,21 @@ the clause ID, head and body, and lists an `induction_hypothesis(Call, Measure)`
 for each recursive call. Base clauses therefore have an empty hypothesis list;
 mutually recursive calls use the shared component measure. These are templates
 for later property proofs, not proofs of a user-supplied specification.
+
+`mnn_pid:analyze_tail_recursion/2` reports `tail_recursive` when every recursive
+call in a predicate is in syntactic tail position, and otherwise returns the
+offending calls as `non_tail_recursive([recursive_call(ClauseId, Call), ...])`.
+Predicates outside recursive call cycles are reported as `non_recursive`.
+Conjunctions after a recursive call and calls in negation or an if-then-else
+condition are not tail calls; calls in the final goal or a final control-flow
+branch can be. The analysis is syntactic: it does not prove stack behavior,
+termination, or safety of meta-calls, and inherits the call-graph limitations of
+the IR analyses.
+
+Run PID tests alone from the repository root with:
+
+```sh
+swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"
+```
+
+Run all tests with `swipl -q -s tests/run.pl`.

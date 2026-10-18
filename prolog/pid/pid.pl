@@ -1,7 +1,8 @@
 :- module(mnn_pid,
           [ analyze_program/2,
             analyze_measures/2,
-            analyze_induction/2
+            analyze_induction/2,
+            analyze_tail_recursion/2
           ]).
 
 :- use_module(library(lists)).
@@ -25,6 +26,68 @@ analyze_induction(Program, pid_induction_report(Results)) :-
     call_edges(Predicates, Keys, Edges),
     maplist(analyze_predicate_induction(Predicates, Edges),
             Measures, Results).
+
+analyze_tail_recursion(
+    mnn_program(_, _, Predicates, _, _),
+    pid_tail_recursion_report(Results)) :-
+    predicate_keys(Predicates, Keys),
+    call_edges(Predicates, Keys, Edges),
+    maplist(analyze_predicate_tail_recursion(Predicates, Edges),
+            Keys, Results).
+
+analyze_predicate_tail_recursion(_, Edges, Key,
+                                 predicate(Key, non_recursive)) :-
+    \+ recursive_path(Key, Key, Edges),
+    !.
+analyze_predicate_tail_recursion(Predicates, Edges, Key,
+                                 predicate(Key, tail_recursion(Status))) :-
+    induction_component(Key, Edges, Component),
+    member(mnn_pred(DeclaredKey, _, _, Clauses, _), Predicates),
+    DeclaredKey == Key,
+    maplist(clause_tail_calls(Component), Clauses, NestedCalls),
+    append(NestedCalls, Calls),
+    (   member(clause_tail_call(_, _, false), Calls)
+    ->  findall(recursive_call(Id, Call),
+                member(clause_tail_call(Id, Call, false), Calls),
+                NonTailCalls),
+        Status = non_tail_recursive(NonTailCalls)
+    ;   Status = tail_recursive
+    ),
+    !.
+
+clause_tail_calls(Component, mnn_clause(Id, _, Body, _), Calls) :-
+    goal_tail_calls(Body, Component, true, TailCalls),
+    maplist(add_clause_to_tail_call(Id), TailCalls, Calls).
+
+add_clause_to_tail_call(Id, tail_call(Call, TailPosition),
+                        clause_tail_call(Id, Call, TailPosition)).
+
+goal_tail_calls(conj(Left, Right), Component, TailPosition, Calls) :-
+    !,
+    goal_tail_calls(Left, Component, false, LeftCalls),
+    goal_tail_calls(Right, Component, TailPosition, RightCalls),
+    append(LeftCalls, RightCalls, Calls).
+goal_tail_calls(disj(Left, Right), Component, TailPosition, Calls) :-
+    !,
+    goal_tail_calls(Left, Component, TailPosition, LeftCalls),
+    goal_tail_calls(Right, Component, TailPosition, RightCalls),
+    append(LeftCalls, RightCalls, Calls).
+goal_tail_calls(ite(If, Then, Else), Component, TailPosition, Calls) :-
+    !,
+    goal_tail_calls(If, Component, false, IfCalls),
+    goal_tail_calls(Then, Component, TailPosition, ThenCalls),
+    goal_tail_calls(Else, Component, TailPosition, ElseCalls),
+    append([IfCalls, ThenCalls, ElseCalls], Calls).
+goal_tail_calls(not(Goal), Component, _, Calls) :-
+    !,
+    goal_tail_calls(Goal, Component, false, Calls).
+goal_tail_calls(Goal, Component, TailPosition,
+                [tail_call(Goal, TailPosition)]) :-
+    callable(Goal),
+    functor(Goal, Name, Arity),
+    memberchk(Name/Arity, Component),
+    !.
+goal_tail_calls(_, _, _, []).
 
 analyze_predicate_induction(_, _,
                             predicate(Key, non_recursive),

@@ -44,7 +44,8 @@ clause obligations, respectively. Supported measures are shared structural
 subterm decreases and a guarded natural-number subtraction pattern. Mutual
 recursion is checked against one shared measure. Unsupported cases are reported
 as unavailable. An induction report is not a termination proof or a proof of a
-user specification; see [`pid.md`](pid.md).
+user specification. `analyze_tail_recursion/2` also classifies recursive calls
+by their syntactic tail position. See [`pid.md`](pid.md).
 
 ## Detlog analysis
 
