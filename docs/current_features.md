@@ -199,10 +199,10 @@ The current work is an initial subset, not a completed version 1 suite:
 - **Stages 1–5 are in progress.** Their implemented slices and limits are
   documented above and in the subsystem guides. In particular, Stage 4 still
   lacks nested `findall/3` conversion and independent checking of most conversion
-  proofs; the checker verifies only ground-fact generators with supported
-  arithmetic filters and direct no-filter ground-list `member/2`, `select/3`,
-  `nth0/3`/`nth1/3` indices, and `length/2` conversions, plus bounded no-filter
-  `between/3`. Stage 5
+  proofs; the checker verifies ground-fact generators with supported arithmetic
+  filters, ground-list `member/2` with or without supported arithmetic filters,
+  and direct no-filter `select/3`, `nth0/3`/`nth1/3`, and `length/2`
+  conversions, plus bounded no-filter `between/3`. Stage 5
   has only conservative success-count analysis;
   mode inference, Detlog code generation, and choicepoint/cut transformations
   are not implemented.

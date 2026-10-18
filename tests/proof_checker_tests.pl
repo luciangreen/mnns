@@ -501,6 +501,23 @@ test(accept_ground_member_findall_to_fold_with_arithmetic_filter) :-
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
+test(reject_findall_to_fold_with_unsupported_member_filter) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                         findall(Value,
+                                                 conj(member(Value, [a, b]),
+                                                      Value \= b),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, loop2_report([])),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_findall_to_fold_in_proof_sequence) :-
     findall_to_fold_programs(Original, Program),
     Proof = proof([

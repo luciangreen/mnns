@@ -31,12 +31,11 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   single-clause ground definitions and unary variable definitions whose bodies
   use only the listed pure type tests, `true`, `fail`, conjunction and
   disjunction; variable-bearing folds require variant body matching to preserve
-  variable sharing. It also independently checks direct, no-filter ground-list
-  conversions for
-  `findall(Value, member(Value, GroundList), Results)`, including supported
-  arithmetic-comparison filters,
+  variable sharing. It also independently checks ground-list
+  `findall(Value, member(Value, GroundList), Results)` conversions, with supported
+  arithmetic-comparison filters, and direct no-filter conversions for
   `findall(Index, nth0(Index, GroundList, _), Results)`, and
-  `findall(Index, nth1(Index, GroundList, _), Results)`, and no-filter
+  `findall(Index, nth1(Index, GroundList, _), Results)`, plus no-filter
   `findall(Template, select(Value, GroundList, Rest), Results)` when each
   selected template is ground, and `findall(Length, length(GroundList, Length),
   Results)` for variable or nonnegative integer lengths. It also checks bounded

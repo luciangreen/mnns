@@ -72,8 +72,9 @@ preserves fact order and duplicates and accepts bound or partially instantiated
 call arguments when every successful template is ground. Arithmetic filters are
 limited to the comparisons and expressions above, must be ground after matching
 each fact, and are not certified if evaluation raises an exception. Conversions
-involving rule generators, filters on built-in generators, or other forms are not
-independently checked. Do not treat such output as proof-certified.
+involving rule generators, filters on built-in generators other than `member/2`,
+or other forms are not independently checked. Do not treat such output as
+proof-certified.
 
 Run the full suite, including loop2 tests, with:
 
