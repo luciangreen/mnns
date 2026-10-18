@@ -5,6 +5,9 @@ program and returns a `loop2_report/1`.
 
 The current supported subset is deliberately narrow:
 
+- A supported `findall/3` may occur inside conjunction, disjunction,
+  if-then-else, negation, or `once/1`; these normalized control structures are
+  preserved while conversion traverses their goals.
 - A direct call to a predicate whose clauses are all ground facts, including
   calls with bound or partially instantiated arguments, optionally followed by
   arithmetic comparisons in a conjunction. Each fact is matched against a copy

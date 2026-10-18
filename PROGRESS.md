@@ -68,7 +68,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   bound call arguments are matched against rule heads. Arbitrary predicate
   filters, variable bounds, recursive dependencies, unsupported rule bodies,
   nested `findall/3`, and independent checking of conversion proofs remain
-  unsupported. The converter
+  unsupported. Conversion traverses supported `findall/3` goals inside normalized
+  conjunction, disjunction, if-then-else, negation, and `once/1`, preserving the
+  surrounding control structure. The converter
   emits a distinct deterministic recursive list-copy helper for each conversion.
   Its report cites the findall-to-fold lemma and
   records finiteness, safe-filter, and determinism side conditions as an

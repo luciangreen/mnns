@@ -112,7 +112,9 @@ arithmetic expressions allow numeric constants, unary `+`, `-`, `abs`, and
 binary `+`, `-`, `*`, `/`, `//`, `mod`, and `rem`. Ground templates are required
 for each result that passes its filter. Arbitrary predicates in filters,
 variable bounds or lists, unsupported rule bodies, other built-in generators,
-and other forms are left unchanged.
+and other forms are left unchanged. Conversion traverses supported findall goals
+inside normalized conjunction, disjunction, if-then-else, negation, and `once/1`,
+preserving those control structures.
 
 Each conversion creates a uniquely named recursive list-copy predicate and
 preserves the existing predicates and their clause order. The report records
