@@ -17,8 +17,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   generators. CI runs the Prolog test suite on pushes and pull requests. Stage 1
   remains in progress: the full supported-syntax acceptance corpus and successful
   CI validation are still outstanding.
-- Current validation command: `swipl -q -s tests/run.pl` (not run locally because
-  SWI-Prolog is unavailable; the new CI job runs it).
+- Current validation command: `swipl -q -s tests/run.pl` (passes locally on
+  SWI-Prolog 9.0.4; the new CI job runs the same command).
 
 ## Remaining stages
 
