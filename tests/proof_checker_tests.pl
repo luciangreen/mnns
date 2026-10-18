@@ -490,7 +490,7 @@ test(render_checked_definition_introduction) :-
     definition_introduction_proof(Proof),
     mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
     assertion(sub_string(Markdown, _, _, _, 'introduce_definition')),
-    assertion(sub_string(Markdown, _, _, _, 'fresh helper predicate')).
+    assertion(sub_string(Markdown, _, _, _, 'helper predicate')).
 
 test(render_checked_rewrite_sequence) :-
     sequence_program(conj(positive(3), true),
