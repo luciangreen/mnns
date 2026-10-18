@@ -410,6 +410,7 @@ safe_variable_definition(Head, Body) :-
 safe_variable_pure_goal(true, _).
 safe_variable_pure_goal(fail, _).
 safe_variable_pure_goal(Goal, Argument) :-
+    nonvar(Goal),
     Goal =.. [Name, GoalArgument],
     GoalArgument == Argument,
     memberchk(Name, [atom, atomic, compound, ground, integer, is_list, number]).

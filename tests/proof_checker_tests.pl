@@ -228,6 +228,35 @@ test(reject_unfold_with_impure_variable_definition) :-
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
+test(reject_unfold_with_unbound_definition_body) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(positive/1, ['?'], [any],
+                             [mnn_clause(1, positive(X), Body,
+                                         source(file, 1))],
+                             original),
+                    mnn_pred(result/0, [], [],
+                             [mnn_clause(2, result, positive(3),
+                                         source(file, 2))],
+                             original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(positive/1, ['?'], [any],
+                            [mnn_clause(1, positive(Y), ProgramBody,
+                                        source(file, 1))],
+                            original),
+                   mnn_pred(result/0, [], [],
+                            [mnn_clause(2, result, integer(3),
+                                        source(file, 2))],
+                            original)],
+                  proof([]), trace([])),
+    definition_rewrite_proof(unfold, Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)),
+    assertion(var(Body)),
+    assertion(var(ProgramBody)).
+
 test(reject_unfold_with_impure_definition) :-
     Original = mnn_program(
                    sample, meta(file, []),
@@ -404,7 +433,7 @@ test(render_checked_unfold) :-
     mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
     assertion(sub_string(Markdown, _, _, _, '## Step 1: `unfold`')),
     assertion(sub_string(Markdown, _, _, _, 'single-clause definition')),
-    assertion(sub_string(Markdown, _, _, _, 'pure built-ins')).
+    assertion(sub_string(Markdown, _, _, _, 'pure type tests')).
 
 test(render_checked_definition_introduction) :-
     definition_introduction_program(Original, Program),

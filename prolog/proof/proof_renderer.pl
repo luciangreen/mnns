@@ -69,11 +69,15 @@ render_report(Result, Proof) :-
     format('~n```~n', []).
 
 render_definition_rewrite(unfold) :-
-    format('One ground call was expanded using its matching single-clause ', []),
-    format('definition with a ground body made only of pure built-ins.~n~n', []).
+    format('One call was expanded using its matching single-clause definition. ', []),
+    format('Ground definitions and unary variable definitions with bodies made ', []),
+    format('only of pure type tests, true, fail, conjunctions, or disjunctions ', []),
+    format('are supported.~n~n', []).
 render_definition_rewrite(fold) :-
-    format('One ground body was replaced by its matching single-clause call; ', []),
-    format('the definition body uses only pure built-ins.~n~n', []).
+    format('One body was replaced by its matching single-clause call. ', []),
+    format('Variable-bearing bodies must match by variant, preserving variable ', []),
+    format('sharing; the definition uses only pure type tests, true, fail, ', []),
+    format('conjunctions, or disjunctions.~n~n', []).
 
 render_definition_introduction :-
     format('One ground pure goal was factored into a fresh zero-arity ', []),
