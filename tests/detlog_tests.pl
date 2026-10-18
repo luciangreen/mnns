@@ -321,4 +321,35 @@ test(classifies_bounded_between_calls) :-
                                  determinism(failure), success_counts([0])),
                         Results)).
 
+test(evaluates_ground_builtin_goals_and_reports_exceptions) :-
+    Program = mnn_program(
+                 sample, meta(sample, []),
+                 [mnn_pred(ground_success/0, [], [],
+                           [mnn_clause(1, ground_success, atom(example),
+                                       source(sample, 1))],
+                           original),
+                  mnn_pred(ground_failure/0, [], [],
+                           [mnn_clause(2, ground_failure, integer(example),
+                                       source(sample, 2))],
+                           original),
+                  mnn_pred(ground_exception/0, [], [],
+                           [mnn_clause(3, ground_exception, is(example, 1),
+                                       source(sample, 3))],
+                           original)],
+                 proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(ground_success/0,
+                                mode(all_arguments_unbound),
+                                determinism(det), success_counts([1])),
+                       Results)),
+    assertion(memberchk(predicate(ground_failure/0,
+                                mode(all_arguments_unbound),
+                                determinism(failure), success_counts([0])),
+                       Results)),
+    assertion(memberchk(predicate(ground_exception/0,
+                                mode(all_arguments_unbound),
+                                unavailable(exceptional_goal(is(example, 1), _)),
+                                unsupported_body),
+                       Results)).
+
 :- end_tests(mnn_detlog).

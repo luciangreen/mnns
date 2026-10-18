@@ -80,10 +80,12 @@ of normalized goals in the all-arguments-unbound mode. It reports unsupported
 goals rather than guessing; acyclic user-predicate calls within the program are
 analyzed recursively when their arguments are distinct unbound variables, while
 recursive, bound-argument, and repeated-argument calls remain unavailable.
-Bounded `between/3` calls with integer literal limits and a variable or integer
-value are also classified, with success counts capped at two. Supported `once/1`
-goals retain possible failure but cap every positive success count at one;
-unsupported inner goals remain unavailable.
+Ground goals from the whitelisted pure built-ins are evaluated exactly for
+success or failure, while exceptions are reported as unavailable. Bounded
+`between/3` calls with integer literal limits and a variable or integer value are
+also classified, with success counts capped at two. Supported `once/1` goals
+retain possible failure but cap every positive success count at one; unsupported
+inner goals remain unavailable.
 Choicepoint/cut conversion and general mode inference are not implemented; see
 [`detlog.md`](detlog.md).
 
