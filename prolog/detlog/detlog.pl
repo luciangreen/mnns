@@ -101,6 +101,18 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     \+ member(mnn_pred(member/2, _, _, _, _), Predicates),
     !,
     member_outcomes(Value, List, Outcomes).
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    nonvar(Goal),
+    Goal = length(List, Length),
+    ground(List),
+    is_list(List),
+    (   var(Length)
+    ;   integer(Length),
+        Length >= 0
+    ),
+    \+ member(mnn_pred(length/2, _, _, _, _), Predicates),
+    !,
+    list_length_outcomes(List, Length, Outcomes).
 goal_outcomes(Goal, _, _, Outcomes) :-
     semidet_builtin(Goal),
     ground(Goal),
@@ -335,6 +347,16 @@ member_success_count(Value, [Element|Elements], Count0, Count) :-
     (   Count1 =:= 2
     ->  Count = 2
     ;   member_success_count(Value, Elements, Count1, Count)
+    ).
+
+list_length_outcomes(_List, Length, [1]) :-
+    var(Length),
+    !.
+list_length_outcomes(List, Length, Outcomes) :-
+    length(List, ActualLength),
+    (   Length =:= ActualLength
+    ->  Outcomes = [1]
+    ;   Outcomes = [0]
     ).
 
 outcomes_determinism([0], failure) :-
