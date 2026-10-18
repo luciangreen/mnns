@@ -103,6 +103,20 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     member_outcomes(Value, List, Outcomes).
 goal_outcomes(Goal, Predicates, _, Outcomes) :-
     nonvar(Goal),
+    Goal = select(Value, List, Rest),
+    ground(List),
+    is_list(List),
+    (   var(Value)
+    ;   ground(Value)
+    ),
+    (   var(Rest)
+    ;   ground(Rest)
+    ),
+    \+ member(mnn_pred(select/3, _, _, _, _), Predicates),
+    !,
+    select_outcomes(Value, List, Rest, Outcomes).
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    nonvar(Goal),
     Goal = length(List, Length),
     ground(List),
     is_list(List),
@@ -347,6 +361,32 @@ member_success_count(Value, [Element|Elements], Count0, Count) :-
     (   Count1 =:= 2
     ->  Count = 2
     ;   member_success_count(Value, Elements, Count1, Count)
+    ).
+
+select_outcomes(Value, List, Rest, Outcomes) :-
+    select_success_count(List, [], Value, Rest, 0, Count),
+    (   Count =:= 0
+    ->  Outcomes = [0]
+    ;   Count =:= 1
+    ->  Outcomes = [1]
+    ;   Outcomes = [2]
+    ).
+
+select_success_count([], _, _, _, Count, Count).
+select_success_count([Element|Elements], Prefix, Value, Rest,
+                     Count0, Count) :-
+    reverse(Prefix, OrderedPrefix),
+    append(OrderedPrefix, Elements, CandidateRest),
+    (   copy_term((Value, Rest), (ValueCopy, RestCopy)),
+        ValueCopy = Element,
+        RestCopy = CandidateRest
+    ->  Count1 is min(2, Count0 + 1)
+    ;   Count1 = Count0
+    ),
+    (   Count1 =:= 2
+    ->  Count = 2
+    ;   select_success_count(Elements, [Element|Prefix], Value, Rest,
+                             Count1, Count)
     ).
 
 list_length_outcomes(_List, Length, [1]) :-

@@ -113,7 +113,10 @@ count as multiple successes. Unsupported list/value shapes and locally defined
 calls are classified for a ground proper list and an unbound or nonnegative
 integer length: the unbound or matching length succeeds once, and a mismatch
 fails. Variable/improper lists and locally defined `length/2` predicates are not
-treated as this built-in case.
+treated as this built-in case. Built-in `select/3` is classified for ground
+proper lists when its selected value and remainder are unbound or ground;
+duplicate positions count separately, and ground patterns constrain the result.
+Other list/value shapes and locally defined `select/3` predicates are unsupported.
 Choicepoint/cut conversion and general mode inference are not implemented; see
 [`detlog.md`](detlog.md).
 
