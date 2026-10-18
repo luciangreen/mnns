@@ -15,6 +15,26 @@ test(converts_ground_fact_generator_and_preserves_answer_order, [nondet]) :-
                      Predicates)),
     run_converted(Converted, numbers(Values), [[[1, 2, 3]]]).
 
+test(converts_findall_inside_once, [nondet]) :-
+    with_converted_program(
+        [num(1),
+         num(2),
+         (numbers(Values) :-
+             once(findall(X, num(X), Values)))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_facts(2),
+                                        safe_arithmetic_filters(0),
+                                        deterministic_loop))])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(
+                  mnn_pred(numbers/1, _, _,
+                           [mnn_clause(_, _, once(mnn_loop2_1(_, _)), _)],
+                           original),
+                  Predicates)),
+    run_converted(Converted, numbers(Values), [[[1, 2]]]).
+
 test(converts_fact_generator_with_bound_arguments, [nondet]) :-
     with_converted_program(
         [pair(a, 1),

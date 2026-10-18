@@ -100,6 +100,12 @@ convert_goal(not(Goal), Predicates, NextClauseId0, NextName0,
     !,
     convert_goal(Goal, Predicates, NextClauseId0, NextName0,
                  NextClauseId, NextName, NewGoal, Generated, Conversions).
+convert_goal(once(Goal), Predicates, NextClauseId0, NextName0,
+             NextClauseId, NextName, once(NewGoal),
+             Generated, Conversions) :-
+    !,
+    convert_goal(Goal, Predicates, NextClauseId0, NextName0,
+                 NextClauseId, NextName, NewGoal, Generated, Conversions).
 convert_goal(findall(Template, Goal, Results), Predicates,
              NextClauseId0, NextName0, NextClauseId, NextName,
              LoopCall, Generated,
