@@ -25,12 +25,14 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   identity proofs, narrowly scoped `reorder_goals` rewrites (swapping one
   adjacent pair of ground, pure unary type tests per step), and one-occurrence
   `introduce_definition` rewrites that factor one ground pure goal into a fresh
-  zero-arity helper, plus one-occurrence `unfold` and `fold` rewrites for
-  matching single-clause definitions with ground heads and bodies made only of
-  pure built-ins, `true`, `fail`, conjunction and disjunction. Ordered sequences
-  of these checked steps can be independently verified and rendered as Markdown
-  reports. General purity/determinism analysis, general goal/clause reordering,
-  and the other proof rules remain unsupported.
+  zero-arity helper. One-occurrence `unfold` and `fold` rewrites support matching
+  single-clause ground definitions and unary variable definitions whose bodies
+  use only the listed pure type tests, `true`, `fail`, conjunction and
+  disjunction; variable-bearing folds require variant body matching to preserve
+  variable sharing. Ordered sequences of these checked steps can be
+  independently verified and rendered as Markdown reports. General
+  purity/determinism analysis, general goal/clause reordering, and the other
+  proof rules remain unsupported.
 - **Stage 3 — PID: in progress.** The call-graph analysis classifies predicates
   as recursive or non-recursive, including mutual recursion and non-recursive
   wrappers. The separate measure analysis identifies a structural measure when
@@ -52,7 +54,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground definition introduction, and narrow ground unfold/fold only) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground definition introduction, and narrow ground or unary variable type-test unfold/fold) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, and schematic measure-backed clause obligations; user specifications and broader measure forms remain) |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |
