@@ -7,6 +7,8 @@ The current supported subset is deliberately narrow:
 
 - A direct call to a predicate whose clauses are all ground facts, optionally
   followed by arithmetic comparisons in a conjunction.
+- `member/2` over a ground proper list, optionally followed by arithmetic
+  comparisons. List order and duplicate elements are preserved.
 - `between/3` with integer literal bounds and a variable or integer third
   argument, optionally followed by arithmetic comparisons. Ranges of at most
   10,000 values are converted; larger ranges are left unchanged. Reversed
@@ -28,10 +30,11 @@ non-ground or non-integer bounds, or ranges above the limit, also remains
 unchanged.
 
 Each conversion report cites the `findall_to_fold` lemma and records the
-finite-ground-fact, safe-arithmetic-filter, and deterministic-loop side
-conditions. The report is an obligation, not a checked proof: the independent
-proof checker does not yet validate this loop2 rule. Do not treat converted
-output as proof-certified.
+generator-specific finiteness condition (ground facts, a ground list, or a
+bounded `between/3` range), safe-arithmetic-filter condition, and
+deterministic-loop condition. The report is an obligation, not a checked proof:
+the independent proof checker does not yet validate this loop2 rule. Do not
+treat converted output as proof-certified.
 
 Run the full suite, including loop2 tests, with:
 

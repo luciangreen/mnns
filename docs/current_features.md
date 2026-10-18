@@ -49,18 +49,19 @@ user specification; see [`pid.md`](pid.md).
 ## loop2 conversion
 
 `mnn_loop2:convert_program/3` currently handles a `findall/3` whose generator is
-a direct call to a predicate made entirely of ground facts, optionally followed
-by arithmetic comparisons over variables bound by those facts. It also converts
-`between/3` with integer literal bounds and a variable or integer generator
-argument, optionally followed by the same arithmetic comparisons. Between ranges
-up to 10,000 values are supported, including reversed and singleton ranges;
-larger ranges are left unchanged. The supported comparisons are `>`, `>=`, `<`,
-`=<`, `=:=`, and `=\=`; arithmetic expressions allow numeric constants, unary
-`+`, `-`, `abs`, and binary `+`, `-`, `*`, `/`, `//`, `mod`, and `rem`. Ground
-templates are required for each result that passes its filter. Filter
-expressions are interpreted through this restricted arithmetic whitelist;
-arbitrary predicates, unbound arithmetic, rules, other built-in generators, and
-other forms are left unchanged.
+a direct call to a predicate made entirely of ground facts, or `member/2` over a
+ground proper list. Either may be followed by arithmetic comparisons over values
+bound by the generator. It also converts `between/3` with integer literal bounds
+and a variable or integer generator argument, optionally followed by the same
+arithmetic comparisons. Between ranges up to 10,000 values are supported,
+including reversed and singleton ranges; larger ranges are left unchanged.
+Member list order and duplicates are preserved. The supported comparisons are
+`>`, `>=`, `<`, `=<`, `=:=`, and `=\=`; arithmetic expressions allow numeric
+constants, unary `+`, `-`, `abs`, and binary `+`, `-`, `*`, `/`, `//`, `mod`, and
+`rem`. Ground templates are required for each result that passes its filter.
+Filter expressions are interpreted through this restricted arithmetic
+whitelist; arbitrary predicates, unbound arithmetic, variable bounds or lists,
+rules, other built-in generators, and other forms are left unchanged.
 
 Each conversion creates a uniquely named recursive list-copy predicate and
 preserves the existing predicates and their clause order. The report records
@@ -96,4 +97,5 @@ Stages 5–14 remain unstarted: Detlog, PLOp, AlgebraPLOp, S2A/Starlog, the AIOC
 pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
 gradient descent, Neuroprolog, core/chatbot/agent, and benchmarks. Stages 1–4
 are also incomplete; consult `PROGRESS.md` for their limitations and next
-acceptance criteria.
+acceptance criteria. In Stage 4, `nth0/3`, `nth1/3`, rule-based generators,
+nested `findall/3`, and independent proof checking for conversions remain.
