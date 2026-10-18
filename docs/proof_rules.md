@@ -85,8 +85,8 @@ generator conversion:
 - `findall(Index, nth1(Index, List, _), Results)`, with the same variable and
   ground-list requirements; indices are one-based.
 
-For either case, it reconstructs the complete expected output IR: the source
-call must be replaced by a call to a fresh helper containing the independently
+For each case, it reconstructs the complete expected output IR: the source call
+must be replaced by a call to a fresh helper containing the independently
 derived values, and that helper must be the two-clause deterministic list-copy
 loop. The `nth0/3` case derives zero-based indices and the `nth1/3` case derives
 one-based indices, both in list order; an empty list produces an empty values
