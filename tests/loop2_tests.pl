@@ -179,6 +179,49 @@ test(converts_ground_between_generator, [nondet]) :-
                                        deterministic_loop))])),
     run_converted(Converted, values(Values), [[[1, 2, 3]]]).
 
+test(converts_ground_length_generator_and_filter, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :-
+              findall(pair(Length, fixed),
+                      (length([a, b], Length), Length > 1),
+                      Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_length(1),
+                                       safe_arithmetic_filters(1),
+                                       deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[pair(2, fixed)]]]).
+
+test(converts_ground_length_with_matching_and_mismatched_integer) :-
+    with_converted_program(
+        [(matching(Values) :- findall(ok, length([a, b], 2), Values)),
+         (mismatching(Values) :- findall(ok, length([a, b], 3), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_length(1),
+                                       safe_arithmetic_filters(0),
+                                       deterministic_loop)),
+             conversion(findall_to_fold, helper(mnn_loop2_2/2),
+                        side_conditions(finite_ground_length(0),
+                                       safe_arithmetic_filters(0),
+                                       deterministic_loop))])),
+    run_converted(Converted, matching(Values), [[[ok]]]),
+    run_converted(Converted, mismatching(Values), [[]]).
+
+test(leaves_negative_length_unchanged) :-
+    with_converted_program(
+        [(values(Values) :- findall(ok, length([a, b], -1), Values))],
+        Converted, loop2_report([])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(
+                  mnn_pred(values/1, _, _,
+                           [mnn_clause(_, _,
+                                       findall(ok, length([a, b], -1), _), _)],
+                           original),
+                  Predicates)).
+
 test(converts_ground_member_generator_and_preserves_duplicates, [nondet]) :-
     with_converted_program(
         [(values(Values) :-
