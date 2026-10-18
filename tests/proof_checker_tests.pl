@@ -143,6 +143,53 @@ test(accept_ground_nth1_index_findall_to_fold_on_empty_list) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_length_findall_to_fold) :-
+    length_findall_to_fold_programs(
+        Length, [a, b], Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [2]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_ground_length_findall_to_fold_on_empty_list) :-
+    length_findall_to_fold_programs(Length, [], Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [0]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_ground_length_findall_to_fold_with_bound_length) :-
+    length_findall_to_fold_programs(2, [a, b], Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_ground_length_findall_to_fold_with_mismatched_length) :-
+    length_findall_to_fold_programs(3, [a, b], Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == []),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_length_findall_to_fold_with_changed_values) :-
+    length_findall_to_fold_programs(
+        Length, [a, b], Original, Program0),
+    replace_length_loop_values(Program0, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_ground_select_findall_to_fold_preserving_order_and_duplicates) :-
     List = [a, b, a],
     Template = pair(Value, Rest),
@@ -873,6 +920,20 @@ nth1_findall_to_fold_programs(
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
 
+length_findall_to_fold_programs(
+    Length, List, Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                         findall(Length,
+                                                 length(List, Length),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
 select_findall_to_fold_programs(
     Template, Generator, Original, Program) :-
     Original = mnn_program(
@@ -888,5 +949,19 @@ select_findall_to_fold_programs(
 findall_to_fold_proof(
     proof([proof_step(1, findall_to_fold, [],
                       equivalent(domain(any), modes([])))])).
+
+replace_length_loop_values(
+    mnn_program(Name, Meta,
+                [mnn_pred(Key, Modes, Domains,
+                          [mnn_clause(Id, Head, LoopCall, Location)],
+                          Status)|Predicates],
+                Proof, Trace),
+    mnn_program(Name, Meta,
+                [mnn_pred(Key, Modes, Domains,
+                          [mnn_clause(Id, Head, ChangedLoopCall, Location)],
+                          Status)|Predicates],
+                Proof, Trace)) :-
+    LoopCall =.. [Loop, _, Results],
+    ChangedLoopCall =.. [Loop, [changed], Results].
 
 :- end_tests(mnn_proof_checker).

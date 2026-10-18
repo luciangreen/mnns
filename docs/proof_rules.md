@@ -3,7 +3,7 @@
 The checker supports `identity`, restricted `reorder_goals` and
 `introduce_definition`, and narrowly scoped `unfold` and `fold` rules. It
 certifies these transformations directly from the IR, without executing either
-program. It also checks two narrow `findall_to_fold` cases.
+program. It also checks a limited set of `findall_to_fold` cases.
 
 The accepted proof shape is:
 
@@ -88,6 +88,11 @@ generator conversion:
   ground proper list and every selected solution grounds `Template`. Value and
   remainder patterns are allowed; selection order and duplicate positions are
   preserved.
+- `findall(Length, length(List, Length), Results)`, where `List` is a ground
+  proper list and `Length` is a variable or nonnegative integer. A variable
+  length produces the list's length once; a matching bound length produces one
+  result, and a nonmatching bound length produces none. The template must be
+  ground in every produced solution.
 
 For each case, it reconstructs the complete expected output IR: the source call
 must be replaced by a call to a fresh helper containing the independently
@@ -96,15 +101,18 @@ loop. The `nth0/3` case derives zero-based indices and the `nth1/3` case derives
 one-based indices, both in list order; an empty list produces an empty values
 list. For `select/3`, the checker independently enumerates each selected position,
 matches the value and remainder patterns, and collects the grounded templates in
-selection order. Existing clauses and predicates must be preserved; the generated
+selection order. For `length/2`, it derives the single possible length and checks
+any bound length before constructing the expected values. Existing clauses and
+predicates must be preserved; the generated
 helper's clause IDs and metadata events must also match. Thus a claimed conversion,
 altered values, missing helper, or unrelated program change is rejected.
 
 These checks cover only no-filter, ground-list `member/2`, the stated
 distinct-variable `nth0/3` and `nth1/3` index forms, and `select/3` with a
-grounded template. They do not certify fact or rule generators, filters, nested
-findall, `between/3`, `length/2`, other list generators, or arbitrary `findall/3`
-rewrites. Ground domain and mode annotations are required but are not inferred.
+grounded template, and the stated `length/2` form. They do not certify fact or
+rule generators, filters, nested findall, `between/3`, other list generators, or
+arbitrary `findall/3` rewrites. Ground domain and mode annotations are required
+but are not inferred.
 The checker does not import or invoke the loop2 converter.
 
 The checker still does not implement general purity/determinism analysis,
