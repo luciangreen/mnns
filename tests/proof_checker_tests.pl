@@ -118,7 +118,7 @@ test(reject_sequence_with_invalid_intermediate_rewrite) :-
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
-test(reject_unfold_with_variable_definition) :-
+test(accept_unfold_with_variable_definition) :-
     Original = mnn_program(
                    sample, meta(file, []),
                    [mnn_pred(positive/1, ['?'], [any],
@@ -140,6 +140,89 @@ test(reject_unfold_with_variable_definition) :-
                             [mnn_clause(2, result, integer(3),
                                         source(file, 2))],
                             original)],
+                  proof([]), trace([])),
+    definition_rewrite_proof(unfold, Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, accepted).
+
+test(accept_fold_with_variable_definition) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(positive/1, ['?'], [any],
+                           [mnn_clause(1, positive(X), integer(X),
+                                       source(file, 1))],
+                           original),
+                  mnn_pred(result/1, ['?'], [any],
+                           [mnn_clause(2, result(Y), integer(Y),
+                                       source(file, 2))],
+                           original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(positive/1, ['?'], [any],
+                          [mnn_clause(1, positive(A), integer(A),
+                                      source(file, 1))],
+                          original),
+                   mnn_pred(result/1, ['?'], [any],
+                          [mnn_clause(2, result(B), positive(B),
+                                      source(file, 2))],
+                          original)],
+                  proof([]), trace([])),
+    definition_rewrite_proof(fold, Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_fold_when_variable_sharing_differs) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(positive/1, ['?'], [any],
+                           [mnn_clause(1, positive(X),
+                                       conj(integer(X), number(X)),
+                                       source(file, 1))],
+                           original),
+                  mnn_pred(result/2, ['?', '?'], [any, any],
+                           [mnn_clause(2, result(A, B),
+                                       conj(integer(A), number(B)),
+                                       source(file, 2))],
+                           original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(positive/1, ['?'], [any],
+                          [mnn_clause(1, positive(Y),
+                                      conj(integer(Y), number(Y)),
+                                      source(file, 1))],
+                          original),
+                   mnn_pred(result/2, ['?', '?'], [any, any],
+                          [mnn_clause(2, result(C, D), positive(C),
+                                      source(file, 2))],
+                          original)],
+                  proof([]), trace([])),
+    definition_rewrite_proof(fold, Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_unfold_with_impure_variable_definition) :-
+    Original = mnn_program(
+                   sample, meta(file, []),
+                   [mnn_pred(positive/1, ['?'], [any],
+                           [mnn_clause(1, positive(X), write(X),
+                                       source(file, 1))],
+                           original),
+                  mnn_pred(result/1, ['?'], [any],
+                           [mnn_clause(2, result(Y), positive(Y),
+                                       source(file, 2))],
+                           original)],
+                   proof([]), trace([])),
+    Program = mnn_program(
+                  sample, meta(file, []),
+                  [mnn_pred(positive/1, ['?'], [any],
+                          [mnn_clause(1, positive(A), write(A),
+                                      source(file, 1))],
+                          original),
+                   mnn_pred(result/1, ['?'], [any],
+                          [mnn_clause(2, result(B), write(B),
+                                      source(file, 2))],
+                          original)],
                   proof([]), trace([])),
     definition_rewrite_proof(unfold, Proof),
     mnn_proof_checker:check_proof(

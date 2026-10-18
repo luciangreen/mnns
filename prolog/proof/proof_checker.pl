@@ -383,7 +383,7 @@ safe_definition(Predicates, Key, Head, Body) :-
             ),
             [[mnn_clause(_, _, _, _)]]).
 
-unfold_definition(Goal, Head, _, _) :-
+unfold_definition(Goal, Head, Body, Body) :-
     ground(Head),
     Goal == Head.
 unfold_definition(Goal, Head, Body, RewrittenBody) :-
