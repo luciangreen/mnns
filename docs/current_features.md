@@ -46,6 +46,13 @@ recursion is checked against one shared measure. Unsupported cases are reported
 as unavailable. An induction report is not a termination proof or a proof of a
 user specification; see [`pid.md`](pid.md).
 
+## Detlog analysis
+
+`mnn_detlog:analyze_determinism/2` classifies success counts for a bounded set
+of normalized goals in the all-arguments-unbound mode. It reports unsupported
+goals rather than guessing. Choicepoint/cut conversion and general mode
+inference are not implemented; see [`detlog.md`](detlog.md).
+
 ## loop2 conversion
 
 `mnn_loop2:convert_program/3` currently handles a `findall/3` whose generator is
@@ -87,6 +94,7 @@ swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner),
 swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"
 swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"
 swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
+swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 ```
 
 The single canonical full-suite command is also used in CI. Individual test
@@ -94,9 +102,11 @@ groups are for focused iteration and do not replace the full suite.
 
 ## Not yet implemented
 
-Stages 5–14 remain unstarted: Detlog, PLOp, AlgebraPLOp, S2A/Starlog, the AIOC
-pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
-gradient descent, Neuroprolog, core/chatbot/agent, and benchmarks. Stages 1–4
-are also incomplete; consult `PROGRESS.md` for their limitations and next
-acceptance criteria. In Stage 4, rule-based generators, nested `findall/3`, and
-independent proof checking for conversions remain.
+Stage 5 has an initial conservative determinism-analysis slice; Detlog code
+generation and cut/choicepoint transformations remain unimplemented. Stages
+6–14 are unstarted: PLOp, AlgebraPLOp, S2A/Starlog, the AIOC pipeline and bundle
+interface, quantum-inspired search/export, AMNN/ANN/manual gradient descent,
+Neuroprolog, core/chatbot/agent, and benchmarks. Stages 1–4 are also incomplete;
+consult `PROGRESS.md` for their limitations and next acceptance criteria. In
+Stage 4, rule-based generators, nested `findall/3`, and independent proof
+checking for conversions remain.

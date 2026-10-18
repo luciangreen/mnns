@@ -75,7 +75,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, and schematic measure-backed clause obligations; user specifications and broader measure forms remain) |
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, ground proper-list `member/2`, `nth0/3`, `nth1/3`, and bounded ground `between/3` ranges with restricted arithmetic filters; rules, nested findall, and checked conversion proofs remain) |
-| 5 | Detlog determinism analysis and transformations | Not started |
+| 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode; general mode inference, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |
 | 8 | S2A synthesis and Starlog view | Not started |
@@ -89,6 +89,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 The requirements in §§1–15 and the version 1 definition of done in §17 remain
 the specification; this table is a status summary, not a reduction in scope.
 
+The Detlog slice is described in `docs/detlog.md`; its tests are included in the
+full test runner and can also be run with
+`swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"`.
 See `docs/current_features.md` for the implemented feature descriptions,
 limitations, and focused test commands. Run the full current test suite with
 `swipl -q -s tests/run.pl`.
