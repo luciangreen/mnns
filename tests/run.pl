@@ -15,5 +15,7 @@ main :-
     load_files(PidTests, [silent(true)]),
     directory_file_path(Directory, 'loop2_tests.pl', Loop2Tests),
     load_files(Loop2Tests, [silent(true)]),
+    directory_file_path(Directory, 'detlog_tests.pl', DetlogTests),
+    load_files(DetlogTests, [silent(true)]),
     run_tests,
     halt.

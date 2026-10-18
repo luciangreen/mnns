@@ -28,6 +28,10 @@ the current implementation and remaining work.
   shared structural and guarded natural-number decreases, and emits schematic
   induction obligations for supported measures. These are not proofs of a
   specification. See [`docs/pid.md`](docs/pid.md).
+- **Detlog analysis:** conservatively classifies success counts for a limited
+  set of normalized goals when all predicate arguments are unbound. Unsupported
+  goals are reported rather than guessed; choicepoint and cut transformations
+  are not implemented yet. See [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` on a
   ground proper list, `nth0/3` or `nth1/3` on a ground proper list, or bounded
   `between/3` ranges, optionally with supported arithmetic filters, into
