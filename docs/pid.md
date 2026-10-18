@@ -25,3 +25,10 @@ a shared structural or guarded natural decrease, other arithmetic measures,
 unbound arguments, and recursive calls that do not match a supported decrease
 pattern are reported as unavailable. It does not yet produce full induction
 proofs or check a user-supplied specification.
+
+`mnn_pid:analyze_induction/2` builds on the checked measure results and emits
+symbolic clause obligations as `pid_induction_report/1`. Each obligation keeps
+the clause ID, head and body, and lists an `induction_hypothesis(Call, Measure)`
+for each recursive call. Base clauses therefore have an empty hypothesis list;
+mutually recursive calls use the shared component measure. These are templates
+for later property proofs, not proofs of a user-supplied specification.

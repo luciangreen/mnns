@@ -284,4 +284,118 @@ test(classifies_non_recursive_measure_target) :-
         Program,
         pid_measure_report([predicate(identity/1, non_recursive)])).
 
+test(generates_structural_induction_obligations) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(walk/1, ['?'], [any],
+                          [mnn_clause(1, walk([]), true, source(sample, 1)),
+                           mnn_clause(2, walk([_|Tail]), walk(Tail),
+                                      source(sample, 2))],
+                          original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_induction(
+        Program,
+        pid_induction_report(
+            [predicate(walk/1,
+                      induction(structural(1),
+                                [clause_obligation(1, walk([]), true, []),
+                                 clause_obligation(
+                                     2, walk([_|Tail]), walk(Tail),
+                                     [induction_hypothesis(
+                                          walk(Tail), structural(1))])]))])).
+
+test(generates_natural_induction_obligations) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(count/1, ['?'], [any],
+                          [mnn_clause(1, count(0), true, source(sample, 1)),
+                           mnn_clause(
+                               2, count(N),
+                               conj(integer(N),
+                                    conj(>(N, 0),
+                                         conj(is(Next, -(N, 1)),
+                                              count(Next)))),
+                               source(sample, 2))],
+                          original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_induction(
+        Program,
+        pid_induction_report(
+            [predicate(count/1,
+                      induction(natural(1),
+                                [clause_obligation(1, count(0), true, []),
+                                 clause_obligation(
+                                     2, count(N),
+                                     conj(integer(N),
+                                          conj(>(N, 0),
+                                               conj(is(Next, -(N, 1)),
+                                                    count(Next)))),
+                                     [induction_hypothesis(
+                                          count(Next), natural(1))])]))])).
+
+test(generates_mutual_induction_hypotheses) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(even/1, ['?'], [any],
+                          [mnn_clause(1, even(0), true, source(sample, 1)),
+                           mnn_clause(2, even(N1),
+                                      conj(integer(N1),
+                                           conj(>(N1, 0),
+                                                conj(is(Next1, -(N1, 1)),
+                                                     odd(Next1)))),
+                                      source(sample, 2))],
+                          original),
+                  mnn_pred(odd/1, ['?'], [any],
+                          [mnn_clause(3, odd(0), true, source(sample, 3)),
+                           mnn_clause(4, odd(N2),
+                                      conj(integer(N2),
+                                           conj(>(N2, 0),
+                                                conj(is(Next2, -(N2, 1)),
+                                                     even(Next2)))),
+                                      source(sample, 4))],
+                          original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_induction(
+        Program,
+        pid_induction_report(
+            [predicate(even/1,
+                      induction(natural(1),
+                                [clause_obligation(1, even(0), true, []),
+                                 clause_obligation(
+                                     2, even(N1), _,
+                                     [induction_hypothesis(
+                                          odd(Next1), natural(1))])])),
+             predicate(odd/1,
+                      induction(natural(1),
+                                [clause_obligation(3, odd(0), true, []),
+                                 clause_obligation(
+                                     4, odd(N2), _,
+                                     [induction_hypothesis(
+                                          even(Next2), natural(1))])]))])).
+
+test(induction_report_preserves_unsupported_measure_status) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(grow/1, ['?'], [any],
+                          [mnn_clause(1, grow(N), grow(N), source(sample, 1))],
+                          original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_induction(
+        Program,
+        pid_induction_report(
+            [predicate(grow/1,
+                      unavailable(no_decreasing_structural_measure))])).
+
+test(induction_report_marks_non_recursive_predicate) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(identity/1, ['?'], [any],
+                          [mnn_clause(1, identity(Value), true,
+                                      source(sample, 1))],
+                          original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_induction(
+        Program,
+        pid_induction_report([predicate(identity/1, non_recursive)])).
+
 :- end_tests(mnn_pid).
