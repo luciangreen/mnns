@@ -109,4 +109,52 @@ test(universal_head_with_overlapping_clause_is_multi) :-
             [predicate(overlap/1, mode(all_arguments_unbound),
                        determinism(multi), success_counts([2]))])).
 
+test(analyzes_acyclic_zero_arity_user_calls) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(always/0, [], [],
+                           [mnn_clause(1, always, true,
+                                       source(sample, 1))],
+                           original),
+                   mnn_pred(multiple/0, [], [],
+                           [mnn_clause(2, multiple, disj(true, true),
+                                       source(sample, 2))],
+                           original),
+                   mnn_pred(nested/0, [], [],
+                           [mnn_clause(3, nested, always,
+                                       source(sample, 3))],
+                           original),
+                   mnn_pred(caller/1, ['?'], [any],
+                           [mnn_clause(4, caller(_X),
+                                       conj(nested, multiple),
+                                       source(sample, 4))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(nested/0, mode(all_arguments_unbound),
+                                 determinism(det), success_counts([1])),
+                       Results)),
+    assertion(memberchk(predicate(caller/1, mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                       Results)).
+
+test(reports_recursive_zero_arity_calls_as_unavailable) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(loop/0, [], [],
+                           [mnn_clause(1, loop, loop, source(sample, 1))],
+                           original),
+                   mnn_pred(caller/1, ['?'], [any],
+                           [mnn_clause(2, caller(_X), loop,
+                                       source(sample, 2))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(loop/0, mode(all_arguments_unbound),
+                                 unavailable(recursive_call(loop/0)),
+                                 unsupported_body), Results)),
+    assertion(memberchk(predicate(caller/1, mode(all_arguments_unbound),
+                                 unavailable(recursive_call(loop/0)),
+                                 unsupported_body), Results)).
+
 :- end_tests(mnn_detlog).

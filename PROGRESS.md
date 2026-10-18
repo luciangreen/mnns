@@ -80,7 +80,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `nth0/3`, `nth1/3`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and checked conversion proofs remain) |
-| 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode; general mode inference, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
+| 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode, including acyclic zero-arity calls; general mode inference, argument-bearing calls, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |
 | 8 | S2A synthesis and Starlog view | Not started |

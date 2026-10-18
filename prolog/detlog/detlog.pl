@@ -7,12 +7,13 @@
 analyze_determinism(
     mnn_program(_, _, Predicates, _, _),
     detlog_report(Results)) :-
-    maplist(analyze_predicate, Predicates, Results).
+    maplist(analyze_predicate(Predicates), Predicates, Results).
 
-analyze_predicate(mnn_pred(Key, _, _, Clauses, _),
+analyze_predicate(Predicates,
+                  mnn_pred(Key, _, _, Clauses, _),
                   predicate(Key, mode(all_arguments_unbound),
                             Determinism, Evidence)) :-
-    maplist(clause_outcomes, Clauses, ClauseOutcomes),
+    maplist(clause_outcomes(Predicates, [Key]), Clauses, ClauseOutcomes),
     (   member(clause_outcome(_, unavailable(Reason)), ClauseOutcomes)
     ->  Determinism = unavailable(Reason),
         Evidence = unsupported_body
@@ -22,39 +23,40 @@ analyze_predicate(mnn_pred(Key, _, _, Clauses, _),
         Evidence = success_counts(Outcomes)
     ).
 
-clause_outcomes(mnn_clause(_, Head, Body, _),
+clause_outcomes(Predicates, Stack,
+                mnn_clause(_, Head, Body, _),
                 clause_outcome(Head, Outcomes)) :-
-    goal_outcomes(Body, Outcomes).
+    goal_outcomes(Body, Predicates, Stack, Outcomes).
 
-goal_outcomes(true, [1]) :-
+goal_outcomes(true, _, _, [1]) :-
     !.
-goal_outcomes(fail, [0]) :-
+goal_outcomes(fail, _, _, [0]) :-
     !.
-goal_outcomes(conj(Left, Right), Outcomes) :-
+goal_outcomes(conj(Left, Right), Predicates, Stack, Outcomes) :-
     !,
-    goal_outcomes(Left, LeftOutcomes),
-    goal_outcomes(Right, RightOutcomes),
+    goal_outcomes(Left, Predicates, Stack, LeftOutcomes),
+    goal_outcomes(Right, Predicates, Stack, RightOutcomes),
     (   LeftOutcomes = unavailable(Reason)
     ->  Outcomes = unavailable(Reason)
     ;   RightOutcomes = unavailable(Reason)
     ->  Outcomes = unavailable(Reason)
     ;   product_outcomes(LeftOutcomes, RightOutcomes, Outcomes)
     ).
-goal_outcomes(disj(Left, Right), Outcomes) :-
+goal_outcomes(disj(Left, Right), Predicates, Stack, Outcomes) :-
     !,
-    goal_outcomes(Left, LeftOutcomes),
-    goal_outcomes(Right, RightOutcomes),
+    goal_outcomes(Left, Predicates, Stack, LeftOutcomes),
+    goal_outcomes(Right, Predicates, Stack, RightOutcomes),
     (   LeftOutcomes = unavailable(Reason)
     ->  Outcomes = unavailable(Reason)
     ;   RightOutcomes = unavailable(Reason)
     ->  Outcomes = unavailable(Reason)
     ;   sum_outcomes(LeftOutcomes, RightOutcomes, Outcomes)
     ).
-goal_outcomes(ite(Condition, Then, Else), Outcomes) :-
+goal_outcomes(ite(Condition, Then, Else), Predicates, Stack, Outcomes) :-
     !,
-    goal_outcomes(Condition, ConditionOutcomes),
-    goal_outcomes(Then, ThenOutcomes),
-    goal_outcomes(Else, ElseOutcomes),
+    goal_outcomes(Condition, Predicates, Stack, ConditionOutcomes),
+    goal_outcomes(Then, Predicates, Stack, ThenOutcomes),
+    goal_outcomes(Else, Predicates, Stack, ElseOutcomes),
     (   ConditionOutcomes = unavailable(Reason)
     ->  Outcomes = unavailable(Reason)
     ;   ThenOutcomes = unavailable(Reason)
@@ -64,17 +66,38 @@ goal_outcomes(ite(Condition, Then, Else), Outcomes) :-
     ;   committed_outcomes(ConditionOutcomes, ThenOutcomes,
                            ElseOutcomes, Outcomes)
     ).
-goal_outcomes(not(Goal), Outcomes) :-
+goal_outcomes(not(Goal), Predicates, Stack, Outcomes) :-
     !,
-    goal_outcomes(Goal, GoalOutcomes),
+    goal_outcomes(Goal, Predicates, Stack, GoalOutcomes),
     (   GoalOutcomes = unavailable(Reason)
     ->  Outcomes = unavailable(Reason)
     ;   negated_outcomes(GoalOutcomes, Outcomes)
     ).
-goal_outcomes(Goal, [0, 1]) :-
+goal_outcomes(Goal, _, _, [0, 1]) :-
     semidet_builtin(Goal),
     !.
-goal_outcomes(Goal, unavailable(unsupported_goal(Goal))).
+goal_outcomes(Goal, Predicates, Stack, Outcomes) :-
+    zero_arity_user_goal(Goal, Predicates, Stack, Outcomes),
+    !.
+goal_outcomes(Goal, _, _, unavailable(unsupported_goal(Goal))).
+
+zero_arity_user_goal(Goal, Predicates, Stack, Outcomes) :-
+    nonvar(Goal),
+    callable(Goal),
+    functor(Goal, Name, 0),
+    Key = Name/0,
+    member(mnn_pred(Key, _, _, Clauses, _), Predicates),
+    !,
+    (   memberchk(Key, Stack)
+    ->  Outcomes = unavailable(recursive_call(Key))
+    ;   NextStack = [Key|Stack],
+      maplist(clause_outcomes(Predicates, NextStack), Clauses,
+              ClauseOutcomes),
+      (   member(clause_outcome(_, unavailable(Reason)), ClauseOutcomes)
+      ->  Outcomes = unavailable(Reason)
+      ;   predicate_outcomes(Clauses, ClauseOutcomes, Outcomes)
+      )
+    ).
 
 semidet_builtin(Goal) :-
     nonvar(Goal),
