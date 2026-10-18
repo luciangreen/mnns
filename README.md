@@ -24,8 +24,9 @@ the current implementation and remaining work.
 - **Proof checker and renderer:** independently checks identity, one adjacent
   reordering of restricted ground type tests, restricted definition
   introduction, narrow single-occurrence unfold/fold steps, and a direct
-  no-filter `findall/3` over `member/2` on a ground proper list. Unsupported
-  rules and broader findall conversions are rejected. See
+  no-filter `findall/3` over `member/2` or the zero-based index form of `nth0/3`
+  on a ground proper list. Unsupported rules and broader findall conversions
+  are rejected. See
   [`docs/proof_rules.md`](docs/proof_rules.md).
 - **PID analysis:** classifies recursive predicates, checks a limited set of
   shared structural and guarded natural-number decreases, and emits schematic

@@ -3,7 +3,7 @@
 The checker supports `identity`, restricted `reorder_goals` and
 `introduce_definition`, and narrowly scoped `unfold` and `fold` rules. It
 certifies these transformations directly from the IR, without executing either
-program. It also checks one narrow `findall_to_fold` case.
+program. It also checks two narrow `findall_to_fold` cases.
 
 The accepted proof shape is:
 
@@ -74,21 +74,29 @@ proof([
 ])
 ```
 
-The checker accepts this rule only when one clause body consists directly of
-`findall(Value, member(Value, List), Results)`, where `List` is a ground proper
-list and the template is the same variable as the `member/2` value. The checker
-reconstructs the complete expected output IR: the source call must be replaced
-by a call to a fresh helper containing the corresponding list, and that helper
-must be the two-clause deterministic list-copy loop. Existing clauses and
-predicates must be preserved; the generated helper's clause IDs and metadata
-events must also match. Thus a claimed conversion, altered result list, missing
-helper, or unrelated program change is rejected.
+The checker accepts this rule when exactly one clause body is a supported direct
+generator conversion:
 
-This check proves only the no-filter, ground-list `member/2` subset. It does not
-certify fact or rule generators, filters, nested findall, other list generators,
-or arbitrary `findall/3` rewrites. Ground domain and mode annotations are
-required but are not inferred. The checker does not import or invoke the loop2
-converter.
+- `findall(Value, member(Value, List), Results)`, where `List` is a ground
+  proper list and the template is the same variable as the `member/2` value.
+- `findall(Index, nth0(Index, List, _), Results)`, where `List` is a ground
+  proper list, `Index` is the unbound index variable used as the template, and
+  the element argument is a distinct unbound variable.
+
+For either case, it reconstructs the complete expected output IR: the source
+call must be replaced by a call to a fresh helper containing the independently
+derived values, and that helper must be the two-clause deterministic list-copy
+loop. The `nth0/3` case derives the zero-based indices in list order; an empty
+list therefore produces an empty values list. Existing clauses and predicates
+must be preserved; the generated helper's clause IDs and metadata events must
+also match. Thus a claimed conversion, altered values, missing helper, or
+unrelated program change is rejected.
+
+These checks cover only no-filter, ground-list `member/2` and the stated
+zero-based `nth0/3` index form. They do not certify fact or rule generators,
+filters, nested findall, other list generators, or arbitrary `findall/3`
+rewrites. Ground domain and mode annotations are required but are not inferred.
+The checker does not import or invoke the loop2 converter.
 
 The checker still does not implement general purity/determinism analysis,
 general clause/goal reordering, or the other rules in §7.2. Domain and mode
