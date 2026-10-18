@@ -174,6 +174,46 @@ test(reports_mutual_recursion_as_unsupported) :-
             [predicate(even/1, unavailable(mutual_recursion)),
              predicate(odd/1, unavailable(mutual_recursion))])).
 
+test(finds_structural_measure_across_mutual_recursion) :-
+    Program = mnn_program(
+                 sample, meta(sample, []),
+                 [mnn_pred(even/1, ['?'], [any],
+                          [mnn_clause(1, even([_|Tail]), odd(Tail),
+                                      source(sample, 1))],
+                          original),
+                  mnn_pred(odd/1, ['?'], [any],
+                          [mnn_clause(2, odd([_|Tail]), even(Tail),
+                                      source(sample, 2))],
+                          original)],
+                 proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(even/1,
+                      measure(structural(1),
+                              [decrease(1, odd(_), structural(1))])),
+             predicate(odd/1,
+                      measure(structural(1),
+                              [decrease(2, even(_), structural(1))]))])).
+
+test(rejects_mutual_recursion_when_any_call_does_not_decrease) :-
+    Program = mnn_program(
+                 sample, meta(sample, []),
+                 [mnn_pred(even/1, ['?'], [any],
+                          [mnn_clause(1, even([_|Tail]), odd(Tail),
+                                      source(sample, 1))],
+                          original),
+                  mnn_pred(odd/1, ['?'], [any],
+                          [mnn_clause(2, odd(Value), even(Value),
+                                      source(sample, 2))],
+                          original)],
+                 proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(even/1, unavailable(mutual_recursion)),
+             predicate(odd/1, unavailable(mutual_recursion))])).
+
 test(classifies_non_recursive_measure_target) :-
     Program = mnn_program(
                   sample, meta(sample, []),
