@@ -91,12 +91,12 @@ test(leaves_rule_generators_and_unrelated_cut_unchanged, [nondet]) :-
 
 test(leaves_unsupported_builtin_generators_unchanged, [nondet]) :-
     with_converted_program(
-        [(values(Values) :- findall(X, member(X, [1, 2]), Values))],
+        [(values(Values) :- findall(X, append(X, [3], [1, 2, 3]), Values))],
         Converted, loop2_report([])),
     Converted = mnn_program(_, _, Predicates, _, _),
     assertion(member(
                   mnn_pred(values/1, _, _,
-                           [mnn_clause(_, _, findall(_, member(_, _), _), _)],
+                           [mnn_clause(_, _, findall(_, append(_, _, _), _), _)],
                            original),
                   Predicates)).
 
@@ -110,6 +110,42 @@ test(converts_ground_between_generator, [nondet]) :-
                                        safe_arithmetic_filters(0),
                                        deterministic_loop))])),
     run_converted(Converted, values(Values), [[[1, 2, 3]]]).
+
+test(converts_ground_member_generator_and_preserves_duplicates, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :-
+              findall(X, member(X, [3, 1, 3]), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                                       side_conditions(finite_ground_member(3),
+                                                       safe_arithmetic_filters(0),
+                                                       deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[3, 1, 3]]]).
+
+test(converts_member_with_arithmetic_filter_and_template, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :-
+              findall(pair(X), (member(X, [1, 3, 4]), X > 2), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                                       side_conditions(finite_ground_member(3),
+                                                       safe_arithmetic_filters(1),
+                                                       deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[pair(3), pair(4)]]]).
+
+test(leaves_member_with_variable_list_unchanged, [nondet]) :-
+    with_converted_program(
+        [(values(List, Values) :-
+              findall(X, member(X, List), Values))],
+        Converted, loop2_report([])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(
+                  mnn_pred(values/2, _, _,
+                                          [mnn_clause(_, _, findall(_, member(_, _), _), _)],
+                                          original),
+                  Predicates)).
 
 test(converts_between_with_arithmetic_filters_and_template, [nondet]) :-
     with_converted_program(

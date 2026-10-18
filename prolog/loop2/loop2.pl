@@ -134,6 +134,16 @@ finite_generator_values(Predicates, Generator, Template, Values,
     fact_clause_values(Clauses, Goal, Template, Filters, Values, Count),
     !.
 finite_generator_values(_, Generator, Template, Values,
+                        finite_ground_member, Count, FilterCount) :-
+    generator_parts(Generator, member(Value, List), Filters),
+    ground(List),
+    is_list(List),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
+    member_candidate_values(List, Value, Template, Filters, Values),
+    length(List, Count),
+    !.
+finite_generator_values(_, Generator, Template, Values,
                         finite_ground_between, Count, FilterCount) :-
     generator_parts(Generator, between(Low, High, Value), Filters),
     integer(Low),
@@ -235,6 +245,21 @@ fact_clause_values([mnn_clause(_, Head, _, _)|Clauses],
         ;   Values = Rest
         )
     ;   fact_clause_values(Clauses, Goal, Template, Filters, Values, Count)
+    ).
+
+member_candidate_values([], _, _, _, []).
+member_candidate_values([Candidate|Candidates], Value, Template, Filters, Values) :-
+    copy_term((Value, Template, Filters),
+              (ValueCopy, TemplateCopy, FiltersCopy)),
+    (   ValueCopy = Candidate
+    ->  evaluate_filters(FiltersCopy, FilterResult),
+        member_candidate_values(Candidates, Value, Template, Filters, Rest),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|Rest]
+        ;   Values = Rest
+        )
+    ;   member_candidate_values(Candidates, Value, Template, Filters, Values)
     ).
 
 evaluate_filters([], true).
