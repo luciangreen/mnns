@@ -87,7 +87,7 @@ decreases_structurally(
     decrease(Id, Call, structural(Argument))) :-
     arg(Argument, Head, HeadArgument),
     nonvar(HeadArgument),
-    functor(HeadArgument, '.', 2),
+    functor(HeadArgument, '[|]', 2),
     arg(2, HeadArgument, Tail),
     arg(Argument, Call, CallArgument),
     CallArgument == Tail.

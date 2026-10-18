@@ -59,7 +59,7 @@ test(finds_measure_on_recursive_argument_two) :-
     Program = mnn_program(
                   sample, meta(sample, []),
                   [mnn_pred(skip/2, ['?', '?'], [any, any],
-                           [mnn_clause(1, skip(X, []), true, source(sample, 1)),
+                           [mnn_clause(1, skip(_, []), true, source(sample, 1)),
                             mnn_clause(2, skip(X, [_|Tail]), skip(X, Tail),
                                        source(sample, 2))],
                            original)],
@@ -107,7 +107,7 @@ test(classifies_non_recursive_measure_target) :-
     Program = mnn_program(
                   sample, meta(sample, []),
                   [mnn_pred(identity/1, ['?'], [any],
-                           [mnn_clause(1, identity(X), true, source(sample, 1))],
+                           [mnn_clause(1, identity(_), true, source(sample, 1))],
                            original)],
                   proof([]), trace([])),
     mnn_pid:analyze_measures(
