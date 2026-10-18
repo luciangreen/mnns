@@ -124,6 +124,9 @@ source_body(\+ Goal, not(NormalizedGoal)) :-
 source_body(not(Goal), not(NormalizedGoal)) :-
     !,
     source_body(Goal, NormalizedGoal).
+source_body(once(Goal), once(NormalizedGoal)) :-
+    !,
+    source_body(Goal, NormalizedGoal).
 source_body(Goal, Goal).
 
 check_goal(Goal) :-
@@ -169,6 +172,9 @@ prolog_body(conj(Left, Right), (PrologLeft, PrologRight)) :-
     prolog_body(Left, PrologLeft),
     prolog_body(Right, PrologRight).
 prolog_body(not(Goal), \+ PrologGoal) :-
+    !,
+    prolog_body(Goal, PrologGoal).
+prolog_body(once(Goal), once(PrologGoal)) :-
     !,
     prolog_body(Goal, PrologGoal).
 prolog_body(Goal, Goal).

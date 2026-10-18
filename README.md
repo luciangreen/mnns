@@ -16,7 +16,8 @@ the current implementation and remaining work.
 
 - **IR parser and emitter:** reads Prolog clauses and directives into
   `mnn_program/5`, preserves clause order and source locations, normalizes
-  control-flow goals, and emits Prolog. Explicit `call/N` goals are rejected.
+  control-flow goals and `once/1` bodies, and emits Prolog. Explicit `call/N`
+  goals are rejected.
 - **Sandboxed runner:** strips source directives, checks requested goals with
   SWI-Prolog's sandbox, and limits execution time and answer count. See
   [`prolog/runner/sandbox_runner.pl`](prolog/runner/sandbox_runner.pl).
@@ -32,8 +33,9 @@ the current implementation and remaining work.
 - **Detlog analysis:** conservatively classifies success counts for a limited
   set of normalized goals when all predicate arguments are unbound. Unsupported
   goals are reported rather than guessed; acyclic user-predicate calls with
-  distinct unbound arguments are analyzed recursively, while choicepoint and cut
-  transformations are not implemented yet. See [`docs/detlog.md`](docs/detlog.md).
+  distinct unbound arguments are analyzed recursively, and `once/1` caps reported
+  successes at one. Choicepoint and cut transformations are not implemented yet.
+  See [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` on a
   ground proper list, `nth0/3` or `nth1/3` on a ground proper list, bounded
   `between/3` ranges, or `length/2` on a ground proper list, optionally with
