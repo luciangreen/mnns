@@ -7,10 +7,11 @@ early implementations of an independent proof checker, termination analysis,
 and finite-generator loop conversion.
 
 This repository implements only a subset of the full vision in
-[`PROGRAM_REQUIREMENTS.md`](PROGRAM_REQUIREMENTS.md). In particular, it does not
-yet provide the end-user MNN compiler, S2A/Starlog, Detlog, PLOp, AIOC,
-neural-network, chatbot, or agent features. See [`PROGRESS.md`](PROGRESS.md) for
-the current implementation and remaining work.
+[`PROGRAM_REQUIREMENTS.md`](PROGRAM_REQUIREMENTS.md). It includes an initial
+Detlog analysis but not Detlog transformations, and does not yet provide the
+end-user MNN compiler, S2A/Starlog, PLOp, AIOC, neural-network, chatbot, or agent
+features. See [`PROGRESS.md`](PROGRESS.md) for the current implementation and
+remaining work.
 
 ## Implemented features
 
@@ -51,7 +52,9 @@ the current implementation and remaining work.
   positions and honors ground value/remainder patterns; and `length/2` calls
   over ground proper lists are classified when the length is unbound or a
   nonnegative integer. `append/3` is classified as multi when all three
-  arguments are distinct unbound variables. See
+  arguments are distinct unbound variables, and as deterministic or failing
+  when all three arguments are ground proper lists or one argument is unbound
+  and the other two are ground proper lists. See
   [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` or
   `select/3` on a ground proper list, `nth0/3` or `nth1/3` on a ground proper

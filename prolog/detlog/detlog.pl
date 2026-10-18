@@ -127,6 +127,12 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     \+ member(mnn_pred(length/2, _, _, _, _), Predicates),
     !,
     list_length_outcomes(List, Length, Outcomes).
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    nonvar(Goal),
+    Goal = append(Prefix, Suffix, List),
+    \+ member(mnn_pred(append/3, _, _, _, _), Predicates),
+    append_ground_mode(Prefix, Suffix, List, Outcomes),
+    !.
 goal_outcomes(Goal, _, _, Outcomes) :-
     semidet_builtin(Goal),
     ground(Goal),
@@ -244,6 +250,33 @@ distinct_variables([Variable|Variables]) :-
     var(Variable),
     \+ identical_member(Variable, Variables),
     distinct_variables(Variables).
+
+append_ground_mode(Prefix, Suffix, List, Outcomes) :-
+    append_supported_list_mode([Prefix, Suffix, List]),
+    copy_term((Prefix, Suffix, List), (PrefixCopy, SuffixCopy, ListCopy)),
+    (   append(PrefixCopy, SuffixCopy, ListCopy)
+    ->  Outcomes = [1]
+    ;   Outcomes = [0]
+    ).
+
+append_supported_list_mode([Prefix, Suffix, List]) :-
+    (   ground_proper_list(Prefix),
+        ground_proper_list(Suffix),
+        ground_proper_list(List)
+    ;   var(Prefix),
+        ground_proper_list(Suffix),
+        ground_proper_list(List)
+    ;   ground_proper_list(Prefix),
+        var(Suffix),
+        ground_proper_list(List)
+    ;   ground_proper_list(Prefix),
+        ground_proper_list(Suffix),
+        var(List)
+    ).
+
+ground_proper_list(List) :-
+    ground(List),
+    is_list(List).
 
 identical_member(Variable, [Other|_]) :-
     Variable == Other,

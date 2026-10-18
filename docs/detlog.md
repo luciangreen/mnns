@@ -42,7 +42,12 @@ built-in case.
 The built-in `append/3` is classified as multi when all three arguments are
 distinct unbound variables: it has at least two successful list splits, so the
 reported count is capped at two. Repeated arguments and a program-defined
-`append/3` are not treated as this built-in case.
+`append/3` are not treated as this built-in case. It is also classified as
+deterministic or failing when all arguments are ground proper lists, or when
+exactly one argument is unbound and the other two are ground proper lists. The
+analyzer checks the relation on copies of those arguments; nonmatching lists
+fail. Calls with two or more unbound arguments, non-list or non-ground inputs,
+and locally defined `append/3` remain unsupported.
 Pairwise non-unifiable clause heads are treated as exclusive. Calls to acyclic
 user predicates in the same program are analyzed recursively when every call
 argument is a distinct unbound variable (zero-arity calls satisfy this condition).

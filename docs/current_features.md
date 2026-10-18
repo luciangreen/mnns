@@ -119,8 +119,10 @@ duplicate positions count separately, and ground patterns constrain the result.
 Other list/value shapes and locally defined `select/3` predicates are unsupported.
 Built-in `append/3` is classified as multi only when all three arguments are
 distinct unbound variables; repeated-argument calls and locally defined
-`append/3` predicates are not treated as the built-in. Choicepoint/cut conversion
-and general mode inference are not implemented; see
+`append/3` predicates are not treated as the built-in. `append/3` is also
+classified as deterministic or failing when all arguments are ground proper lists
+or exactly one argument is unbound and the other two are ground proper lists.
+Other partially instantiated append calls are unavailable. Choicepoint/cut conversion and general mode inference are not implemented; see
 [`detlog.md`](detlog.md).
 
 ## loop2 conversion
