@@ -40,9 +40,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   guarded natural-number decrease pattern with an integer type test, a positive
   guard, and a direct subtraction before each recursive call, including across
   mutual-recursion components when every call decreases the same argument.
-  Other arithmetic measures and unsupported forms are explicitly reported as
-  unavailable. It does not yet verify full termination, generate induction
-  proofs, or check user specifications.
+  `analyze_induction/2` now emits symbolic clause obligations for predicates
+  with these verified measures, listing induction hypotheses for each recursive
+  call (including mutual recursion). Other arithmetic measures and unsupported
+  forms are explicitly reported as unavailable. The templates do not verify
+  full termination or user specifications, and user-declared measures remain
+  unsupported.
 
 ## Remaining stages
 
@@ -50,7 +53,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground definition introduction, and narrow ground unfold/fold only) |
-| 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion; induction proofs and broader measure forms remain) |
+| 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, and schematic measure-backed clause obligations; user specifications and broader measure forms remain) |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |

@@ -1,6 +1,7 @@
 :- module(mnn_pid,
           [ analyze_program/2,
-            analyze_measures/2
+            analyze_measures/2,
+            analyze_induction/2
           ]).
 
 :- use_module(library(lists)).
@@ -16,6 +17,45 @@ analyze_measures(
     predicate_keys(Predicates, Keys),
     call_edges(Predicates, Keys, Edges),
     maplist(analyze_predicate_measure(Predicates, Edges), Keys, Results).
+
+analyze_induction(Program, pid_induction_report(Results)) :-
+    Program = mnn_program(_, _, Predicates, _, _),
+    analyze_measures(Program, pid_measure_report(Measures)),
+    predicate_keys(Predicates, Keys),
+    call_edges(Predicates, Keys, Edges),
+    maplist(analyze_predicate_induction(Predicates, Edges),
+            Measures, Results).
+
+analyze_predicate_induction(_, _,
+                            predicate(Key, non_recursive),
+                            predicate(Key, non_recursive)).
+analyze_predicate_induction(_, _,
+                            predicate(Key, unavailable(Reason)),
+                            predicate(Key, unavailable(Reason))).
+analyze_predicate_induction(Predicates, Edges,
+                            predicate(Key, measure(Measure, _)),
+                            predicate(Key, induction(Measure, Obligations))) :-
+    induction_component(Key, Edges, Component),
+    member(mnn_pred(DeclaredKey, _, _, Clauses, _), Predicates),
+    DeclaredKey == Key,
+    maplist(induction_clause_obligation(Component, Measure),
+            Clauses, Obligations),
+    !.
+
+induction_component(Key, Edges, Component) :-
+    (   mutually_recursive_component(Key, Edges, Component)
+    ->  true
+    ;   Component = [Key]
+    ).
+
+induction_clause_obligation(
+    Component, Measure, mnn_clause(Id, Head, Body, _),
+    clause_obligation(Id, Head, Body, Hypotheses)) :-
+    goal_recursive_calls(Body, Component, Calls),
+    maplist(induction_hypothesis(Measure), Calls, Hypotheses).
+
+induction_hypothesis(Measure, Call,
+                     induction_hypothesis(Call, Measure)).
 
 analyze_predicate_measure(_, Edges, Key, predicate(Key, non_recursive)) :-
     \+ recursive_path(Key, Key, Edges),
