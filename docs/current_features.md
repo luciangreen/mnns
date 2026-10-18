@@ -67,8 +67,10 @@ checks no-filter
 every selected solution grounds the template, preserving selection order and
 duplicate positions while honoring value and remainder patterns. The index
 cases emit zero-based or one-based indices, respectively, and accept an empty
-ground list. These proof subsets exclude filters, fact/rule generators, nested
-findall, and other list generators. The renderer creates Markdown explanations
+ground list. It also checks no-filter conversions for `length/2` over a ground
+proper list, with a variable or nonnegative integer length; a mismatch yields no
+values. These proof subsets exclude filters, fact/rule generators, nested
+findall, `between/3`, and other list generators. The renderer creates Markdown explanations
 but does not certify proofs. General purity analysis, general clause/goal
 reordering, and most proof rules in the requirements remain unsupported.
 
@@ -162,8 +164,9 @@ The current work is an initial subset, not a completed version 1 suite:
 - **Stages 1–5 are in progress.** Their implemented slices and limits are
   documented above and in the subsystem guides. In particular, Stage 4 still
   lacks nested `findall/3` conversion and independent checking of most conversion
-  proofs; the checker currently verifies only a direct no-filter `member/2` over
-  a ground proper list. Stage 5 has only conservative success-count analysis;
+  proofs; the checker verifies only direct no-filter ground-list `member/2`,
+  `select/3`, `nth0/3`/`nth1/3` index, and `length/2` conversions. Stage 5 has
+  only conservative success-count analysis;
   mode inference, Detlog code generation, and choicepoint/cut transformations
   are not implemented.
 - **Stages 6–14 are not started:** PLOp, AlgebraPLOp, S2A/Starlog, the AIOC

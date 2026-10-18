@@ -250,6 +250,20 @@ findall_candidate_values(Template, nth1(Index, List, Value), Indices) :-
     ground(List),
     is_list(List),
     list_indices(List, 1, Indices).
+findall_candidate_values(Template, length(List, Length), Values) :-
+    ground(List),
+    is_list(List),
+    (   var(Length)
+    ;   integer(Length),
+        Length >= 0
+    ),
+    length(List, ActualLength),
+    copy_term((Length, Template), (LengthCopy, TemplateCopy)),
+    (   LengthCopy = ActualLength
+    ->  ground(TemplateCopy),
+        Values = [TemplateCopy]
+    ;   Values = []
+    ).
 findall_candidate_values(Template, select(Value, List, Rest), Values) :-
     ground(List),
     is_list(List),
