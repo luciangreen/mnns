@@ -42,6 +42,15 @@ test(reject_call_goal, [throws(error(domain_error(call_free_goal, _), _))]) :-
         ),
         delete_file(Source)).
 
+test(reject_call_with_extra_arguments,
+     [throws(error(domain_error(call_free_goal, _), _))]) :-
+    setup_call_cleanup(
+        temporary_source(Source),
+        ( write_source(Source, [(unsafe(Goal) :- call(Goal, extra))]),
+          mnn_ir:parse_program(Source, _)
+        ),
+        delete_file(Source)).
+
 test(preserves_clause_source_lines) :-
     setup_call_cleanup(
         temporary_source(Source),

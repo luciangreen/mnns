@@ -8,17 +8,17 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 - **Stage 1 — IR, parser, emitter, sandboxed runner, test harness, CI: in progress.**
   The initial parser/emitter slice is in place for ordinary clauses, facts,
   directives and normalized conjunction, disjunction, if-then(-else) and
-  negation. Source locations and source order are retained, and `call/1` is
-  rejected. The sandboxed runner strips source directives before loading clauses,
+  negation. Source locations and source order are retained, and explicit `call/N`
+  goals are rejected. The sandboxed runner strips source directives before loading clauses,
   validates queries with SWI-Prolog's sandbox, and bounds time and answer count.
   A round-trip corpus now covers recursive rules, cuts, control flow, generators,
   lists, arithmetic, strings, terms, and required list/generator built-ins; the
-  runner now has execution checks for list operations, arithmetic, and finite
-  generators. CI runs the Prolog test suite on pushes and pull requests. Stage 1
-  remains in progress: the full supported-syntax acceptance corpus and successful
-  CI validation are still outstanding.
-- Current validation command: `swipl -q -s tests/run.pl` (passes locally on
-  SWI-Prolog 9.0.4; the new CI job runs the same command).
+  runner has execution checks for list operations, arithmetic, finite generators,
+  cut-based control flow, negation and recursion. CI runs the Prolog test suite on
+  pushes and pull requests. Stage 1 remains in progress: the full supported-syntax
+  acceptance corpus and successful CI validation are still outstanding.
+- Current validation command: `swipl -q -s tests/run.pl` (the new CI job runs this
+  command).
 
 ## Remaining stages
 
