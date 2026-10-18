@@ -873,6 +873,18 @@ nth1_findall_to_fold_programs(
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
 
+select_findall_to_fold_programs(
+    Template, Generator, Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                        findall(Template, Generator, Results),
+                                        source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
 findall_to_fold_proof(
     proof([proof_step(1, findall_to_fold, [],
                       equivalent(domain(any), modes([])))])).
