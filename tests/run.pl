@@ -5,6 +5,8 @@ main :-
     file_directory_name(RunnerFile, Directory),
     directory_file_path(Directory, 'ir_tests.pl', Tests),
     load_files(Tests, [silent(true)]),
+    directory_file_path(Directory, 'proof_checker_tests.pl', ProofTests),
+    load_files(ProofTests, [silent(true)]),
     directory_file_path(Directory, 'test_corpus.pl', CorpusTests),
     load_files(CorpusTests, [silent(true)]),
     directory_file_path(Directory, 'runner_tests.pl', RunnerTests),
