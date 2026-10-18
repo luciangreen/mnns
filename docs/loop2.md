@@ -62,11 +62,14 @@ meta-call, or unsupported body goal prevents conversion. Each conversion report
 cites the `findall_to_fold` lemma and records the generator-specific finiteness
 condition (ground facts, finite acyclic rules, a ground list, or a bounded
 `between/3` range), safe-arithmetic-filter condition, and deterministic-loop
-condition. The report is an obligation, not a checked proof: the independent
-proof checker validates only direct no-filter conversions for ground-list
-`member/2`, `select/3`, `nth0/3`/`nth1/3` indices, `length/2`, and bounded
-`between/3`. Conversions involving filters, fact/rule generators, or other
-forms are not independently checked. Do not treat such output as proof-certified.
+condition. The report is an obligation, not itself a checked proof. The
+independent proof checker validates direct no-filter conversions over predicates
+consisting entirely of ground facts, plus ground-list `member/2`, `select/3`,
+`nth0/3`/`nth1/3` indices, `length/2`, and bounded `between/3`. For a ground-fact
+generator, the checker preserves fact order and duplicates and accepts bound or
+partially instantiated call arguments when every matching template is ground.
+Conversions involving filters, rule generators, or other forms are not
+independently checked. Do not treat such output as proof-certified.
 
 Run the full suite, including loop2 tests, with:
 

@@ -40,11 +40,15 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   selected template is ground, and `findall(Length, length(GroundList, Length),
   Results)` for variable or nonnegative integer lengths. It also checks bounded
   no-filter `between/3` conversions with integer bounds and a variable or integer
-  value, for ranges up to 10,000. Selection order, duplicate positions, and
-  value/remainder patterns are checked by rebuilding
+  value, for ranges up to 10,000, and no-filter calls to predicates whose
+  clauses are all ground facts. Fact order, duplicate facts, and bound or
+  partially instantiated call patterns are checked by rebuilding the output;
+  every matching template must be ground. Selection order, duplicate positions,
+  and value/remainder patterns are checked by rebuilding
   the expected output and deterministic copy helper. Ordered sequences of
   these checked steps can be independently verified and rendered as Markdown
-  reports. Other findall conversions, general purity/determinism analysis,
+  reports. Fact-generator filters, rule generators, other findall conversions,
+  general purity/determinism analysis,
   general goal/clause reordering, and the other proof rules remain unsupported.
 - **Stage 3 — PID: in progress.** The call-graph analysis classifies predicates
   as recursive or non-recursive, including mutual recursion and non-recursive
@@ -79,24 +83,25 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   bound call arguments are matched against rule heads. Arbitrary predicate
   filters, variable bounds, recursive dependencies, unsupported rule bodies,
   and nested `findall/3` remain unsupported. Most conversion proofs are not
-  independently checked; the proof checker validates only direct no-filter
-  ground-list `member/2`, `select/3`, `nth0/3`/`nth1/3` index, and `length/2`
-  subsets, plus bounded integer-literal `between/3`.
+  independently checked; the proof checker validates no-filter ground-fact
+  generators and direct no-filter ground-list `member/2`, `select/3`,
+  `nth0/3`/`nth1/3` index, and `length/2` subsets, plus bounded
+  integer-literal `between/3`.
   Conversion traverses supported `findall/3` goals inside normalized
   conjunction, disjunction, if-then-else, negation, and `once/1`, preserving the
   surrounding control structure. The converter emits a distinct deterministic
   recursive list-copy helper for each conversion.
   Its report cites the findall-to-fold lemma and records finiteness, safe-filter,
   and determinism side conditions as an obligation; the independent checker
-  validates only the documented no-filter ground-list and bounded `between/3`
-  subsets.
+  validates the documented no-filter ground-fact, ground-list, and bounded
+  `between/3` subsets.
 
 ## Remaining stages
 
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, direct no-filter ground-list member, select, nth0-index, nth1-index, and length findall conversions, plus bounded integer-literal between conversions) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, no-filter ground-fact generators, direct no-filter ground-list member, select, nth0-index, nth1-index, and length findall conversions, plus bounded integer-literal between conversions) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and general checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode, including acyclic calls with distinct unbound arguments, ground whitelisted built-ins with exceptions reported unavailable, bounded literal `between/3`, `member/2` over ground proper lists, and `once/1` count capping; general mode inference, most bound/repeated-argument calls, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |

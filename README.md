@@ -28,10 +28,11 @@ the current implementation and remaining work.
   proper list, plus `select/3` over a ground proper list when each selected
   template is ground, and `length/2` over a ground proper list with a variable
   or nonnegative integer length, and bounded no-filter `between/3` with integer
-  bounds and a variable or integer value (ranges up to 10,000 values). Selection
-  order and duplicate positions are preserved. Index results are checked as
-  zero-based for `nth0/3` and one-based for `nth1/3`. Unsupported rules and
-  broader findall conversions are rejected.
+  bounds and a variable or integer value (ranges up to 10,000 values). It also
+  checks no-filter conversions over predicates consisting entirely of ground
+  facts. Selection order, fact order, and duplicate answers are preserved. Index
+  results are checked as zero-based for `nth0/3` and one-based for `nth1/3`.
+  Unsupported rules and broader findall conversions are rejected.
   See [`docs/proof_rules.md`](docs/proof_rules.md).
 - **PID analysis:** classifies recursive predicates, checks a limited set of
   shared structural and guarded natural-number decreases, and emits schematic
