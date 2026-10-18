@@ -34,10 +34,11 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 - **Stage 3 — PID: in progress.** The call-graph analysis classifies predicates
   as recursive or non-recursive, including mutual recursion and non-recursive
   wrappers. The separate measure analysis identifies a structural measure when
-  every direct self-recursive call passes the tail of the same list-pattern
-  argument; it reports per-call decrease obligations. Mutual recursion and other
-  measure forms are explicitly reported as unavailable. It does not yet verify
-  full termination, generate induction obligations, or check user specifications.
+  every direct self-recursive call passes a strict subterm of the same compound
+  argument (including nested compound subterms); it reports per-call decrease
+  obligations. Mutual recursion, arithmetic measures and other unsupported
+  forms are explicitly reported as unavailable. It does not yet verify full
+  termination, generate induction obligations, or check user specifications.
 
 ## Remaining stages
 
@@ -45,7 +46,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground definition introduction, and narrow ground unfold/fold only) |
-| 3 | PID termination measures and induction obligations | In progress (call-graph recursion classification and direct structural list-tail measures only) |
+| 3 | PID termination measures and induction obligations | In progress (call-graph classification and strict structural subterm measures; induction obligations and broader measure forms remain) |
 | 4 | loop2 finite-generator loop conversions | Not started |
 | 5 | Detlog determinism analysis and transformations | Not started |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |

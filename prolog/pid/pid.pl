@@ -87,10 +87,18 @@ decreases_structurally(
     decrease(Id, Call, structural(Argument))) :-
     arg(Argument, Head, HeadArgument),
     nonvar(HeadArgument),
-    functor(HeadArgument, '[|]', 2),
-    arg(2, HeadArgument, Tail),
+    acyclic_term(HeadArgument),
     arg(Argument, Call, CallArgument),
-    CallArgument == Tail.
+    strict_subterm(CallArgument, HeadArgument).
+
+strict_subterm(Subterm, Term) :-
+    compound(Term),
+    functor(Term, _, Arity),
+    between(1, Arity, Index),
+    arg(Index, Term, Child),
+    (   Child == Subterm
+    ;   strict_subterm(Subterm, Child)
+    ).
 
 predicate_keys([], []).
 predicate_keys([mnn_pred(Key, _, _, _, _)|Predicates], [Key|Keys]) :-

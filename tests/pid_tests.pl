@@ -71,6 +71,21 @@ test(finds_measure_on_recursive_argument_two) :-
                       measure(structural(2),
                               [decrease(2, skip(_, _), structural(2))]))])).
 
+test(finds_measure_for_nested_compound_subterm) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(walk/1, ['?'], [any],
+                          [mnn_clause(1, walk(tree(_, node(_, Child))),
+                                      walk(Child), source(sample, 1))],
+                          original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(walk/1,
+                      measure(structural(1),
+                              [decrease(1, walk(_), structural(1))]))])).
+
 test(rejects_recursive_call_that_does_not_use_list_tail) :-
     Program = mnn_program(
                   sample, meta(sample, []),
