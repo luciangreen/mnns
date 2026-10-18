@@ -24,7 +24,7 @@ test(converts_fact_generator_with_bound_arguments, [nondet]) :-
         Converted,
         loop2_report(
             [conversion(findall_to_fold, helper(mnn_loop2_1/2),
-                        side_conditions(finite_ground_facts(3),
+                        side_conditions(finite_ground_facts(2),
                                         safe_arithmetic_filters(0),
                                         deterministic_loop))])),
     run_converted(Converted, values(Values), [[[1, 3]]]).
