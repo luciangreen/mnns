@@ -14,9 +14,10 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   A round-trip corpus now covers recursive rules, cuts, control flow, generators,
   lists, arithmetic, strings, terms, and required list/generator built-ins; the
   runner has execution checks for list operations, arithmetic, finite generators,
-  cut-based control flow, negation and recursion. CI runs the Prolog test suite on
-  pushes and pull requests. Stage 1 remains in progress: the full supported-syntax
-  acceptance corpus and successful CI validation are still outstanding.
+  cut-based control flow, negation, recursion, `nth0/3`, strings, atoms and nested
+  terms. CI runs the Prolog test suite on pushes and pull requests. Stage 1 remains
+  in progress: full supported-syntax acceptance coverage and successful CI
+  validation are still outstanding.
 - Current validation command: `swipl -q -s tests/run.pl` (the new CI job runs this
   command).
 - **Stage 2 — proof system: in progress.** The independent checker accepts

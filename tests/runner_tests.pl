@@ -29,6 +29,19 @@ test(run_required_builtins_and_arithmetic) :-
         Source, selected([1, 2, 3, 4, 11], _Selected), [],
         answers([[[2, 4]]])).
 
+test(run_nth0_string_atom_and_nested_terms) :-
+    corpus_source('lists_and_generators.pl', ListsAndGenerators),
+    mnn_sandbox_runner:run_program(
+        ListsAndGenerators, indexed_values([a, b, c], _Pairs), [],
+        answers([[[0-a, 1-b, 2-c]]])),
+    corpus_source('strings_and_terms.pl', StringsAndTerms),
+    mnn_sandbox_runner:run_program(
+        StringsAndTerms, label('sample item', _Label), [],
+        answers([["hello, world"]])),
+    mnn_sandbox_runner:run_program(
+        StringsAndTerms, nested_term([a, b], _Term), [],
+        answers([[pair(a, [b])]])).
+
 test(run_control_flow_and_recursion) :-
     corpus_source('control_flow.pl', ControlFlow),
     mnn_sandbox_runner:run_program(
