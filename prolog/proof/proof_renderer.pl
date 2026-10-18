@@ -53,6 +53,16 @@ render_report(accepted, proof([proof_step(Id, Rule, [],
     render_definition_rewrite(Rule),
     format('- Domain: `~q`~n', [Domain]),
     format('- Modes: `~q`~n', [Modes]).
+render_report(accepted, proof([proof_step(Id, findall_to_fold, [],
+                                          equivalent(domain(Domain),
+                                                     modes(Modes)))])) :-
+    !,
+    format('# Proof report~n~n', []),
+    format('**Independent check:** accepted.~n~n', []),
+    format('## Step ~d: `findall_to_fold`~n~n', [Id]),
+    render_findall_to_fold,
+    format('- Domain: `~q`~n', [Domain]),
+    format('- Modes: `~q`~n', [Modes]).
 render_report(accepted, proof(Steps)) :-
     is_list(Steps),
     length(Steps, Count),
@@ -103,3 +113,11 @@ render_step_summary(introduce_definition) :-
 render_step_summary(Rule) :-
     memberchk(Rule, [unfold, fold]),
     render_definition_rewrite(Rule).
+render_step_summary(findall_to_fold) :-
+    render_findall_to_fold.
+
+render_findall_to_fold :-
+    format('One direct findall over a variable and a ground proper-list ', []),
+    format('member/2 generator was replaced by a verified deterministic list ', []),
+    format('copy helper. No filters or other generator forms are certified.~n~n',
+           []).

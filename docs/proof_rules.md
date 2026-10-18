@@ -3,7 +3,7 @@
 The checker supports `identity`, restricted `reorder_goals` and
 `introduce_definition`, and narrowly scoped `unfold` and `fold` rules. It
 certifies these transformations directly from the IR, without executing either
-program.
+program. It also checks one narrow `findall_to_fold` case.
 
 The accepted proof shape is:
 
@@ -63,11 +63,39 @@ generated without colliding with existing predicates or clauses. This limited
 rule does not infer general purity or determinism and does not support goals over
 multiple variables.
 
+## `findall_to_fold`
+
+Use the standard proof-step form, with `findall_to_fold` as the rule name:
+
+```prolog
+proof([
+    proof_step(1, findall_to_fold, [],
+               equivalent(domain(Domain), modes(Modes)))
+])
+```
+
+The checker accepts this rule only when one clause body consists directly of
+`findall(Value, member(Value, List), Results)`, where `List` is a ground proper
+list and the template is the same variable as the `member/2` value. The checker
+reconstructs the complete expected output IR: the source call must be replaced
+by a call to a fresh helper containing the corresponding list, and that helper
+must be the two-clause deterministic list-copy loop. Existing clauses and
+predicates must be preserved; the generated helper's clause IDs and metadata
+events must also match. Thus a claimed conversion, altered result list, missing
+helper, or unrelated program change is rejected.
+
+This check proves only the no-filter, ground-list `member/2` subset. It does not
+certify fact or rule generators, filters, nested findall, other list generators,
+or arbitrary `findall/3` rewrites. Ground domain and mode annotations are
+required but are not inferred. The checker does not import or invoke the loop2
+converter.
+
 The checker still does not implement general purity/determinism analysis,
 general clause/goal reordering, or the other rules in §7.2. Domain and mode
 annotations must be ground but are not inferred. `render_proof/4` reports the
 independent checker's result and summarizes accepted identity, goal-reordering,
-definition-introduction, unfold, and fold steps. Rendering is explanatory and
+definition-introduction, unfold, fold, and restricted findall-to-fold steps.
+Rendering is explanatory and
 does not itself certify a proof.
 
 `mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` renders a

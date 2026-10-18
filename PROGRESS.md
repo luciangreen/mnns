@@ -31,10 +31,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   single-clause ground definitions and unary variable definitions whose bodies
   use only the listed pure type tests, `true`, `fail`, conjunction and
   disjunction; variable-bearing folds require variant body matching to preserve
-  variable sharing. Ordered sequences of these checked steps can be
-  independently verified and rendered as Markdown reports. General
-  purity/determinism analysis, general goal/clause reordering, and the other
-  proof rules remain unsupported.
+  variable sharing. It also independently checks a direct, no-filter
+  `findall(Value, member(Value, GroundList), Results)` conversion by rebuilding
+  the expected output and deterministic copy helper. Ordered sequences of
+  these checked steps can be independently verified and rendered as Markdown
+  reports. Other findall conversions, general purity/determinism analysis,
+  general goal/clause reordering, and the other proof rules remain unsupported.
 - **Stage 3 — PID: in progress.** The call-graph analysis classifies predicates
   as recursive or non-recursive, including mutual recursion and non-recursive
   wrappers. The separate measure analysis identifies a structural measure when
@@ -67,24 +69,24 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   `fail`, supported source calls, and bound whitelisted arithmetic comparisons;
   bound call arguments are matched against rule heads. Arbitrary predicate
   filters, variable bounds, recursive dependencies, unsupported rule bodies,
-  nested `findall/3`, and independent checking of conversion proofs remain
-  unsupported. Conversion traverses supported `findall/3` goals inside normalized
-  conjunction, disjunction, if-then-else, negation, and `once/1`, preserving the
-  surrounding control structure. The converter
-  emits a distinct deterministic recursive list-copy helper for each conversion.
-  Its report cites the findall-to-fold lemma and
-  records finiteness, safe-filter, and determinism side conditions as an
-  obligation; independent proof-checker support for this rule is not yet
-  implemented.
+  and nested `findall/3` remain unsupported. Most conversion proofs are not
+  independently checked; the proof checker validates only the direct no-filter
+  ground-list `member/2` subset. Conversion traverses supported `findall/3` goals
+  inside normalized conjunction, disjunction, if-then-else, negation, and
+  `once/1`, preserving the surrounding control structure. The converter emits a
+  distinct deterministic recursive list-copy helper for each conversion.
+  Its report cites the findall-to-fold lemma and records finiteness, safe-filter,
+  and determinism side conditions as an obligation; the independent checker
+  currently validates only the stated ground-list member subset.
 
 ## Remaining stages
 
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, and direct no-filter ground-list member findall conversion) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
-| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and checked conversion proofs remain) |
+| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; nested findall and general checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode, including acyclic calls with distinct unbound arguments, ground whitelisted built-ins with exceptions reported unavailable, bounded literal `between/3`, and `once/1` count capping; general mode inference, bound/repeated-argument calls, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |

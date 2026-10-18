@@ -56,11 +56,14 @@ unsupported goals are not run.
 ## Proof checking
 
 `mnn_proof_checker:check_proof/4` checks supported proof terms directly against
-the IR and does not import the optimizer. Supported steps and their restrictions
-are detailed in [`proof_rules.md`](proof_rules.md). The renderer creates
-Markdown explanations but does not certify proofs. General purity analysis,
-general clause/goal reordering, and most proof rules in the requirements remain
-unsupported.
+the IR and does not import the optimizer. In addition to the rules described in
+[`proof_rules.md`](proof_rules.md), it verifies one direct
+`findall(Value, member(Value, GroundList), Results)` conversion by independently
+reconstructing the expected helper and complete output IR. This proof subset
+excludes filters, fact/rule generators, nested findall, and other list
+generators. The renderer creates Markdown explanations but does not certify
+proofs. General purity analysis, general clause/goal reordering, and most proof
+rules in the requirements remain unsupported.
 
 ## PID analysis
 
@@ -151,10 +154,11 @@ The current work is an initial subset, not a completed version 1 suite:
 
 - **Stages 1–5 are in progress.** Their implemented slices and limits are
   documented above and in the subsystem guides. In particular, Stage 4 still
-  lacks nested `findall/3` conversion and independent checking of conversion
-  proofs. Stage 5 has only conservative success-count analysis; mode inference,
-  Detlog code generation, and choicepoint/cut transformations are not
-  implemented.
+  lacks nested `findall/3` conversion and independent checking of most conversion
+  proofs; the checker currently verifies only a direct no-filter `member/2` over
+  a ground proper list. Stage 5 has only conservative success-count analysis;
+  mode inference, Detlog code generation, and choicepoint/cut transformations
+  are not implemented.
 - **Stages 6–14 are not started:** PLOp, AlgebraPLOp, S2A/Starlog, the AIOC
   pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.

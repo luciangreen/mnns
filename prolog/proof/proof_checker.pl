@@ -25,6 +25,8 @@ check_supported_proof(Program, Original, Proof, Result) :-
     ->  Result = accepted
     ;   valid_definition_rewrite_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_findall_to_fold_proof(Program, Original, Proof)
+    ->  Result = accepted
     ;   valid_proof_sequence(Program, Original, Proof)
     ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
@@ -141,6 +143,19 @@ valid_definition_rewrite_proof(Program, Original, Proof) :-
     rewrite_program(Rule, OriginalCopy, Rewritten),
     Program =@= Rewritten.
 
+valid_findall_to_fold_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, findall_to_fold, [],
+                              equivalent(domain(Domain), modes(Modes)))]),
+    integer(Id),
+    Id > 0,
+    ground(Domain),
+    ground(Modes),
+    valid_rewrite_program(Original),
+    copy_term(Original, OriginalCopy),
+    findall_to_fold_program(OriginalCopy, Rewritten),
+    Program =@= Rewritten.
+
 valid_proof_sequence(Program, Original, proof(Steps)) :-
     ground(Steps),
     is_list(Steps),
@@ -179,6 +194,110 @@ apply_proof_rule(Rule, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
     rewrite_program(Rule, ProgramCopy, Rewritten).
+apply_proof_rule(findall_to_fold, Program, Rewritten) :-
+    valid_rewrite_program(Program),
+    copy_term(Program, ProgramCopy),
+    findall_to_fold_program(ProgramCopy, Rewritten).
+
+findall_to_fold_program(
+    mnn_program(Name, meta(Source, Events), Predicates, Proof, Trace),
+    mnn_program(Name, meta(Source, UpdatedEvents), UpdatedPredicates,
+                Proof, Trace)) :-
+    is_list(Events),
+    is_list(Predicates),
+    findall(PredicateIndex-ClauseIndex,
+            member_findall_candidate(Predicates, PredicateIndex, ClauseIndex,
+                                     _, _),
+            [PredicateIndex-ClauseIndex]),
+    member_findall_candidate(Predicates, PredicateIndex, ClauseIndex,
+                             Values, Results),
+    fresh_loop_name(Predicates, Loop),
+    max_clause_id(Predicates, MaxClauseId),
+    FirstGeneratedId is MaxClauseId + 1,
+    SecondGeneratedId is FirstGeneratedId + 1,
+    replace_findall_candidate(Predicates, PredicateIndex, ClauseIndex,
+                              Loop, Values, Results, UpdatedPredicates0),
+    make_copy_loop(Loop, FirstGeneratedId, SecondGeneratedId, Helper),
+    append(UpdatedPredicates0, [Helper], UpdatedPredicates),
+    append(Events, [clause(FirstGeneratedId), clause(SecondGeneratedId)],
+           UpdatedEvents).
+
+member_findall_candidate(Predicates, PredicateIndex, ClauseIndex, Values,
+                         Results) :-
+    nth1(PredicateIndex, Predicates, Predicate),
+    arg(4, Predicate, Clauses),
+    nth1(ClauseIndex, Clauses, Clause),
+    arg(3, Clause, Body),
+    nonvar(Body),
+    Body = findall(Template, member(Value, List), Results),
+    Template == Value,
+    ground(List),
+    is_list(List),
+    Values = List.
+
+replace_findall_candidate(
+    [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
+    1, ClauseIndex, Loop, Values, Results,
+    [mnn_pred(Key, Modes, Domains, UpdatedClauses, Status)|Predicates]) :-
+    !,
+    replace_findall_clause(Clauses, ClauseIndex, Loop, Values, Results,
+                           UpdatedClauses).
+replace_findall_candidate(
+    [Predicate|Predicates], PredicateIndex, ClauseIndex, Loop, Values,
+    Results, [Predicate|UpdatedPredicates]) :-
+    PredicateIndex > 1,
+    NextPredicateIndex is PredicateIndex - 1,
+    replace_findall_candidate(Predicates, NextPredicateIndex, ClauseIndex,
+                              Loop, Values, Results, UpdatedPredicates).
+
+replace_findall_clause(
+    [mnn_clause(Id, Head, findall(_, _, _), Location)|Clauses],
+    1, Loop, Values, Results,
+    [mnn_clause(Id, Head, LoopCall, Location)|Clauses]) :-
+    !,
+    LoopCall =.. [Loop, Values, Results].
+replace_findall_clause(
+    [Clause|Clauses], ClauseIndex, Loop, Values, Results,
+    [Clause|UpdatedClauses]) :-
+    ClauseIndex > 1,
+    NextClauseIndex is ClauseIndex - 1,
+    replace_findall_clause(Clauses, NextClauseIndex, Loop, Values, Results,
+                           UpdatedClauses).
+
+fresh_loop_name(Predicates, Name) :-
+    fresh_loop_name(1, Predicates, Name).
+
+fresh_loop_name(Index, Predicates, Name) :-
+    format(atom(Candidate), 'mnn_loop2_~d', [Index]),
+    (   member(mnn_pred(Key, _, _, _, _), Predicates),
+        Key == Candidate/2
+    ->  NextIndex is Index + 1,
+        fresh_loop_name(NextIndex, Predicates, Name)
+    ;   Name = Candidate
+    ).
+
+max_clause_id(Predicates, MaxClauseId) :-
+    findall(Id,
+            ( member(mnn_pred(_, _, _, Clauses, _), Predicates),
+              member(mnn_clause(Id, _, _, _), Clauses)
+            ),
+            Ids),
+    maplist(integer, Ids),
+    (   Ids = []
+    ->  MaxClauseId = 0
+    ;   max_list(Ids, MaxClauseId)
+    ).
+
+make_copy_loop(Name, FirstId, SecondId,
+               mnn_pred(Name/2, ['?', '?'], [any, any],
+                        [mnn_clause(FirstId, EmptyHead, true,
+                                    generated(loop2)),
+                         mnn_clause(SecondId, RecursiveHead,
+                                    RecursiveBody, generated(loop2))],
+                        generated(loop2))) :-
+    EmptyHead =.. [Name, [], []],
+    RecursiveHead =.. [Name, [Value|Values], [Value|Results]],
+    RecursiveBody =.. [Name, Values, Results].
 
 valid_rewrite_program(mnn_program(_, _, Predicates, _, _)) :-
     is_list(Predicates),
