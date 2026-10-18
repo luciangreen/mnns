@@ -49,6 +49,13 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   forms are explicitly reported as unavailable. The templates do not verify
   full termination or user specifications, and user-declared measures remain
   unsupported.
+- **Stage 4 — loop2: in progress.** `mnn_loop2:convert_program/3` converts
+  `findall/3` over a predicate consisting only of ground facts when each
+  matching template instance is ground. It emits a distinct deterministic
+  recursive list-copy helper for each conversion and leaves unsupported
+  generators unchanged. The conversion report cites the findall-to-fold lemma
+  and its side conditions as an obligation; independent proof-checker support
+  for this rule is not yet implemented.
 
 ## Remaining stages
 
@@ -57,7 +64,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, and narrow ground or unary variable type-test unfold/fold) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, and schematic measure-backed clause obligations; user specifications and broader measure forms remain) |
-| 4 | loop2 finite-generator loop conversions | Not started |
+| 4 | loop2 finite-generator loop conversions | In progress (ground facts only; filters, member/between/nth generators, rules, and checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | Not started |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |

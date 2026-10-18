@@ -119,6 +119,7 @@ convert_goal(Goal, _, NextClauseId, NextName,
 finite_fact_values(Predicates, Goal, Template, Values) :-
     nonvar(Goal),
     callable(Goal),
+    \+ predicate_property(system:Goal, built_in),
     functor(Goal, Name, Arity),
     Key = Name/Arity,
     member(mnn_pred(FoundKey, _, _, Clauses, _), Predicates),
