@@ -153,6 +153,53 @@ finite_generator_values(_, Generator, Template, Values,
     length(Filters, FilterCount),
     between_values(Low, High, Value, Template, Filters, Values, Count),
     !.
+finite_generator_values(_, Generator, Template, Values,
+                        finite_ground_nth0, Count, FilterCount) :-
+    generator_parts(Generator, nth0(Index, List, Value), Filters),
+    ground(List),
+    is_list(List),
+    supported_nth_index(Index),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
+    length(List, Count),
+    nth_candidate_values(List, 0, Index, Value, Template, Filters, Values),
+    !.
+finite_generator_values(_, Generator, Template, Values,
+                        finite_ground_nth1, Count, FilterCount) :-
+    generator_parts(Generator, nth1(Index, List, Value), Filters),
+    ground(List),
+    is_list(List),
+    supported_nth_index(Index),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
+    length(List, Count),
+    nth_candidate_values(List, 1, Index, Value, Template, Filters, Values),
+    !.
+
+supported_nth_index(Index) :-
+    var(Index),
+    !.
+supported_nth_index(Index) :-
+    integer(Index).
+
+nth_candidate_values([], _, _, _, _, _, []).
+nth_candidate_values([Candidate|Candidates], Index, IndexPattern,
+                     ValuePattern, Template, Filters, Values) :-
+    copy_term((IndexPattern, ValuePattern, Template, Filters),
+              (IndexCopy, ValueCopy, TemplateCopy, FiltersCopy)),
+    (   IndexCopy = Index,
+        ValueCopy = Candidate
+    ->  evaluate_filters(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|Rest]
+        ;   Values = Rest
+        )
+    ;   Values = Rest
+    ),
+    NextIndex is Index + 1,
+    nth_candidate_values(Candidates, NextIndex, IndexPattern,
+                         ValuePattern, Template, Filters, Rest).
 
 between_values(Low, High, Value, Template, Filters, Values, Count) :-
     (   Low > High
