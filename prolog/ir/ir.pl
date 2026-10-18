@@ -20,7 +20,8 @@ read_terms(Stream, File, Id, Terms) :-
     read_term(Stream, Term, [syntax_errors(error), module(mnn_ir)]),
     (   Term == end_of_file
     ->  Terms = []
-    ;   Terms = [located(Id, Line, Term)|Rest],
+    ;   SourceLine is Line + 1,
+        Terms = [located(Id, SourceLine, Term)|Rest],
         NextId is Id + 1,
         read_terms(Stream, File, NextId, Rest)
     ).
@@ -44,11 +45,20 @@ number_terms([located(Id, Line, Term)|Terms], NextId, Numbered) :-
     number_terms(Terms, Next, Rest).
 
 build_program(File, Terms, mnn_program(Name, Meta, Predicates, proof([]), trace([]))) :-
-    file_base_name(File, BaseName),
-    file_name_extension(Name, _, BaseName),
+    program_name(Terms, File, Name),
     collect_predicates(Terms, File, [], Predicates),
     collect_events(Terms, Events),
     Meta = meta(File, Events).
+
+program_name(Terms, _, Name) :-
+    member(directive(_, module(Name, _)), Terms),
+    !.
+program_name(Terms, _, Name) :-
+    member(directive(_, module(Name)), Terms),
+    !.
+program_name(_, File, Name) :-
+    file_base_name(File, BaseName),
+    file_name_extension(Name, _, BaseName).
 
 collect_predicates([], _, Predicates, Predicates).
 collect_predicates([clause(Id, Head, Body, Line)|Terms], File, Acc, Predicates) :-
@@ -169,8 +179,10 @@ emit_program(Program, File) :-
         write_terms(Stream, Terms),
         close(Stream)).
 
-write_terms(_, []).
+write_terms(_, []) :-
+    !.
 write_terms(Stream, [Term|Terms]) :-
+    !,
     write_term(Stream, Term, [quoted(true), numbervars(true)]),
     write(Stream, '.\n\n'),
     write_terms(Stream, Terms).
