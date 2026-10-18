@@ -80,6 +80,16 @@ goal_outcomes(once(Goal), Predicates, Stack, Outcomes) :-
     ->  Outcomes = unavailable(Reason)
     ;   once_outcomes(GoalOutcomes, Outcomes)
     ).
+goal_outcomes(Goal, _, _, Outcomes) :-
+    nonvar(Goal),
+    Goal = between(Low, High, Value),
+    integer(Low),
+    integer(High),
+    (   var(Value)
+    ;   integer(Value)
+    ),
+    !,
+    between_outcomes(Low, High, Value, Outcomes).
 goal_outcomes(Goal, _, _, [0, 1]) :-
     semidet_builtin(Goal),
     !.
@@ -264,6 +274,22 @@ once_outcomes(GoalOutcomes, Outcomes) :-
             ),
             Possible),
     sort(Possible, Outcomes).
+
+between_outcomes(Low, High, _, [0]) :-
+    High < Low,
+    !.
+between_outcomes(Low, High, Value, Outcomes) :-
+    (   var(Value)
+    ->  Count is High - Low + 1,
+        (   Count =:= 1
+        ->  Outcomes = [1]
+        ;   Outcomes = [2]
+        )
+    ;   Value >= Low,
+        Value =< High
+    ->  Outcomes = [1]
+    ;   Outcomes = [0]
+    ).
 
 outcomes_determinism([0], failure) :-
     !.
