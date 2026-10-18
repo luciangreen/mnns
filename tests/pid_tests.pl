@@ -196,9 +196,68 @@ test(finds_structural_measure_across_mutual_recursion) :-
                       measure(structural(1),
                               [decrease(2, even(_), structural(1))]))])).
 
-test(rejects_mutual_recursion_when_any_call_does_not_decrease) :-
+test(finds_natural_measure_across_mutual_recursion) :-
     Program = mnn_program(
                  sample, meta(sample, []),
+                [mnn_pred(even/1, ['?'], [any],
+                         [mnn_clause(1, even(0), true, source(sample, 1)),
+                          mnn_clause(
+                              2, even(N),
+                              conj(integer(N),
+                                   conj(>(N, 0),
+                                        conj(is(Next, -(N, 1)),
+                                             odd(Next)))),
+                              source(sample, 2))],
+                         original),
+                 mnn_pred(odd/1, ['?'], [any],
+                         [mnn_clause(3, odd(0), true, source(sample, 3)),
+                          mnn_clause(
+                              4, odd(N),
+                              conj(integer(N),
+                                   conj(>(N, 0),
+                                        conj(is(Next, -(N, 1)),
+                                             even(Next)))),
+                              source(sample, 4))],
+                         original)],
+                proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(even/1,
+                      measure(natural(1),
+                              [decrease(2, odd(_), natural(1))])),
+             predicate(odd/1,
+                      measure(natural(1),
+                              [decrease(4, even(_), natural(1))]))])).
+
+test(rejects_mutual_natural_measure_when_any_call_does_not_decrease) :-
+    Program = mnn_program(
+                sample, meta(sample, []),
+                [mnn_pred(even/1, ['?'], [any],
+                         [mnn_clause(
+                              1, even(N),
+                              conj(integer(N),
+                                   conj(>(N, 0),
+                                        conj(is(Next, -(N, 1)),
+                                             odd(Next)))),
+                              source(sample, 1))],
+                         original),
+                 mnn_pred(odd/1, ['?'], [any],
+                         [mnn_clause(
+                              2, odd(N),
+                              conj(integer(N), conj(>(N, 0), even(N))),
+                              source(sample, 2))],
+                         original)],
+                proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(even/1, unavailable(mutual_recursion)),
+             predicate(odd/1, unavailable(mutual_recursion))])).
+
+test(rejects_mutual_recursion_when_any_call_does_not_decrease) :-
+    Program = mnn_program(
+                sample, meta(sample, []),
                  [mnn_pred(even/1, ['?'], [any],
                           [mnn_clause(1, even([_|Tail]), odd(Tail),
                                       source(sample, 1))],

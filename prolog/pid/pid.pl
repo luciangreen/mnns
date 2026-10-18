@@ -28,6 +28,14 @@ analyze_predicate_measure(Predicates, Edges, Key,
     recursive_calls(Predicates, Key, Keys, Calls),
     maplist(decreases_structurally(Argument), Calls, Obligations),
     !.
+analyze_predicate_measure(Predicates, Edges, Key,
+                          predicate(Key, measure(natural(Argument),
+                                                 Obligations))) :-
+    mutually_recursive_component(Key, Edges, Keys),
+    component_natural_measure(Predicates, Keys, Argument),
+    recursive_calls(Predicates, Key, Keys, Calls),
+    maplist(decreases_naturally(Argument), Calls, Obligations),
+    !.
 analyze_predicate_measure(_, Edges, Key,
                           predicate(Key, unavailable(mutual_recursion))) :-
     memberchk(edge(Key, Other), Edges),
@@ -121,6 +129,13 @@ component_structural_measure(Predicates, Component, Argument) :-
     component_recursive_calls(Predicates, Component, Calls),
     Calls = [_|_],
     maplist(decreases_structurally(Argument), Calls, _).
+
+component_natural_measure(Predicates, Component, Argument) :-
+    component_minimum_arity(Predicates, Component, MaxArgument),
+    between(1, MaxArgument, Argument),
+    component_recursive_calls(Predicates, Component, Calls),
+    Calls = [_|_],
+    maplist(decreases_naturally(Argument), Calls, _).
 
 component_minimum_arity(Predicates, Component, MaxArgument) :-
     findall(Arity,
