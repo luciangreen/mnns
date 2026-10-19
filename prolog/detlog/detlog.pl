@@ -120,6 +120,14 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     \+ member(mnn_pred(select/3, _, _, _, _), Predicates),
     !,
     select_outcomes(Value, List, Rest, Outcomes).
+goal_outcomes(Goal, Predicates, _, [2]) :-
+    nonvar(Goal),
+    Goal = length(List, Length),
+    var(List),
+    var(Length),
+    List \== Length,
+    \+ member(mnn_pred(length/2, _, _, _, _), Predicates),
+    !.
 goal_outcomes(Goal, Predicates, _, Outcomes) :-
     nonvar(Goal),
     Goal = length(List, Length),

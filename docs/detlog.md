@@ -44,7 +44,9 @@ once and a mismatch fails. Variable or improper lists, negative or non-integer
 length arguments, and a program-defined `length/2` are not handled by this
 built-in case. A variable list paired with a fixed nonnegative integer length is
 also classified as deterministic: it has exactly one solution, including for
-length zero. Other non-ground list patterns and negative lengths remain
+length zero. Distinct unbound list and length variables have multiple solutions,
+so that mode is classified as multi; an aliased list and length variable remains
+unsupported. Other non-ground list patterns and negative lengths remain
 unavailable.
 The built-ins `nth0/3` and `nth1/3` are classified for ground proper lists when
 the index is an unbound variable or integer and the element is an unbound
@@ -119,7 +121,8 @@ list or variable shapes. Run the complete suite with `swipl -q -s tests/run.pl`.
 The append tests cover all distinct-unbound, ground, one-unbound, and two-unbound
 modes, including empty and nonempty ground lists and unsupported repeated or
 non-ground arguments.
-The `length/2` tests cover ground lists and variable lists with fixed nonnegative
-lengths, as well as unsupported improper lists, negative lengths, and local
-definitions. Ground user-call tests cover matching, missing and duplicate facts,
+The `length/2` tests cover ground lists, variable lists with fixed nonnegative
+lengths, and distinct unbound list and length variables, as well as unsupported
+aliases, improper lists, negative lengths, and local definitions. Ground
+user-call tests cover matching, missing and duplicate facts,
 as well as rejection of non-fact definitions.
