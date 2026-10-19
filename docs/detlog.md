@@ -120,11 +120,11 @@ only `true`, `fail`, normalized conjunction, disjunction, if-then-else,
 negation, and these pure built-ins: `=/2`, `\=/2`, `==/2`, `\==/2`, `is/2`,
 arithmetic comparisons, the type tests `var/1`, `nonvar/1`, `atom/1`,
 `atomic/1`, `compound/1`, `ground/1`, `integer/1`, `number/1`, and
-`is_list/1`, and built-in `member/2`. A call is not compiled as a built-in when
-the source program defines that predicate; it remains unchanged instead. The
-if-then-else commits to the first condition solution and retains failure when
-the condition has no solution. Restricting the condition to this side-effect-free
-subset avoids changing effects or cut scope.
+`is_list/1`, plus built-in `member/2` and `between/3`. A call is not compiled as a
+built-in when the source program defines that predicate; it remains unchanged
+instead. The if-then-else commits to the first condition solution and retains
+failure when the condition has no solution. Restricting the condition to this
+side-effect-free subset avoids changing effects or cut scope.
 
 Unsupported `once/1` goals remain unchanged. The report is
 `detlog_transform_report(Events)`, with `compiled_once(Predicate, ClauseId,
@@ -142,6 +142,7 @@ Run the focused tests from the repository root:
 ```sh
 swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
+swipl -q -s tests/run.pl
 ```
 
 The transformation tests include built-in `member/2` first-answer behavior and

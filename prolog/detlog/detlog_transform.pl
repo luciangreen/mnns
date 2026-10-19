@@ -119,4 +119,5 @@ pure_builtin(ground/1).
 pure_builtin(integer/1).
 pure_builtin(number/1).
 pure_builtin(is_list/1).
+pure_builtin(between/3).
 pure_builtin(member/2).
