@@ -60,9 +60,10 @@ unsupported goals are not run.
 
 `mnn_proof_checker:check_proof/4` checks supported proof terms directly against
 the IR and does not import the optimizer. In addition to the rules described in
-[`proof_rules.md`](proof_rules.md), it verifies one direct
-`findall(Value, member(Value, GroundList), Results)` conversion, including
-supported arithmetic-comparison filters on the member generator, and one
+[`proof_rules.md`](proof_rules.md), it verifies `findall/3` conversions over
+ground proper-list `member/2` generators when the template is ground for every
+matching solution, including supported arithmetic-comparison filters on the
+member generator, and one
 `findall(Index, nth0(Index, GroundList, _), Results)` or
 `findall(Index, nth1(Index, GroundList, _), Results)` conversion, independently
 reconstructing the generated values, helper, and complete output IR. The

@@ -77,12 +77,14 @@ proof([
 The checker accepts this rule when exactly one clause body is a supported direct
 generator conversion:
 
-- `findall(Value, member(Value, List), Results)`, where `List` is a ground
-  proper list and the template is the same variable as the `member/2` value.
-  It also accepts conjunctions of that generator and whitelisted arithmetic
-  comparisons (`>`, `>=`, `<`, `=<`, `=:=`, `=\=`). Comparisons must be ground
-  after matching each list element; arithmetic exceptions are not certified,
-  and the template must be ground for every element that passes the filters.
+- `findall(Template, member(Value, List), Results)`, where `List` is a ground
+  proper list. `Value` may be constrained by a term pattern, and the template
+  may use variables bound by each matching element; every successful template
+  must be ground. Element order and duplicates are preserved. It also accepts
+  conjunctions of that generator and whitelisted arithmetic comparisons (`>`,
+  `>=`, `<`, `=<`, `=:=`, `=\=`). Comparisons must be ground after matching
+  each list element; arithmetic exceptions are not certified, and the template
+  must be ground for every element that passes the filters.
 - `findall(Index, nth0(Index, List, _), Results)`, where `List` is a ground
   proper list, `Index` is the unbound index variable used as the template, and
   the element argument is a distinct unbound variable.

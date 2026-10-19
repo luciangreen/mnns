@@ -230,10 +230,10 @@ findall_candidate(Predicates, PredicateIndex, ClauseIndex, Values, Results) :-
     Body = findall(Template, Generator, Results),
     findall_candidate_values(Predicates, Template, Generator, Values).
 
-findall_candidate_values(_, Template, member(Value, List), List) :-
-    Template == Value,
+findall_candidate_values(_, Template, member(Value, List), Values) :-
     ground(List),
-    is_list(List).
+    is_list(List),
+    member_candidate_values(List, Value, Template, [], Values).
 findall_candidate_values(_, Template, nth0(Index, List, Value), Indices) :-
     Template == Index,
     var(Index),

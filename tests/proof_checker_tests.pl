@@ -123,6 +123,20 @@ test(accept_direct_ground_member_findall_to_fold) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_member_findall_template_with_bound_pattern) :-
+    member_template_findall_to_fold_programs(
+        label(Value), pair(a, Value),
+        [pair(a, 1), pair(b, 2), pair(a, 1)], Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_ground_member_findall_template_with_unbound_values) :-
+    member_template_findall_to_fold_programs(
+        label(Unbound), Value, [a], Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_ground_nth0_index_findall_to_fold) :-
     nth0_findall_to_fold_programs([a, b, a], Original, Program),
     findall_to_fold_proof(Proof),
@@ -1361,6 +1375,18 @@ findall_to_fold_programs(
                                findall(Value,
                                        member(Value, [a, b]),
                                        Results),
+                               source(source, 1))],
+                   original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+member_template_findall_to_fold_programs(
+    Template, Value, List, Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                   [mnn_clause(1, numbers(Results),
+                               findall(Template, member(Value, List), Results),
                                source(source, 1))],
                    original)],
                    proof([]), trace([])),
