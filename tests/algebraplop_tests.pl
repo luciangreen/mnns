@@ -121,6 +121,42 @@ test(rejects_unsupported_or_invalid_inverse_inputs) :-
         formula(linear(slope, 3), verified_on([3, 5, 7])),
         7, no_position).
 
+test(inverts_polynomial_at_unique_nonnegative_position) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([1, 1, 2]), verified_on([1, 2, 5])),
+        17, position(4)).
+
+test(inverts_polynomial_at_multiple_positions) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([0, 3, -6, 6]), verified_on([0, 3, 0, -3])),
+        0, positions([0, 2, 4])).
+
+test(rejects_value_absent_from_polynomial) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([1, 1, 2]), verified_on([1, 2, 5])),
+        0, no_position).
+
+test(inverts_constant_polynomial_at_all_positions) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([4, 0, 0]), verified_on([4, 4, 4])),
+        4, all_positions),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([4, 0, 0]), verified_on([4, 4, 4])),
+        5, no_position).
+
+test(trims_zero_leading_newton_coefficients) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([1, 2, 0, 0]), verified_on([1, 3, 5])),
+        7, position(3)).
+
+test(rejects_invalid_polynomial_inverse_inputs) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([]), verified_on([])), 1, no_position),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([1, coefficient]), verified_on([])), 1, no_position),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(polynomial([1, 2]), verified_on([])), 3.0, no_position).
+
 test(inverts_geometric_sequence) :-
     mnn_algebraplop:invert_sequence_formula(
         formula(exponential(2, 3), verified_on([2, 6, 18, 54])),
