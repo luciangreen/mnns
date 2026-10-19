@@ -341,8 +341,9 @@ The current work is an initial subset, not a completed version 1 suite:
   packets, cut conversion, and fallback diagnostics are not implemented.
 - **Stage 6 is in progress only for the proof-gated pipeline described above**;
   its full rewrite search and closed-form discovery remain unimplemented.
-- **Stage 7 has an initial exact constant/affine/quadratic and higher-degree
-  polynomial sequence-inference slice** as described above; inverse discovery,
+- **Stage 7 has an initial exact constant/affine/quadratic, higher-degree
+  polynomial, and integer-base geometric sequence-inference slice** as described
+  above; inverse discovery,
   program-position extraction, splice-index loops, `r_spec` provenance,
   complexity ranking, and proof-backed formulas remain unimplemented. **Stages
   8–14 are not started:** S2A/Starlog,
