@@ -212,6 +212,34 @@ test(accept_bounded_between_findall_to_fold_with_bound_value) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_bounded_between_findall_to_fold_with_arithmetic_filters) :-
+    filtered_between_findall_to_fold_programs(
+        conj(Value > 2, Value =< 4), Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [3, 4]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_filtered_between_findall_to_fold_with_changed_values) :-
+    filtered_between_findall_to_fold_programs(
+        Value > 2, Original, Program0),
+    replace_loop_values(Program0, [3], Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_between_findall_to_fold_with_unsupported_filter) :-
+    filtered_between_findall_to_fold_programs(
+        member(Value, [2, 4]), Original, Program),
+    assertion(Program =@= Original),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_ground_fact_findall_to_fold_preserving_patterns_and_duplicates) :-
     fact_findall_to_fold_programs(Value, pair(a, Value), Original, Program),
     Program = mnn_program(_, _,
@@ -1200,6 +1228,20 @@ between_findall_to_fold_programs(
                                           Results),
                                   source(source, 1))],
                              original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+filtered_between_findall_to_fold_programs(Filter, Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                            [mnn_clause(
+                                 1, numbers(Results),
+                                 findall(Value,
+                                         conj(between(1, 5, Value), Filter),
+                                         Results),
+                                 source(source, 1))],
+                            original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
 

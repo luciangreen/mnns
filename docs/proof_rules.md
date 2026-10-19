@@ -105,8 +105,12 @@ generator conversion:
 - `findall(Template, between(Low, High, Value), Results)`, where the bounds are
   integer literals and `Value` is a variable or integer. The inclusive range
   must contain at most 10,000 integers; reversed bounds produce no results.
-  An integer `Value` produces a result only when it lies in the range, and the
-  template must be ground in every produced solution.
+  The generator may be followed by whitelisted arithmetic comparisons (`>`,
+  `>=`, `<`, `=<`, `=:=`, `=\=`) whose expressions are ground after matching
+  each range value. An integer `Value` produces a result only when it lies in
+  the range and passes every comparison. The template must be ground in every
+  produced solution; comparisons that raise arithmetic exceptions are not
+  certified.
 - `findall(Template, Goal, Results)`, where `Goal` calls a predicate in the
   original program whose clauses are all ground facts. The checker matches the
   call against each fact in clause order, preserving duplicate facts and bound

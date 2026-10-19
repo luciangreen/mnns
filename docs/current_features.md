@@ -72,18 +72,20 @@ duplicate positions while honoring value and remainder patterns. The index
 cases emit zero-based or one-based indices, respectively, and accept an empty
 ground list. It also checks no-filter conversions for `length/2` over a ground
 proper list, with a variable or nonnegative integer length; a mismatch yields no
-values. It also checks no-filter `between/3` conversions with integer bounds and
-a variable or integer third argument when the inclusive range has at most 10,000
-values; reversed bounds and nonmatching integer values yield no results.
+values. It checks bounded `between/3` conversions with integer bounds and a
+variable or integer third argument when the inclusive range has at most 10,000
+values; supported arithmetic-comparison filters may follow the generator.
+Reversed bounds and nonmatching integer values yield no results.
 It also verifies conversions over predicates made entirely of ground facts with
 supported arithmetic-comparison filters, matching bound or partially
 instantiated call arguments and preserving clause order and duplicate facts.
 Filters must be ground after matching each fact; arithmetic exceptions are not
-certified. For filtered member conversions, comparisons must be ground after
-matching each list element and templates must be ground for every passing
-solution. Arithmetic exceptions are not certified. These proof subsets exclude
-filters on built-in generators other than `member/2`, `nth0/3`, and `nth1/3`,
-rule generators, nested findall, oversized ranges, and other list generators. The
+certified. For filtered member conversions and filtered bounded `between/3`
+conversions, comparisons must be ground after matching each value and templates
+must be ground for every passing solution. Arithmetic exceptions are not
+certified. These proof subsets exclude filters on built-in generators other than
+`member/2`, `nth0/3`, `nth1/3`, and bounded `between/3`, rule generators, nested
+findall, oversized ranges, and other list generators. The
 renderer creates Markdown
 explanations but does not certify proofs. General
 purity analysis, general clause/goal reordering, and most proof rules in the
@@ -171,8 +173,9 @@ finiteness and filter side conditions for the findall-to-fold lemma, but the
 independent proof checker validates only ground-fact conversions with supported
 arithmetic comparisons and the documented direct ground-list `member/2`,
 `select/3`, `nth0/3`/`nth1/3` index, `length/2`, and bounded `between/3`
-subsets. Rule generators, filters on built-in generators, and other conversions
-remain unchecked; do not treat them as proof-certified. See [`loop2.md`](loop2.md).
+subsets, including supported arithmetic filters on bounded `between/3`. Rule
+generators, other filters on built-in generators, and other conversions remain
+unchecked; do not treat them as proof-certified. See [`loop2.md`](loop2.md).
 
 ## Test commands
 
