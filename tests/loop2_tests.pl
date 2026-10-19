@@ -210,7 +210,7 @@ test(converts_ground_append_with_pattern_and_arithmetic_filter, [nondet]) :-
     with_converted_program(
         [(values(Values) :-
               findall(Value,
-                      (append([Value], Suffix, [1, 2, 3]), Value > 0),
+                      (append([Value], _, [1, 2, 3]), Value > 0),
                       Values))],
         Converted,
         loop2_report(

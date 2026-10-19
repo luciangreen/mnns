@@ -675,46 +675,37 @@ select_candidate_values([Candidate|Candidates], Prefix, Value, Rest, Template,
                            Template, Filters, RemainingValues).
 
 append_candidate_values(List, Prefix, Suffix, Template, Values) :-
-    findall(TemplateCopy,
-            ( copy_term((Prefix, Suffix, Template),
-                        (PrefixCopy, SuffixCopy, TemplateCopy)),
-              append(PrefixCopy, SuffixCopy, List),
-              (   ground(TemplateCopy)
-              ->  true
-              ;   throw(ungrounded_append_template)
-              )
-            ),
-            Values).
+    append_candidate_values(List, Prefix, Suffix, Template, [], Values).
 
 append_candidate_values(List, Prefix, Suffix, Template, Filters, Values) :-
-    findall(candidate(TemplateCopy, FilterResult),
-            ( copy_term((Prefix, Suffix, Template, Filters),
-                        (PrefixCopy, SuffixCopy, TemplateCopy, FiltersCopy)),
-              append(PrefixCopy, SuffixCopy, List),
-              maplist(supported_arithmetic_filter, FiltersCopy),
-              (   checked_filters_result(FiltersCopy, FilterResult)
-              ->  true
-              ;   throw(invalid_append_filter)
-              ),
-              (   FilterResult == true
-              ->  (   ground(TemplateCopy)
-                  ->  true
-                  ;   throw(ungrounded_append_template)
-                  )
-              ;   true
-              )
-            ),
-            Candidates),
+    findall(split(PrefixPart, SuffixPart),
+            append(PrefixPart, SuffixPart, List),
+            Splits),
+    maplist(checked_append_split(Prefix, Suffix, Template, Filters),
+            Splits, Candidates),
     checked_append_candidate_values(Candidates, Values).
 
 checked_append_candidate_values([], []).
-checked_append_candidate_values([candidate(Template, Result)|Candidates],
-                               Values) :-
-    (   Result == true
-    ->  Values = [Template|Rest]
-    ;   Values = Rest
-    ),
-    checked_append_candidate_values(Candidates, Rest).
+checked_append_candidate_values([skip|Candidates], Values) :-
+    checked_append_candidate_values(Candidates, Values).
+checked_append_candidate_values([result(Template)|Candidates],
+                               [Template|Values]) :-
+    checked_append_candidate_values(Candidates, Values).
+
+checked_append_split(Prefix, Suffix, Template, Filters,
+                     split(PrefixPart, SuffixPart), Candidate) :-
+    copy_term((Prefix, Suffix, Template, Filters),
+              (PrefixCopy, SuffixCopy, TemplateCopy, FiltersCopy)),
+    (   PrefixCopy = PrefixPart,
+        SuffixCopy = SuffixPart
+    ->  checked_filters_result(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Candidate = result(TemplateCopy)
+        ;   Candidate = skip
+        )
+    ;   Candidate = skip
+    ).
 
 member_candidate_values([], _, _, _, []).
 member_candidate_values([Candidate|Candidates], Value, Template, Filters,
