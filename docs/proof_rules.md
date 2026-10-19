@@ -96,7 +96,11 @@ generator conversion:
 - `findall(Template, select(Value, List, Rest), Results)`, where `List` is a
   ground proper list and every selected solution grounds `Template`. Value and
   remainder patterns are allowed; selection order and duplicate positions are
-  preserved.
+  preserved. The generator may also be followed by whitelisted arithmetic
+  comparisons (`>`, `>=`, `<`, `=<`, `=:=`, `=\=`). Each comparison must be
+  ground after matching the selected value and remainder; arithmetic exceptions
+  are not certified, and the template must be ground for each selected solution
+  that passes the filters.
 - `findall(Length, length(List, Length), Results)`, where `List` is a ground
   proper list and `Length` is a variable or nonnegative integer. A variable
   length produces the list's length once; a matching bound length produces one
@@ -135,7 +139,9 @@ the supported comparisons on the resulting ground terms, and collects passing
 templates in list order, preserving duplicates. For `select/3`, the checker
 independently enumerates each selected position,
 matches the value and remainder patterns, and collects the grounded templates in
-selection order. For `length/2`, it derives the single possible length and checks
+selection order. For filtered `select/3`, it also checks the comparisons for each
+matching selected value and remainder before collecting passing templates.
+For `length/2`, it derives the single possible length and checks
 any bound length before constructing the expected values. Existing clauses and
 predicates must be preserved; the generated
 helper's clause IDs and metadata events must also match. Thus a claimed conversion,
@@ -145,11 +151,12 @@ zero-based or one-based index with its ground list element, evaluates the
 comparisons, and collects passing templates in list order.
 
 These checks cover ground-fact calls with or without whitelisted arithmetic filters,
-ground-list `member/2` with or without supported arithmetic-comparison filters,
+ground-list `member/2` and `select/3` with or without supported
+arithmetic-comparison filters,
 the stated distinct-variable `nth0/3` and `nth1/3` index forms with or without
-supported arithmetic filters, `select/3` with a grounded template, the stated
-`length/2` form, and bounded `between/3`. They do not certify rule generators,
-filters on built-in generators other than `member/2`, `nth0/3`, and `nth1/3`,
+supported arithmetic filters, the stated `length/2` form, and bounded
+`between/3`. They do not certify rule generators, filters on built-in generators
+other than `member/2`, `select/3`, `nth0/3`, and `nth1/3`,
 nested findall, other list generators, or arbitrary `findall/3` rewrites. Ground
 domain and mode annotations are required but are not inferred.
 The checker does not import or invoke the loop2 converter.

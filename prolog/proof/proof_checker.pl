@@ -308,6 +308,13 @@ findall_candidate_values(_, Template, select(Value, List, Rest), Values) :-
     is_list(List),
     select_candidate_values(List, Value, Rest, Template, Values).
 findall_candidate_values(_, Template, Generator, Values) :-
+    generator_parts(Generator, select(Value, List, Rest), Filters),
+    Filters \= [],
+    ground(List),
+    is_list(List),
+    maplist(supported_arithmetic_filter, Filters),
+    select_candidate_values(List, Value, Rest, Template, Filters, Values).
+findall_candidate_values(_, Template, Generator, Values) :-
     generator_parts(Generator, member(Value, List), Filters),
     Filters \= [],
     ground(List),
@@ -489,6 +496,29 @@ select_candidate_values(List, Value, Rest, Template, Values) :-
             ),
             Candidates),
     collect_select_values(Candidates, Values).
+
+select_candidate_values(List, Value, Rest, Template, Filters, Values) :-
+    select_candidate_values(List, [], Value, Rest, Template, Filters, Values).
+
+select_candidate_values([], _, _, _, _, _, []).
+select_candidate_values([Candidate|Candidates], Prefix, Value, Rest, Template,
+                        Filters, Values) :-
+    copy_term((Value, Rest, Template, Filters),
+              (ValueCopy, RestCopy, TemplateCopy, FiltersCopy)),
+    reverse(Prefix, PrefixInOrder),
+    append(PrefixInOrder, Candidates, SelectedRest),
+    (   ValueCopy = Candidate,
+        RestCopy = SelectedRest
+    ->  checked_filters_result(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|RemainingValues]
+        ;   Values = RemainingValues
+        )
+    ;   Values = RemainingValues
+    ),
+    select_candidate_values(Candidates, [Candidate|Prefix], Value, Rest,
+                           Template, Filters, RemainingValues).
 
 member_candidate_values([], _, _, _, []).
 member_candidate_values([Candidate|Candidates], Value, Template, Filters,

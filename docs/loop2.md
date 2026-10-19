@@ -65,16 +65,16 @@ condition (ground facts, finite acyclic rules, a ground list, or a bounded
 condition. The report is an obligation, not itself a checked proof. The
 independent proof checker validates conversions over predicates consisting
 entirely of ground facts, including supported arithmetic-comparison filters, plus
-ground-list `member/2` with or without supported arithmetic-comparison filters,
-no-filter `select/3` and `nth0/3`/`nth1/3` indices,
+ground-list `member/2` and `select/3` with or without supported
+arithmetic-comparison filters, `nth0/3`/`nth1/3` indices with supported filters,
 `length/2`, and bounded `between/3`. For a ground-fact generator, the checker
 preserves fact order and duplicates and accepts bound or partially instantiated
 call arguments when every successful template is ground. Arithmetic filters are
 limited to the comparisons and expressions above, must be ground after matching
 each fact, and are not certified if evaluation raises an exception. Conversions
 involving rule generators, filters on built-in generators other than `member/2`,
-or other forms are not independently checked. Do not treat such output as
-proof-certified.
+`select/3`, `nth0/3`, `nth1/3`, and bounded `between/3`, or other forms are not
+independently checked. Do not treat such output as proof-certified.
 
 Run the full suite, including loop2 tests, with:
 
