@@ -210,6 +210,55 @@ test(analyzes_acyclic_calls_with_distinct_unbound_arguments) :-
                                 determinism(multi), success_counts([2])),
                        Results)).
 
+test(analyzes_ground_calls_to_ground_fact_predicates) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(colour/1, ['?'], [any],
+                           [mnn_clause(1, colour(red), true, source(sample, 1)),
+                            mnn_clause(2, colour(blue), true, source(sample, 2)),
+                            mnn_clause(3, colour(red), true, source(sample, 3))],
+                           original),
+                   mnn_pred(found/0, [], [],
+                           [mnn_clause(4, found, colour(red), source(sample, 4))],
+                           original),
+                   mnn_pred(missing/0, [], [],
+                           [mnn_clause(5, missing, colour(green),
+                                       source(sample, 5))],
+                           original),
+                   mnn_pred(ambiguous/0, [], [],
+                           [mnn_clause(6, ambiguous, colour(blue),
+                                       source(sample, 6))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(found/0, mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                       Results)),
+    assertion(memberchk(predicate(missing/0, mode(all_arguments_unbound),
+                                 determinism(failure), success_counts([0])),
+                       Results)),
+    assertion(memberchk(predicate(ambiguous/0, mode(all_arguments_unbound),
+                                 determinism(det), success_counts([1])),
+                       Results)).
+
+test(ground_calls_to_non_fact_predicates_remain_unsupported) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(value/1, ['?'], [any],
+                           [mnn_clause(1, value(X), integer(X),
+                                       source(sample, 1))],
+                           original),
+                   mnn_pred(caller/0, [], [],
+                           [mnn_clause(2, caller, value(1), source(sample, 2))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(
+        Program,
+        detlog_report(Results)),
+    assertion(memberchk(predicate(caller/0, mode(all_arguments_unbound),
+                                 unavailable(unsupported_goal(value(1))),
+                                 unsupported_body), Results)).
+
 test(reports_bound_and_repeated_argument_calls_as_unsupported) :-
     Program = mnn_program(
                   sample, meta(sample, []),
