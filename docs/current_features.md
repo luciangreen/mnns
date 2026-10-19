@@ -264,17 +264,21 @@ swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 
 `mnn_algebraplop:infer_sequence_formula/2` is an initial, conservative sequence
 inference slice. It accepts a proper list of at least three integers, treats the
-first value as position zero, and returns either an exact constant formula or an
-exact affine formula `linear(Slope, Intercept)`. The formula is checked against
-every supplied value, including values after the first two that act as held-out
-checks. Successful results use `verified_on(Samples)`; they are sample-verified,
-not accompanied by a proof. Unsupported or inconsistent samples return
-`no_formula`. The procedure is deterministic.
+first value as position zero, and returns an exact constant, affine
+`linear(Slope, Intercept)`, or quadratic
+`quadratic(Intercept, FirstDifference, SecondDifference)` formula. The quadratic
+formula uses the Newton forward-difference form: at zero-based position `i`, its
+value is `Intercept + FirstDifference*i +
+SecondDifference*i*(i-1)/2`. It requires at least four samples so a fourth or
+later sample checks the candidate fitted from the first three. Every supplied
+sample is verified. Successful results use `verified_on(Samples)`; they are
+sample-verified, not accompanied by a proof. Unsupported or inconsistent samples
+return `no_formula`. The procedure is deterministic.
 
-It does not infer exponentials, piecewise formulas, inverses, formulas from
-program index calculations, splice-index loops, or `r_spec` provenance. It also
-does not replace program code. In particular, `[2,4,8,16]` and prime samples
-return `no_formula`.
+It does not infer exponentials, higher-degree or piecewise formulas, inverses,
+formulas from program index calculations, splice-index loops, or `r_spec`
+provenance. It also does not replace program code. In particular,
+`[2,4,8,16]` and prime samples return `no_formula`.
 
 Run this focused suite from the repository root:
 
