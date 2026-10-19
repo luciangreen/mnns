@@ -707,6 +707,54 @@ test(classifies_select_over_ground_proper_lists) :-
                                  determinism(failure), success_counts([0])),
                         Results)).
 
+test(classifies_select_with_distinct_unbound_arguments_as_multi) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(select_any/0, [], [],
+                           [mnn_clause(1, select_any,
+                                       select(_Value, _List, _Rest),
+                                       source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(select_any/0, mode(all_arguments_unbound),
+                                determinism(multi), success_counts([2])),
+                        Results)).
+
+test(select_with_aliased_unbound_arguments_remains_unsupported) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(aliased_select/0, [], [],
+                           [mnn_clause(1, aliased_select,
+                                       select(_List, _List, _Rest),
+                                       source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(aliased_select/0,
+                                mode(all_arguments_unbound),
+                                unavailable(unsupported_goal(select(_, _, _))),
+                                unsupported_body), Results)).
+
+test(local_select_definition_is_not_treated_as_builtin_for_free_lists) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(select/3, ['?', '?', '?'], [any, any, any],
+                           [mnn_clause(1, select(_, _, _), true,
+                                       source(sample, 1))],
+                           original),
+                   mnn_pred(local_select_caller/0, [], [],
+                           [mnn_clause(2, local_select_caller,
+                                       select(_Value, _List, _Rest),
+                                       source(sample, 2))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(local_select_caller/0,
+                                mode(all_arguments_unbound),
+                                determinism(det), success_counts([1])),
+                        Results)).
+
 test(reports_unsupported_select_shapes_and_local_definition) :-
     Program = mnn_program(
                   sample, meta(sample, []),

@@ -122,6 +122,12 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     select_outcomes(Value, List, Rest, Outcomes).
 goal_outcomes(Goal, Predicates, _, [2]) :-
     nonvar(Goal),
+    Goal = select(Value, List, Rest),
+    distinct_variables([Value, List, Rest]),
+    \+ member(mnn_pred(select/3, _, _, _, _), Predicates),
+    !.
+goal_outcomes(Goal, Predicates, _, [2]) :-
+    nonvar(Goal),
     Goal = length(List, Length),
     var(List),
     var(Length),

@@ -36,7 +36,10 @@ value and remainder are each either unbound or ground. Counts are capped at two;
 duplicate positions remain distinct successes, and ground value or remainder
 patterns constrain the counted solutions. Variable or improper lists,
 partially instantiated value or remainder patterns, and a program-defined
-`select/3` remain unavailable.
+`select/3` remain unavailable for this finite-list case. When all three arguments
+are distinct unbound variables, the call is classified as multi because the
+built-in admits at least two list/value/remainder solutions. Repeated-variable
+calls and program-defined `select/3` predicates are not treated as this mode.
 The built-in `length/2` is also classified when its first argument is a ground
 proper list and its length argument is unbound or a nonnegative integer. An
 unbound length succeeds exactly once; a matching nonnegative integer succeeds
@@ -126,3 +129,6 @@ lengths, and distinct unbound list and length variables, as well as unsupported
 aliases, improper lists, negative lengths, and local definitions. Ground
 user-call tests cover matching, missing and duplicate facts,
 as well as rejection of non-fact definitions.
+The `select/3` tests cover ground proper lists and the distinct-unbound mode,
+including duplicate positions, constrained results, aliases, and local
+definitions.
