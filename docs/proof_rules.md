@@ -79,11 +79,20 @@ generator conversion:
 
 - `findall(Value, member(Value, List), Results)`, where `List` is a ground
   proper list and the template is the same variable as the `member/2` value.
+  It also accepts conjunctions of that generator and whitelisted arithmetic
+  comparisons (`>`, `>=`, `<`, `=<`, `=:=`, `=\=`). Comparisons must be ground
+  after matching each list element; arithmetic exceptions are not certified,
+  and the template must be ground for every element that passes the filters.
 - `findall(Index, nth0(Index, List, _), Results)`, where `List` is a ground
   proper list, `Index` is the unbound index variable used as the template, and
   the element argument is a distinct unbound variable.
 - `findall(Index, nth1(Index, List, _), Results)`, with the same variable and
   ground-list requirements; indices are one-based.
+- Either index generator may be followed by whitelisted arithmetic comparisons.
+  The index and element arguments must be distinct unbound variables, and each
+  comparison must be ground after matching a list element and its index. The
+  template must be ground for each solution that passes the filters; arithmetic
+  exceptions are not certified.
 - `findall(Template, select(Value, List, Rest), Results)`, where `List` is a
   ground proper list and every selected solution grounds `Template`. Value and
   remainder patterns are allowed; selection order and duplicate positions are
@@ -115,21 +124,28 @@ must be replaced by a call to a fresh helper containing the independently
 derived values, and that helper must be the two-clause deterministic list-copy
 loop. The `nth0/3` case derives zero-based indices and the `nth1/3` case derives
 one-based indices, both in list order; an empty list produces an empty values
-list. For `select/3`, the checker independently enumerates each selected position,
+list. For filtered `member/2`, it independently matches each list element, evaluates
+the supported comparisons on the resulting ground terms, and collects passing
+templates in list order, preserving duplicates. For `select/3`, the checker
+independently enumerates each selected position,
 matches the value and remainder patterns, and collects the grounded templates in
 selection order. For `length/2`, it derives the single possible length and checks
 any bound length before constructing the expected values. Existing clauses and
 predicates must be preserved; the generated
 helper's clause IDs and metadata events must also match. Thus a claimed conversion,
 altered values, missing helper, or unrelated program change is rejected.
+For filtered `nth0/3` and `nth1/3`, the checker independently reconstructs each
+zero-based or one-based index with its ground list element, evaluates the
+comparisons, and collects passing templates in list order.
 
-These checks cover ground-fact calls with or without whitelisted arithmetic
-filters, ground-list `member/2`, the stated distinct-variable `nth0/3` and
-`nth1/3` index forms, `select/3` with a grounded template, the stated `length/2`
-form, and bounded `between/3`. They do not certify rule generators, filters on
-built-in generators, nested findall, other list generators, or arbitrary
-`findall/3` rewrites. Ground domain and mode annotations are required but are not
-inferred.
+These checks cover ground-fact calls with or without whitelisted arithmetic filters,
+ground-list `member/2` with or without supported arithmetic-comparison filters,
+the stated distinct-variable `nth0/3` and `nth1/3` index forms with or without
+supported arithmetic filters, `select/3` with a grounded template, the stated
+`length/2` form, and bounded `between/3`. They do not certify rule generators,
+filters on built-in generators other than `member/2`, `nth0/3`, and `nth1/3`,
+nested findall, other list generators, or arbitrary `findall/3` rewrites. Ground
+domain and mode annotations are required but are not inferred.
 The checker does not import or invoke the loop2 converter.
 
 The checker still does not implement general purity/determinism analysis,

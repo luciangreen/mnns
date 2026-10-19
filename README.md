@@ -24,16 +24,14 @@ remaining work.
   [`prolog/runner/sandbox_runner.pl`](prolog/runner/sandbox_runner.pl).
 - **Proof checker and renderer:** independently checks identity, one adjacent
   reordering of restricted ground type tests, restricted definition
-  introduction, narrow single-occurrence unfold/fold steps, and a direct
-  no-filter `findall/3` over `member/2`, `nth0/3`, or `nth1/3` on a ground
-  proper list, plus `select/3` over a ground proper list when each selected
-  template is ground, and `length/2` over a ground proper list with a variable
-  or nonnegative integer length, and bounded no-filter `between/3` with integer
-  bounds and a variable or integer value (ranges up to 10,000 values). It also
-  checks ground-fact conversions with supported arithmetic-comparison filters.
-  Selection order, fact order, and duplicate answers are preserved. Index
-  results are checked as zero-based for `nth0/3` and one-based for `nth1/3`.
-  Unsupported rules and broader findall conversions are rejected.
+  introduction, narrow single-occurrence unfold/fold steps, and `findall/3`
+  conversions over ground facts, `member/2`, `nth0/3`, and `nth1/3`, with
+  supported arithmetic-comparison filters. It also checks no-filter conversions
+  over `select/3`, `length/2`, and bounded `between/3`. The `nth0/3` and `nth1/3`
+  filter cases require distinct unbound index and element variables. Selection
+  order, fact order, and duplicate answers are preserved; indices are checked
+  as zero-based for `nth0/3` and one-based for `nth1/3`. Unsupported rules and
+  broader findall conversions are rejected.
   See [`docs/proof_rules.md`](docs/proof_rules.md).
 - **PID analysis:** classifies recursive predicates, checks a limited set of
   shared structural and guarded natural-number decreases, and emits schematic

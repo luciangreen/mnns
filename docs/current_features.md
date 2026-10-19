@@ -58,11 +58,14 @@ unsupported goals are not run.
 `mnn_proof_checker:check_proof/4` checks supported proof terms directly against
 the IR and does not import the optimizer. In addition to the rules described in
 [`proof_rules.md`](proof_rules.md), it verifies one direct
-`findall(Value, member(Value, GroundList), Results)` conversion and one
+`findall(Value, member(Value, GroundList), Results)` conversion, including
+supported arithmetic-comparison filters on the member generator, and one
 `findall(Index, nth0(Index, GroundList, _), Results)` or
 `findall(Index, nth1(Index, GroundList, _), Results)` conversion, independently
-reconstructing the generated values, helper, and complete output IR. It also
-checks no-filter
+reconstructing the generated values, helper, and complete output IR. The
+`nth0/3` and `nth1/3` index forms also accept whitelisted arithmetic-comparison
+filters when the index and element are distinct unbound variables; comparisons
+must be ground after each list item is matched. It also checks no-filter
 `findall(Template, select(Value, GroundList, Rest), Results)` conversions when
 every selected solution grounds the template, preserving selection order and
 duplicate positions while honoring value and remainder patterns. The index
@@ -76,9 +79,12 @@ It also verifies conversions over predicates made entirely of ground facts with
 supported arithmetic-comparison filters, matching bound or partially
 instantiated call arguments and preserving clause order and duplicate facts.
 Filters must be ground after matching each fact; arithmetic exceptions are not
-certified. Templates must be ground for every produced solution. These proof
-subsets exclude filters on built-in generators, rule generators, nested findall,
-oversized ranges, and other list generators. The renderer creates Markdown
+certified. For filtered member conversions, comparisons must be ground after
+matching each list element and templates must be ground for every passing
+solution. Arithmetic exceptions are not certified. These proof subsets exclude
+filters on built-in generators other than `member/2`, `nth0/3`, and `nth1/3`,
+rule generators, nested findall, oversized ranges, and other list generators. The
+renderer creates Markdown
 explanations but does not certify proofs. General
 purity analysis, general clause/goal reordering, and most proof rules in the
 requirements remain unsupported.
@@ -198,10 +204,10 @@ The current work is an initial subset, not a completed version 1 suite:
 - **Stages 1–5 are in progress.** Their implemented slices and limits are
   documented above and in the subsystem guides. In particular, Stage 4 still
   lacks nested `findall/3` conversion and independent checking of most conversion
-  proofs; the checker verifies only ground-fact generators with supported
-  arithmetic filters and direct no-filter ground-list `member/2`, `select/3`,
-  `nth0/3`/`nth1/3` indices, and `length/2` conversions, plus bounded no-filter
-  `between/3`. Stage 5
+  proofs; the checker verifies ground-fact generators with supported arithmetic
+  filters, ground-list `member/2` with or without supported arithmetic filters,
+  and direct no-filter `select/3`, `nth0/3`/`nth1/3`, and `length/2`
+  conversions, plus bounded no-filter `between/3`. Stage 5
   has only conservative success-count analysis;
   mode inference, Detlog code generation, and choicepoint/cut transformations
   are not implemented.
