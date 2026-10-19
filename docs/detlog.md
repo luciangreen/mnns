@@ -76,9 +76,10 @@ argument is a distinct unbound variable (zero-arity calls satisfy this condition
 Their success counts are propagated to the caller; recursive calls are reported
 as unavailable. A separate ground-call case counts a call exactly when its
 predicate consists only of ground facts; unmatched calls fail and duplicate
-matching facts count as distinct successes. Ground calls to predicates with rules
-or non-ground fact heads remain unavailable. This does not extend analysis to
-general bound-argument or repeated-variable modes.
+matching facts count as distinct successes, with the count capped at two.
+Ground calls to predicates with rules or non-ground fact heads remain
+unavailable. This does not extend analysis to general bound-argument or
+repeated-variable modes.
 Bound arguments and repeated variables in a call are unsupported. The reported
 classes are:
 
