@@ -21,6 +21,12 @@ invert_sequence_formula(Formula, Value, Result) :-
         integer(Initial),
         integer(Base)
     ->  inverse_exponential_positions(Initial, Base, Value, Result)
+    ;   integer(Value),
+        Formula = formula(polynomial(Coefficients), verified_on(_)),
+        is_list(Coefficients),
+        maplist(integer, Coefficients),
+        Coefficients \= []
+    ->  inverse_polynomial_positions(Coefficients, Value, Result)
     ;   Result = no_position
     ),
     !.
@@ -84,6 +90,116 @@ geometric_position(Initial, Base, Value, Position) :-
     Quotient is Value // Base,
     geometric_position(Initial, Base, Quotient, PreviousPosition),
     Position is PreviousPosition + 1.
+
+inverse_polynomial_positions(Coefficients, Value, Result) :-
+    trim_newton_coefficients(Coefficients, Trimmed),
+    (   Trimmed = [Constant]
+    ->  (   Value =:= Constant
+        ->  Result = all_positions
+        ;   Result = no_position
+        )
+    ;   polynomial_root_bound(Trimmed, Value, Bound),
+        findall(Position,
+                ( between(0, Bound, Position),
+                  newton_value(Trimmed, Position, Sample),
+                  Sample =:= Value
+                ),
+                Positions),
+        polynomial_positions_result(Positions, Result)
+    ).
+
+trim_newton_coefficients(Coefficients, Trimmed) :-
+    reverse(Coefficients, Reversed),
+    trim_reversed_coefficients(Reversed, TrimmedReversed),
+    reverse(TrimmedReversed, Trimmed).
+
+trim_reversed_coefficients([0|Coefficients], Trimmed) :-
+    Coefficients \= [],
+    !,
+    trim_reversed_coefficients(Coefficients, Trimmed).
+trim_reversed_coefficients(Coefficients, Coefficients).
+
+polynomial_positions_result([], no_position).
+polynomial_positions_result([Position], position(Position)) :-
+    !.
+polynomial_positions_result(Positions, positions(Positions)).
+
+polynomial_root_bound(Coefficients, Value, Bound) :-
+    length(Coefficients, Count),
+    Degree is Count - 1,
+    factorial(Degree, DegreeFactorial),
+    newton_monomial_terms(Coefficients, 0, Degree, DegreeFactorial, Terms),
+    sum_polynomials(Terms, [], ScaledPolynomial),
+    ScaledPolynomial = [Constant|OtherCoefficients],
+    AdjustedConstant is Constant - Value * DegreeFactorial,
+    MonomialCoefficients = [AdjustedConstant|OtherCoefficients],
+    reverse(MonomialCoefficients, [LeadingCoefficient|LowerCoefficients]),
+    maximum_absolute_value(LowerCoefficients, MaximumLower),
+    Bound is 1 + MaximumLower // abs(LeadingCoefficient).
+
+newton_monomial_terms([], _, _, _, []).
+newton_monomial_terms([Coefficient|Coefficients], Order, Degree,
+                      DegreeFactorial, [Term|Terms]) :-
+    falling_factorial(Order, FallingFactorial),
+    factorial(Order, OrderFactorial),
+    Scale is DegreeFactorial // OrderFactorial,
+    ScaledCoefficient is Coefficient * Scale,
+    scale_polynomial(FallingFactorial, ScaledCoefficient, Term),
+    NextOrder is Order + 1,
+    newton_monomial_terms(Coefficients, NextOrder, Degree, DegreeFactorial,
+                          Terms),
+    Order =< Degree.
+
+falling_factorial(0, [1]) :-
+    !.
+falling_factorial(Order, Coefficients) :-
+    PreviousOrder is Order - 1,
+    falling_factorial(PreviousOrder, PreviousCoefficients),
+    multiply_by_x_minus(PreviousCoefficients, PreviousOrder, Coefficients).
+
+multiply_by_x_minus([Coefficient|Coefficients], Offset,
+                    [First|ProductCoefficients]) :-
+    First is -Offset * Coefficient,
+    multiply_by_x_minus(Coefficients, Coefficient, Offset,
+                        ProductCoefficients).
+
+multiply_by_x_minus([], LastCoefficient, _, [LastCoefficient]).
+multiply_by_x_minus([Coefficient|Coefficients], PreviousCoefficient, Offset,
+                    [ProductCoefficient|ProductCoefficients]) :-
+    ProductCoefficient is PreviousCoefficient - Offset * Coefficient,
+    multiply_by_x_minus(Coefficients, Coefficient, Offset,
+                        ProductCoefficients).
+
+scale_polynomial([], _, []).
+scale_polynomial([Coefficient|Coefficients], Scale,
+                 [ScaledCoefficient|ScaledCoefficients]) :-
+    ScaledCoefficient is Coefficient * Scale,
+    scale_polynomial(Coefficients, Scale, ScaledCoefficients).
+
+sum_polynomials([], Sum, Sum).
+sum_polynomials([Polynomial|Polynomials], Accumulator, Sum) :-
+    add_polynomials(Accumulator, Polynomial, NextAccumulator),
+    sum_polynomials(Polynomials, NextAccumulator, Sum).
+
+add_polynomials([], Polynomial, Polynomial).
+add_polynomials(Polynomial, [], Polynomial).
+add_polynomials([Coefficient1|Coefficients1], [Coefficient2|Coefficients2],
+                [Sum|Sums]) :-
+    Sum is Coefficient1 + Coefficient2,
+    add_polynomials(Coefficients1, Coefficients2, Sums).
+
+factorial(0, 1) :-
+    !.
+factorial(Number, Factorial) :-
+    PreviousNumber is Number - 1,
+    factorial(PreviousNumber, PreviousFactorial),
+    Factorial is Number * PreviousFactorial.
+
+maximum_absolute_value([], 0).
+maximum_absolute_value([Value|Values], Maximum) :-
+    AbsoluteValue is abs(Value),
+    maximum_absolute_value(Values, RemainingMaximum),
+    Maximum is max(AbsoluteValue, RemainingMaximum).
 
 infer_sequence_formula(Samples, Result) :-
     (   is_list(Samples),
@@ -192,6 +308,9 @@ newton_value([Coefficient|Coefficients], Position, Order, Accumulator, Value) :-
     newton_value(Coefficients, Position, NextOrder, NextAccumulator, Value).
 
 binomial(_, 0, 1) :-
+    !.
+binomial(Number, Order, 0) :-
+    Order > Number,
     !.
 binomial(Number, Order, Value) :-
     Order > 0,

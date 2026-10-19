@@ -306,19 +306,23 @@ accompanied by a proof. Unsupported or inconsistent samples return `no_formula`.
 The procedure is deterministic.
 
 `mnn_algebraplop:invert_sequence_formula/3` inverts constant, affine, and
-integer-base geometric formulas. It returns `position(Index)` for a unique exact
-nonnegative integer position, `all_positions` when every position matches, and
-`positions(First, Step)` for an infinite arithmetic progression of matching
-positions (`First + k*Step`, for nonnegative integer `k`). The latter covers
-alternating values for base `-1` and the zero tail for base `0`. Values outside
-the sequence, non-integer targets, negative positions, and unsupported formulas
-return `no_position`. Inversion is exact for the supplied formula but does not
-establish that the formula itself is correct beyond its reported sample
-verification.
+integer-base geometric and polynomial formulas. For a polynomial expressed in
+Newton forward-difference coefficients, it returns `position(Index)` for one
+exact nonnegative integer position or `positions(Indices)` for multiple finite
+matches. It computes an exact Cauchy bound for the roots of the polynomial minus
+the target, so an absent value is reported without unbounded searching. Constant
+polynomials return `all_positions` when they match. The other result forms are
+`all_positions` when every position matches and `positions(First, Step)` for an
+infinite arithmetic progression of matching positions (`First + k*Step`, for
+nonnegative integer `k`); the latter covers alternating values for base `-1`
+and the zero tail for base `0`. Values outside the sequence, non-integer targets,
+negative positions, and unsupported formulas return `no_position`. Inversion is
+exact for the supplied formula but does not establish that the formula itself is
+correct beyond its reported sample verification.
 
-Polynomial inverses, piecewise formulas, formulas from program index
-calculations, splice-index loops, and `r_spec` provenance remain unsupported.
-The module also does not replace program code. In particular,
+Piecewise formulas, formulas from program index calculations, splice-index loops,
+and `r_spec` provenance remain unsupported. The module also does not replace
+program code. In particular,
 `[2,4,8,16]` is reported as `exponential(2, 2)`, while prime samples return
 `no_formula`.
 
