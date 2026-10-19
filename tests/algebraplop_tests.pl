@@ -112,7 +112,7 @@ test(handles_zero_slope_affine_formula) :-
 
 test(rejects_unsupported_or_invalid_inverse_inputs) :-
     mnn_algebraplop:invert_sequence_formula(
-        formula(exponential(2, 2), verified_on([2, 4, 8])),
+        formula(polynomial([1, 2, 1]), verified_on([1, 3, 6])),
         8, no_position),
     mnn_algebraplop:invert_sequence_formula(
         formula(linear(2, 3), verified_on([3, 5, 7])),
