@@ -518,6 +518,78 @@ test(reject_findall_to_fold_with_unsupported_member_filter) :-
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
+test(accept_ground_nth0_findall_to_fold_with_arithmetic_filter) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                         findall(Index,
+                                                 conj(nth0(Index,
+                                                           [1, 2, 3],
+                                                           Value),
+                                                      Value > 1),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program0, _),
+    Program0 = mnn_program(_, _,
+                           [mnn_pred(_, _, _,
+                                     [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                 _)],
+                                     _)|_],
+                           _, _),
+    assertion(Values == [1, 2]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program0, Original, Proof, accepted),
+    replace_loop_values(Program0, [2, 1], Program),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(accept_ground_nth1_findall_to_fold_with_arithmetic_filter) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                         findall(Index,
+                                                 conj(nth1(Index,
+                                                           [1, 2, 3],
+                                                           Value),
+                                                      Index > 1),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [2, 3]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_findall_to_fold_with_unsupported_nth_filter) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(1, numbers(Results),
+                                         findall(Index,
+                                                 conj(nth0(Index,
+                                                           [1, 2, 3],
+                                                           Value),
+                                                      Value \= 2),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, loop2_report([])),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_findall_to_fold_in_proof_sequence) :-
     findall_to_fold_programs(Original, Program),
     Proof = proof([

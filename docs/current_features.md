@@ -62,8 +62,10 @@ the IR and does not import the optimizer. In addition to the rules described in
 supported arithmetic-comparison filters on the member generator, and one
 `findall(Index, nth0(Index, GroundList, _), Results)` or
 `findall(Index, nth1(Index, GroundList, _), Results)` conversion, independently
-reconstructing the generated values, helper, and complete output IR. It also
-checks no-filter
+reconstructing the generated values, helper, and complete output IR. The
+`nth0/3` and `nth1/3` index forms also accept whitelisted arithmetic-comparison
+filters when the index and element are distinct unbound variables; comparisons
+must be ground after each list item is matched. It also checks no-filter
 `findall(Template, select(Value, GroundList, Rest), Results)` conversions when
 every selected solution grounds the template, preserving selection order and
 duplicate positions while honoring value and remainder patterns. The index
@@ -80,8 +82,9 @@ Filters must be ground after matching each fact; arithmetic exceptions are not
 certified. For filtered member conversions, comparisons must be ground after
 matching each list element and templates must be ground for every passing
 solution. Arithmetic exceptions are not certified. These proof subsets exclude
-filters on other built-in generators, rule generators, nested findall, oversized
-ranges, and other list generators. The renderer creates Markdown
+filters on built-in generators other than `member/2`, `nth0/3`, and `nth1/3`,
+rule generators, nested findall, oversized ranges, and other list generators. The
+renderer creates Markdown
 explanations but does not certify proofs. General
 purity analysis, general clause/goal reordering, and most proof rules in the
 requirements remain unsupported.
