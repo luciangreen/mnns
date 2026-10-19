@@ -275,6 +275,28 @@ test(classifies_append_splits_for_two_unbound_arguments) :-
                         determinism(multi), success_counts([2])),
                         Results)).
 
+test(classifies_append_with_unbounded_output_as_multi) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(unbound_prefix/0, [], [],
+                          [mnn_clause(1, unbound_prefix,
+                            append(_Prefix, [b], _PrefixList),
+                            source(sample, 1))],
+                          original),
+                   mnn_pred(unbound_suffix/0, [], [],
+                          [mnn_clause(2, unbound_suffix,
+                            append([a], _Suffix, _SuffixList),
+                            source(sample, 2))],
+                          original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(unbound_prefix/0, mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                        Results)),
+    assertion(memberchk(predicate(unbound_suffix/0, mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                        Results)).
+
 test(classifies_append_when_two_arguments_are_ground_lists) :-
     Program = mnn_program(
                   sample, meta(sample, []),

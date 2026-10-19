@@ -146,8 +146,10 @@ classified as deterministic or failing when all arguments are ground proper list
 or exactly one argument is unbound and the other two are ground proper lists.
 With two distinct unbound arguments and a ground proper-list result, the empty
 list has one split and is deterministic, while a nonempty list has multiple
-splits and is classified as multi. Other partially instantiated append calls are
-unavailable. Choicepoint/cut conversion and general mode inference are not implemented; see
+splits and is classified as multi. The two modes with an unbound output and one
+ground proper-list input are also classified as multi; other partially
+instantiated append calls are unavailable. Choicepoint/cut conversion and general
+mode inference are not implemented; see
 [`detlog.md`](detlog.md).
 
 ## loop2 conversion
