@@ -30,10 +30,9 @@ run_candidate([], Program, _, _, Program,
               [kept(no_supported_conversion)], Proof, unchanged) :-
     !,
     identity_proof(Proof).
-run_candidate([_|_], Program, Candidate, Scope, Optimized,
+run_candidate([Conversion], Program, Candidate, Scope, Optimized,
               [applied(findall_to_fold, Conversions)], Proof, accepted) :-
-    Conversions = [_],
-    findall_conversion_report(Program, Candidate, Conversions),
+    Conversions = [Conversion],
     scope_accepts(Scope, Program, Candidate),
     findall_proof(Proof),
     mnn_proof_checker:check_proof(Candidate, Program, Proof, accepted),
@@ -50,13 +49,11 @@ run_candidate([_], Program, Candidate, predicate(Key), Program,
               unchanged) :-
     !,
     identity_proof(Proof),
-    Candidate \=@= Program.
+    target_is_unchanged(Program, Candidate, Key).
 run_candidate([_], Program, _, _, Program,
               [kept(proof_rejected)], Proof, unchanged) :-
     !,
     identity_proof(Proof).
-
-findall_conversion_report(_, _, [_]).
 
 scope_accepts(whole_program, _, _).
 scope_accepts(predicate(Key), Program, Candidate) :-
@@ -69,6 +66,18 @@ target_is_only_modified(
     member(mnn_pred(Key, _, _, _, _), OriginalPredicates),
     maplist(unchanged_unselected_predicate(CandidatePredicates, Key),
             OriginalPredicates).
+
+target_is_unchanged(
+    mnn_program(_, _, OriginalPredicates, _, _),
+    mnn_program(_, _, CandidatePredicates, _, _),
+    Key) :-
+    member(OriginalPredicate, OriginalPredicates),
+    OriginalPredicate = mnn_pred(FoundKey, _, _, _, _),
+    FoundKey == Key,
+    member(CandidatePredicate, CandidatePredicates),
+    CandidatePredicate = mnn_pred(CandidateKey, _, _, _, _),
+    CandidateKey == Key,
+    OriginalPredicate =@= CandidatePredicate.
 
 unchanged_unselected_predicate(_, Key,
                                mnn_pred(FoundKey, _, _, _, _)) :-

@@ -34,8 +34,7 @@ test(keeps_program_with_multiple_supported_conversions) :-
     findall_program(Original0),
     Original0 = mnn_program(Name, Meta, Predicates, Proof0, Trace),
     Predicates = [Facts, Values],
-    Values = mnn_pred(_, Modes, Domains, [Clause], Status),
-    Clause = mnn_clause(_, _, Body, Source),
+    Values = mnn_pred(_, Modes, Domains, [_], Status),
     Clause2 = mnn_clause(4, values_again(Again),
                          findall(X, num(X), Again), source(test, 4)),
     Original = mnn_program(
@@ -48,8 +47,7 @@ test(keeps_program_with_multiple_supported_conversions) :-
     mnn_plop:optimize_program(
         Original, Optimized,
         plop_report([kept(multiple_conversions(2))], _, unchanged)),
-    assertion(Optimized =@= Original),
-    assertion(Body = findall(_, _, _)).
+    assertion(Optimized =@= Original).
 
 test(reports_unknown_single_predicate) :-
     findall_program(Program),

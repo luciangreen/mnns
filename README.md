@@ -9,9 +9,10 @@ and finite-generator loop conversion.
 This repository implements only a subset of the full vision in
 [`PROGRAM_REQUIREMENTS.md`](PROGRAM_REQUIREMENTS.md). It includes an initial
 Detlog analysis but not Detlog transformations, and does not yet provide the
-end-user MNN compiler, S2A/Starlog, PLOp, AIOC, neural-network, chatbot, or agent
-features. See [`PROGRESS.md`](PROGRESS.md) for the current implementation and
-remaining work.
+end-user MNN compiler, S2A/Starlog, the general PLOp optimizer, AIOC,
+neural-network, chatbot, or agent features. A proof-gated PLOp pipeline currently
+exposes one independently checked finite-generator conversion. See
+[`PROGRESS.md`](PROGRESS.md) for the current implementation and remaining work.
 
 ## Implemented features
 
@@ -79,11 +80,18 @@ remaining work.
   unchanged, and the conversion report is an obligation—not an independently
   checked proof.
   See [`docs/loop2.md`](docs/loop2.md).
+- **PLOp pipeline (initial slice):** whole-program and single-predicate entry
+  points reuse the finite-generator conversion and apply it only when the
+  independent proof checker accepts the result. This slice accepts at most one
+  conversion per run; unsupported or ambiguous cases are left unchanged. It does
+  not yet implement closed-form discovery, a cost model, or the general PLOp
+  rewrite set. See [`docs/current_features.md`](docs/current_features.md#plop-pipeline).
 
 ## Requirements
 
 Install SWI-Prolog 9.x or 10.x. On Debian or Ubuntu:
 
+swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 ```sh
 sudo apt-get install swi-prolog-nox
 ```
