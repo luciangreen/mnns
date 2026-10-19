@@ -22,6 +22,7 @@ sharing a change.
 | Tail recursion analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Detlog determinism analysis | `prolog/detlog/detlog.pl` | `swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"` | [Detlog analysis](detlog.md) |
 | loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
+| Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
 
 Run the complete suite, including every group above, with:
 
@@ -198,6 +199,30 @@ generators and on the built-in subsets documented in [`proof_rules.md`](proof_ru
 Other filters and conversions remain unchecked; do not treat them as
 proof-certified. See [`loop2.md`](loop2.md).
 
+## PLOp pipeline
+
+`mnn_plop:optimize_program/3` and `mnn_plop:optimize_predicate/4` share one
+conservative pipeline. It calls the existing loop2 finite-generator conversion,
+then submits the candidate and a `findall_to_fold` proof step to the independent
+proof checker. A candidate is returned only when the checker accepts it.
+
+At most one supported conversion may be applied in a run. If the converter finds
+multiple conversions, the input is returned unchanged. The single-predicate entry
+point also keeps the input unchanged unless its one conversion changes only the
+requested predicate. Both entry points return `plop_report(Events, Proof, Status)`;
+unchanged inputs include an identity proof, and accepted output includes the
+checked rewrite proof. The pipeline does not infer costs and does not yet perform
+unfold/fold search, memoization, common-subgoal hoisting, closed-form discovery,
+or the other general PLOp rewrites. The accepted conversion subset and its
+limitations are those documented for [loop2](loop2.md); output is proof-gated but
+this initial pipeline does not claim to estimate or improve runtime cost.
+
+Run PLOp tests with:
+
+```sh
+swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
+```
+
 ## Test commands
 
 Run every test, including the corpus and all subsystem tests:
@@ -216,6 +241,7 @@ swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_che
 swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"
 swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
 swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
+swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 ```
 
 The single canonical full-suite command is also used in CI. Individual test
@@ -236,7 +262,9 @@ The current work is an initial subset, not a completed version 1 suite:
   has only conservative success-count analysis;
   mode inference, Detlog code generation, and choicepoint/cut transformations
   are not implemented.
-- **Stages 6–14 are not started:** PLOp, AlgebraPLOp, S2A/Starlog, the AIOC
+- **Stage 6 is in progress only for the proof-gated pipeline described above**;
+  its full rewrite search and closed-form discovery remain unimplemented.
+- **Stages 7–14 are not started:** AlgebraPLOp, S2A/Starlog, the AIOC
   pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 
