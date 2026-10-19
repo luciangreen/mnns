@@ -152,7 +152,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   remain unimplemented.
 - **Stage 7 — AlgebraPLOp: in progress (initial sequence-inference slice).**
   `mnn_algebraplop:infer_sequence_formula/2` recognizes exact constant, affine,
-  quadratic, and higher-degree integer polynomial sequences. Higher-degree
+  quadratic, higher-degree integer polynomial, and integer-base geometric
+  sequences. Geometric candidates are checked against all samples, including at
+  least one held-out sample. Higher-degree
   candidates use Newton forward differences, are fitted from degree-plus-one
   samples, and require at least one held-out sample; every supplied value is
   checked. Results report `verified_on(Samples)` and do not claim a proof.
@@ -169,7 +171,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `append/3`, `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; independent proof checks cover ground facts and finite acyclic rule chains with restricted pure bodies, plus documented built-in generator subsets; nested findall and general checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes ground-list `select/3` with partially instantiated value/remainder patterns, `member/2` over an unbound list for independent element patterns, `select/3` with three distinct unbound arguments, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths or distinct unbound list/length variables, selected `append/3` modes, and counts capped at two for ground calls to ground-fact-only predicates; restricted pure `once/1` compilation includes built-in `member/2` and `between/3` when not shadowed by source definitions; general mode inference, other bound/repeated-argument calls, choicepoint splicing, choice packets, and cut conversion remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
-| 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial sequence inference with held-out validation; program-position extraction, inverses, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
+| 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; program-position extraction, inverses, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | Not started |
 | 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | Not started |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
