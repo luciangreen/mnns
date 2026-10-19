@@ -59,8 +59,12 @@ the first two arguments are distinct unbound variables and the third is a ground
 proper list, the empty list has one split and is deterministic, while a nonempty
 list has multiple splits and is classified as multi. The analyzer checks the
 relation on copies of the arguments in the one-unbound mode; nonmatching lists
-fail. Other calls with two or more unbound arguments, non-list or non-ground
-inputs, and locally defined `append/3` remain unsupported.
+fail. It also classifies the two modes with an unbound output and one ground input
+(`append(Prefix, GroundSuffix, List)` and
+`append(GroundPrefix, Suffix, List)`) as multi: each has at least two possible
+list results. Repeated-variable modes, other calls with two or more unbound
+arguments, non-list or non-ground inputs, and locally defined `append/3` remain
+unsupported.
 Pairwise non-unifiable clause heads are treated as exclusive. Calls to acyclic
 user predicates in the same program are analyzed recursively when every call
 argument is a distinct unbound variable (zero-arity calls satisfy this condition).

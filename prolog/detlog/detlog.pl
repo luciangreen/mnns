@@ -296,12 +296,27 @@ append_ground_mode(Prefix, Suffix, List, Outcomes) :-
     ;   Outcomes = [2]
     ).
 append_ground_mode(Prefix, Suffix, List, Outcomes) :-
+    append_unbounded_mode(Prefix, Suffix, List),
+    !,
+    Outcomes = [2].
+append_ground_mode(Prefix, Suffix, List, Outcomes) :-
     append_supported_list_mode([Prefix, Suffix, List]),
     copy_term((Prefix, Suffix, List), (PrefixCopy, SuffixCopy, ListCopy)),
     (   append(PrefixCopy, SuffixCopy, ListCopy)
     ->  Outcomes = [1]
     ;   Outcomes = [0]
     ).
+
+append_unbounded_mode(Prefix, Suffix, List) :-
+    var(Prefix),
+    ground_proper_list(Suffix),
+    var(List),
+    Prefix \== List.
+append_unbounded_mode(Prefix, Suffix, List) :-
+    ground_proper_list(Prefix),
+    var(Suffix),
+    var(List),
+    Suffix \== List.
 
 append_supported_list_mode([Prefix, Suffix, List]) :-
     var(Prefix),
