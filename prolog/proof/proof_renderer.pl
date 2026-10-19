@@ -117,8 +117,11 @@ render_step_summary(findall_to_fold) :-
     render_findall_to_fold.
 
 render_findall_to_fold :-
-    format('One direct findall over a supported generator was replaced by a ', []),
-    format('verified deterministic list-copy helper. Supported forms include ', []),
-    format('ground proper-list member/2, select/3, nth0/3, nth1/3, and length/2, ', []),
-    format('plus bounded between/3. Filters and other generator forms are not ', []),
-    format('certified.~n~n', []).
+    format('One direct findall over a supported finite generator was replaced ', []),
+    format('by a verified deterministic list-copy helper. Supported forms include ', []),
+    format('ground-fact predicates, finite acyclic source-rule chains with ', []),
+    format('restricted pure bodies, ground proper-list member/2, select/3, ', []),
+    format('append/3, nth0/3, nth1/3, and length/2, plus bounded integer-literal ', []),
+    format('between/3. Supported filters are whitelisted arithmetic comparisons ', []),
+    format('that are ground when reached; templates must be ground for every ', []),
+    format('produced result.~n~n', []).

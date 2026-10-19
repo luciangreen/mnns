@@ -1213,6 +1213,11 @@ test(render_checked_findall_to_fold) :-
     mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown),
     assertion(sub_string(Markdown, _, _, _, 'findall_to_fold')),
     assertion(sub_string(Markdown, _, _, _, 'ground proper-list')),
+    assertion(sub_string(Markdown, _, _, _, 'finite acyclic source-rule chains')),
+    assertion(sub_string(Markdown, _, _, _, 'whitelisted arithmetic comparisons')),
+    assertion(sub_string(Markdown, _, _, _, 'templates must be ground')),
+    assertion(\+ sub_string(Markdown, _, _, _,
+                            'Filters and other generator forms are not certified')),
     assertion(sub_string(Markdown, _, _, _, 'Independent check:** accepted.')).
 
 test(render_checked_nth0_index_findall_to_fold) :-

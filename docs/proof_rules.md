@@ -191,11 +191,25 @@ definition-introduction, unfold, fold, and restricted findall-to-fold steps.
 Rendering is explanatory and
 does not itself certify a proof.
 
-`mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` renders a
-Markdown report and includes the independent checker's result. Accepted identity
-proofs are explained as alpha-equivalence of the complete IR terms; rejected or
-unsupported proofs are shown as quoted Prolog terms and are clearly marked as
-rejected.
+`mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` independently
+checks the proof, then renders a Markdown report with the checker's result.
+Accepted identity proofs are explained as alpha-equivalence of the complete IR
+terms. Accepted findall-to-fold steps are summarized for ground-fact predicates,
+finite acyclic source-rule chains with restricted pure bodies, ground proper-list
+`member/2`, `select/3`, `append/3`, `nth0/3`, `nth1/3`, and `length/2`, and bounded
+integer-literal `between/3`. The summary includes the supported arithmetic-filter
+and ground-template conditions; the exact accepted subset is defined above.
+Rejected or unsupported proofs are shown as quoted Prolog terms and clearly marked
+as rejected. Rendering is explanatory; the independent checker result is the
+certification.
+
+Run the renderer tests as part of the proof-checker suite:
+
+```sh
+swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"
+```
+
+Run all tests with `swipl -q -s tests/run.pl`.
 
 Several checked rewrites may be composed in one proof by listing their steps in
 order. For a multi-step proof, each step is independently validated against the
