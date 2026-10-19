@@ -191,6 +191,9 @@ goal_outcomes(Goal, _, _, Outcomes) :-
 goal_outcomes(Goal, _, _, [0, 1]) :-
     semidet_builtin(Goal),
     !.
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    ground_fact_goal(Goal, Predicates, Outcomes),
+    !.
 goal_outcomes(Goal, Predicates, _, [2]) :-
     nonvar(Goal),
     Goal = append(Prefix, Suffix, List),
@@ -201,6 +204,40 @@ goal_outcomes(Goal, Predicates, Stack, Outcomes) :-
     user_predicate_goal(Goal, Predicates, Stack, Outcomes),
     !.
 goal_outcomes(Goal, _, _, unavailable(unsupported_goal(Goal))).
+
+ground_fact_goal(Goal, Predicates, Outcomes) :-
+    nonvar(Goal),
+    callable(Goal),
+    ground(Goal),
+    Goal =.. [Name|Arguments],
+    length(Arguments, Arity),
+    Key = Name/Arity,
+    member(mnn_pred(Key, _, _, Clauses, _), Predicates),
+    ground_fact_clauses(Clauses),
+    count_ground_fact_matches(Goal, Clauses, 0, Count),
+    (   Count =:= 0
+    ->  Outcomes = [0]
+    ;   Count =:= 1
+    ->  Outcomes = [1]
+    ;   Outcomes = [2]
+    ).
+
+ground_fact_clauses([]).
+ground_fact_clauses([mnn_clause(_, Head, true, _)|Clauses]) :-
+    ground(Head),
+    ground_fact_clauses(Clauses).
+
+count_ground_fact_matches(_, [], Count, Count).
+count_ground_fact_matches(Goal, [mnn_clause(_, Head, true, _)|Clauses],
+                          Count0, Count) :-
+    (   Head =@= Goal
+    ->  Count1 is min(2, Count0 + 1)
+    ;   Count1 = Count0
+    ),
+    (   Count1 =:= 2
+    ->  Count = 2
+    ;   count_ground_fact_matches(Goal, Clauses, Count1, Count)
+    ).
 
 user_predicate_goal(Goal, Predicates, Stack, Outcomes) :-
     nonvar(Goal),
