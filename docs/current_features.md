@@ -17,7 +17,7 @@ sharing a change.
 | Program IR, parser and emitter | `prolog/ir/ir.pl` | `swipl -q -g "load_files('tests/ir_tests.pl'), run_tests(mnn_ir), halt"` | [IR section](#program-ir) |
 | Round-trip corpus | `tests/corpus/` | `swipl -q -g "load_files('tests/test_corpus.pl'), run_tests(mnn_ir_corpus), halt"` | [IR section](#program-ir) |
 | Sandboxed execution | `prolog/runner/sandbox_runner.pl` | `swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"` | [Sandboxed execution](#sandboxed-execution) |
-| Proof checker and renderer | `prolog/proof/` | `swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"` | [Proof checking](proof_rules.md) |
+| Proof checker and renderer | `prolog/proof/` | `swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"` | [Proof checking](proof_rules.md); [Proof rendering](#proof-rendering) |
 | PID analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Tail recursion analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Detlog determinism analysis | `prolog/detlog/detlog.pl` | `swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"` | [Detlog analysis](detlog.md) |
@@ -102,6 +102,25 @@ generators remain unsupported. The renderer creates Markdown explanations but
 does not certify proofs. General
 purity analysis, general clause/goal reordering, and most proof rules in the
 requirements remain unsupported.
+
+## Proof rendering
+
+`mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` first calls
+the independent proof checker and returns a Markdown report containing its
+result. Accepted supported steps receive explanatory summaries; rejected or
+unsupported proofs are displayed as quoted Prolog terms and marked with the
+checker result. The report includes domain and mode annotations but does not
+infer them. Identity, restricted goal reordering, definition introduction,
+unfold, fold, and supported `findall_to_fold` steps can be rendered. Rendering
+does not itself certify a proof; certification comes from the independent
+checker. See [`proof_rules.md`](proof_rules.md) for supported proof rules and
+their limitations.
+
+Run the renderer tests with the proof-checker suite:
+
+```sh
+swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"
+```
 
 ## PID analysis
 
