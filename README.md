@@ -59,7 +59,8 @@ exposes one independently checked finite-generator conversion. See
   and `length/2` calls
   over ground proper lists are classified when the length is unbound or a
   nonnegative integer, while variable lists with fixed nonnegative lengths are
-  classified as deterministic. Ground proper-list `nth0/3` and `nth1/3` calls are
+  classified as deterministic; distinct unbound list and length variables are
+  classified as multi. Ground proper-list `nth0/3` and `nth1/3` calls are
   classified for variable or integer indices and variable or ground elements,
   preserving zero-/one-based indexing and duplicate-position counts. `append/3`
   is classified as multi when all three

@@ -808,6 +808,30 @@ test(classifies_variable_list_with_fixed_nonnegative_length) :-
                                  determinism(det), success_counts([1])),
                         Results)).
 
+test(classifies_distinct_unbound_length_arguments_as_multi) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(generates_any_length/0, [], [],
+                            [mnn_clause(1, generates_any_length,
+                                       length(_List, _Length),
+                                       source(sample, 1))],
+                            original),
+                   mnn_pred(aliased_length_arguments/1, ['?'], [any],
+                            [mnn_clause(2, aliased_length_arguments(Value),
+                                       length(Value, Value),
+                                       source(sample, 2))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(generates_any_length/0,
+                                 mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                        Results)),
+    assertion(memberchk(predicate(aliased_length_arguments/1,
+                                 mode(all_arguments_unbound),
+                                 unavailable(unsupported_goal(length(_, _))),
+                                 unsupported_body), Results)).
+
 test(reports_unsupported_length_shapes_and_local_definition) :-
     Program = mnn_program(
                   sample, meta(sample, []),
