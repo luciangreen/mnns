@@ -45,7 +45,13 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   `between/3` conversions with integer bounds and a variable or integer value,
   for ranges up to 10,000, including supported arithmetic-comparison filters,
   and calls to predicates whose clauses are all ground facts with supported
-  arithmetic-comparison filters. Fact order,
+  arithmetic-comparison filters. It now also independently checks finite
+  acyclic rule generators whose clauses are ground facts or rules composed only
+  of `true`, `fail`, conjunction, disjunction, supported arithmetic comparisons,
+  and calls to other supported source predicates. The checker interprets these
+  rules without executing the source and preserves clause order and duplicate
+  derivations; recursive dependencies, unsupported goals, unsafe filters, and
+  non-ground passing templates are rejected. Fact order,
   duplicate facts, and bound or
   partially instantiated call patterns are checked by rebuilding the output;
   every matching template must be ground. Selection order, duplicate positions,
@@ -57,7 +63,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   supported arithmetic-comparison filters on ground-list `member/2`, `select/3`,
   `nth0/3`, and `nth1/3` conversions, plus
   supported arithmetic filters on bounded integer-literal `between/3`.
-  Rule generators, filters on the other built-in generators, other findall
+  Filters on the other built-in generators, nested findall, other findall
   conversions, general purity/determinism analysis, general goal/clause
   reordering, and the other proof rules remain unsupported.
 - **Stage 3 — PID: in progress.** The call-graph analysis classifies predicates
@@ -97,7 +103,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   with supported arithmetic-comparison filters and ground-list `member/2`,
   `select/3`, `nth0/3`, and `nth1/3` subsets with supported arithmetic filters,
   plus direct no-filter `nth0/3`/`nth1/3` index and `length/2` subsets and bounded
-  integer-literal `between/3` with supported arithmetic filters.
+  integer-literal `between/3` with supported arithmetic filters, and finite
+  acyclic rule generators with the restricted pure bodies described above.
   Conversion traverses supported `findall/3` goals inside normalized
   conjunction, disjunction, if-then-else, negation, and `once/1`, preserving the
   surrounding control structure. The converter emits a distinct deterministic
@@ -112,9 +119,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, ground-fact generators and ground-list member/select/nth0/nth1/length conversions with supported arithmetic filters, no-filter nth0-index/nth1-index/length conversions, and bounded integer-literal between conversions with supported arithmetic filters) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, ground-fact and finite acyclic rule generators with restricted pure bodies and supported arithmetic filters, ground-list member/select/nth0/nth1/length conversions with supported arithmetic filters, no-filter nth0-index/nth1-index/length conversions, and bounded integer-literal between conversions with supported arithmetic filters) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
-| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; independent proof checks include filters on member/select/nth0/nth1/bounded between; nested findall and general checked conversion proofs remain) |
+| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; independent proof checks cover ground facts and finite acyclic rule chains with restricted pure bodies, plus documented built-in generator subsets; nested findall and general checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative count analysis for a limited set of normalized goals in the all-arguments-unbound mode, including acyclic calls with distinct unbound arguments, ground whitelisted built-ins with exceptions reported unavailable, bounded literal `between/3`, `member/2` over supported ground proper lists with variable, ground, or partially instantiated element patterns, `select/3` over supported ground proper lists, `nth0/3` and `nth1/3` over ground proper lists with variable/integer indices and variable/ground elements, `length/2`, `append/3` with three distinct unbound arguments, all ground proper-list arguments, exactly one unbound argument and two ground proper lists, or two distinct unbound arguments with a ground proper list, and `once/1` count capping; general mode inference, most bound/repeated-argument calls, choicepoint/cut transformations, runtime constructs, and fallback diagnostics remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |

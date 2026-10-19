@@ -132,6 +132,15 @@ generator conversion:
   and `rem`. The template must be ground for each successful fact; rules and
   non-ground facts are not accepted by this proof case. A comparison that raises
   an arithmetic exception is not certified.
+- `findall(Template, Goal, Results)`, where `Goal` calls a finite, acyclic chain
+  of source predicates. Every clause in the chain must be a ground fact or a rule
+  whose body contains only `true`, `fail`, conjunction, disjunction, calls to
+  other supported source predicates, and whitelisted arithmetic comparisons.
+  Comparisons must be ground when reached and must not raise arithmetic
+  exceptions. The checker interprets clause and goal order independently,
+  preserves duplicate derivations, and requires a ground template for every
+  passing derivation. Recursive dependencies and unsupported body goals are
+  rejected; the source program is never executed.
 
 For each case, it reconstructs the complete expected output IR: the source call
 must be replaced by a call to a fresh helper containing the independently
@@ -160,10 +169,11 @@ arithmetic-comparison filters,
 the stated distinct-variable `nth0/3` and `nth1/3` index forms with or without
 supported arithmetic filters, the stated `length/2` form with or without
 supported arithmetic filters, and bounded
-`between/3`. They do not certify rule generators, filters on built-in generators
-other than `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and `between/3`,
-nested findall, other list generators, or arbitrary `findall/3` rewrites. Ground
-domain and mode annotations are required but are not inferred.
+`between/3`, plus finite acyclic rule generators with the restricted bodies
+described above. Filters on built-in generators other than `member/2`, `select/3`,
+`nth0/3`, `nth1/3`, `length/2`, and `between/3`, nested findall, other list
+generators, and arbitrary `findall/3` rewrites are not certified. Ground domain
+and mode annotations are required but are not inferred.
 The checker does not import or invoke the loop2 converter.
 
 The checker still does not implement general purity/determinism analysis,

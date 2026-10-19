@@ -64,17 +64,21 @@ condition (ground facts, finite acyclic rules, a ground list, or a bounded
 `between/3` range), safe-arithmetic-filter condition, and deterministic-loop
 condition. The report is an obligation, not itself a checked proof. The
 independent proof checker validates conversions over predicates consisting
-entirely of ground facts, including supported arithmetic-comparison filters, plus
-ground-list `member/2` and `select/3` with or without supported
-arithmetic-comparison filters, `nth0/3`/`nth1/3` indices with supported filters,
-`length/2`, and bounded `between/3`. For a ground-fact generator, the checker
-preserves fact order and duplicates and accepts bound or partially instantiated
-call arguments when every successful template is ground. Arithmetic filters are
-limited to the comparisons and expressions above, must be ground after matching
-each fact, and are not certified if evaluation raises an exception. Conversions
-involving rule generators, filters on built-in generators other than `member/2`,
-`select/3`, `nth0/3`, `nth1/3`, and bounded `between/3`, or other forms are not
-independently checked. Do not treat such output as proof-certified.
+entirely of ground facts, including supported arithmetic-comparison filters, and
+finite acyclic rule generators whose clauses use only ground facts, conjunction,
+disjunction, `true`, `fail`, supported arithmetic comparisons, and calls to other
+supported source predicates. It also checks ground-list `member/2` and
+`select/3` with or without supported arithmetic-comparison filters,
+`nth0/3`/`nth1/3` indices with supported filters, `length/2`, and bounded
+`between/3`. For rule generators, clause and answer order and duplicate
+derivations are preserved; recursive dependencies, unsupported body goals,
+unsafe filters, arithmetic exceptions, and passing non-ground templates are
+rejected. For a ground-fact generator, the checker preserves fact order and
+duplicates and accepts bound or partially instantiated call arguments when
+every successful template is ground. Arithmetic filters are limited to the
+comparisons and expressions above and must be ground when reached. Conversions
+involving unsupported built-in filters or other forms are not independently
+checked. Do not treat such output as proof-certified.
 
 Run the full suite, including loop2 tests, with:
 
