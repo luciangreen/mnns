@@ -41,6 +41,41 @@ test(infers_geometric_sequence_with_zero_base) :-
     mnn_algebraplop:infer_sequence_formula(
         [5, 0, 0], formula(exponential(5, 0), verified_on([5, 0, 0]))).
 
+test(evaluates_supported_formula_families) :-
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(constant(7), verified_on([7, 7, 7])), 12, value(7)),
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(linear(2, 3), verified_on([3, 5, 7])), 4, value(11)),
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(quadratic(1, 3, 2), verified_on([1, 4, 9])), 3, value(16)),
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(polynomial([1, 7, 12, 6]), verified_on([])), 4, value(125)),
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(exponential(-2, -2), verified_on([])), 3, value(16)).
+
+test(evaluates_zero_exponent_and_negative_positions_rejected) :-
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(exponential(5, 0), verified_on([])), 0, value(5)),
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(linear(2, 3), verified_on([])), -1, no_value).
+
+test(rejects_unsupported_or_invalid_formula_values) :-
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(unknown(1), verified_on([])), 0, no_value),
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(polynomial([]), verified_on([])), 1, no_value),
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(linear(slope, 3), verified_on([])), 1, no_value),
+    mnn_algebraplop:evaluate_sequence_formula(
+        formula(constant(7), verified_on([])), 1.0, no_value).
+
+test(evaluation_is_deterministic) :-
+    call_cleanup(
+        mnn_algebraplop:evaluate_sequence_formula(
+            formula(polynomial([1, 7, 12, 6]), verified_on([])), 4, _),
+        Deterministic = true),
+    assertion(Deterministic == true).
+
 test(rejects_geometric_candidate_that_fails_held_out_sample) :-
     mnn_algebraplop:infer_sequence_formula([2, 4, 8, 15], no_formula).
 

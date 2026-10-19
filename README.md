@@ -101,8 +101,9 @@ exposes one independently checked finite-generator conversion. See
   affine, quadratic, higher-degree integer polynomial, and integer-base geometric
   sequences and checks all provided samples, including held-out samples for fitted
   formulas. Exact inverse lookup is available for constant, affine, and
-  integer-base geometric and polynomial formulas; program positions and
-  proof-backed formulas remain unsupported. See
+  integer-base geometric and polynomial formulas. Supported formulas can also be
+  evaluated at exact nonnegative positions; program positions and proof-backed
+  formulas remain unsupported. See
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
 
 ## Requirements

@@ -1,7 +1,54 @@
 :- module(mnn_algebraplop,
           [ infer_sequence_formula/2,
-            invert_sequence_formula/3
+            invert_sequence_formula/3,
+            evaluate_sequence_formula/3
           ]).
+
+evaluate_sequence_formula(Formula, Position, Result) :-
+    (   integer(Position),
+        Position >= 0,
+        Formula = formula(Shape, verified_on(_)),
+        sequence_value(Shape, Position, Value)
+    ->  Result = value(Value)
+    ;   Result = no_value
+    ),
+    !.
+
+sequence_value(constant(Value), _, Value) :-
+    integer(Value).
+sequence_value(linear(Slope, Intercept), Position, Value) :-
+    integer(Slope),
+    integer(Intercept),
+    Value is Slope * Position + Intercept.
+sequence_value(quadratic(Intercept, FirstDifference, SecondDifference),
+               Position, Value) :-
+    integer(Intercept),
+    integer(FirstDifference),
+    integer(SecondDifference),
+    SecondOrderTerm is Position * (Position - 1) // 2,
+    Value is Intercept + FirstDifference * Position +
+            SecondDifference * SecondOrderTerm.
+sequence_value(polynomial(Coefficients), Position, Value) :-
+    is_list(Coefficients),
+    Coefficients \= [],
+    maplist(integer, Coefficients),
+    newton_value(Coefficients, Position, Value).
+sequence_value(exponential(Initial, Base), Position, Value) :-
+    integer(Initial),
+    integer(Base),
+    integer_power(Base, Position, Power),
+    Value is Initial * Power.
+
+integer_power(_, 0, 1) :-
+    !.
+integer_power(Base, Exponent, Power) :-
+    Exponent > 0,
+    HalfExponent is Exponent // 2,
+    integer_power(Base, HalfExponent, HalfPower),
+    (   0 is Exponent mod 2
+    ->  Power is HalfPower * HalfPower
+    ;   Power is Base * HalfPower * HalfPower
+    ).
 
 invert_sequence_formula(Formula, Value, Result) :-
     (   integer(Value),
