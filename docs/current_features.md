@@ -145,7 +145,11 @@ ground proper lists when its selected value and remainder are unbound or ground;
 duplicate positions count separately, and ground patterns constrain the result.
 When all three arguments are distinct unbound variables, it is classified as
 multi; aliases, other list/value shapes, and locally defined `select/3`
-predicates remain unsupported by the built-in cases.
+predicates remain unsupported by the built-in cases. With an unbound list and a
+ground selected value plus unbound remainder, it is multi. With a ground
+proper-list remainder and an unbound list, an empty remainder is deterministic
+and a nonempty remainder is multi when the selected value is ground or an
+independent variable.
 Ground proper-list `nth0/3` and `nth1/3` calls are classified when the index is
 variable or integer and the element is variable or ground; zero-/one-based
 indexing and duplicate matching elements are accounted for. Shared unbound

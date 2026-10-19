@@ -40,6 +40,12 @@ partially instantiated value or remainder patterns, and a program-defined
 are distinct unbound variables, the call is classified as multi because the
 built-in admits at least two list/value/remainder solutions. Repeated-variable
 calls and program-defined `select/3` predicates are not treated as this mode.
+For an unbound list, a ground selected value with an unbound remainder is
+classified as multi. With a ground proper-list remainder and an unbound list,
+the call has one success when the remainder is empty and multiple successes when
+it is nonempty, whether the selected value is ground or an independent unbound
+variable. A selected value aliased with the unbound list, partially instantiated
+patterns, and locally defined `select/3` remain unavailable.
 The built-in `length/2` is also classified when its first argument is a ground
 proper list and its length argument is unbound or a nonnegative integer. An
 unbound length succeeds exactly once; a matching nonnegative integer succeeds
@@ -129,6 +135,6 @@ lengths, and distinct unbound list and length variables, as well as unsupported
 aliases, improper lists, negative lengths, and local definitions. Ground
 user-call tests cover matching, missing and duplicate facts,
 as well as rejection of non-fact definitions.
-The `select/3` tests cover ground proper lists and the distinct-unbound mode,
-including duplicate positions, constrained results, aliases, and local
-definitions.
+The `select/3` tests cover ground proper lists, the distinct-unbound mode, and
+unbound lists with ground selected values or proper-list remainders, including
+duplicate positions, constrained results, aliases, and local definitions.

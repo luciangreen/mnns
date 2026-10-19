@@ -721,6 +721,78 @@ test(classifies_select_with_distinct_unbound_arguments_as_multi) :-
                                 determinism(multi), success_counts([2])),
                         Results)).
 
+test(classifies_select_with_unbound_list_and_ground_value) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(unbounded_remainder/0, [], [],
+                           [mnn_clause(1, unbounded_remainder,
+                                      select(a, _List, _Rest),
+                                      source(sample, 1))],
+                           original),
+                   mnn_pred(empty_remainder/0, [], [],
+                           [mnn_clause(2, empty_remainder,
+                                      select(a, _EmptyList, []),
+                                      source(sample, 2))],
+                           original),
+                   mnn_pred(nonempty_remainder/0, [], [],
+                           [mnn_clause(3, nonempty_remainder,
+                                      select(a, _NonemptyList, [a]),
+                                      source(sample, 3))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(unbounded_remainder/0,
+                                mode(all_arguments_unbound),
+                                determinism(multi), success_counts([2])),
+                        Results)),
+    assertion(memberchk(predicate(empty_remainder/0,
+                                mode(all_arguments_unbound),
+                                determinism(det), success_counts([1])),
+                        Results)),
+    assertion(memberchk(predicate(nonempty_remainder/0,
+                                mode(all_arguments_unbound),
+                                determinism(multi), success_counts([2])),
+                        Results)).
+
+test(classifies_select_with_unbound_value_and_ground_remainder) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(empty_remainder/0, [], [],
+                           [mnn_clause(1, empty_remainder,
+                                      select(_Value, _EmptyList, []),
+                                      source(sample, 1))],
+                           original),
+                   mnn_pred(nonempty_remainder/0, [], [],
+                           [mnn_clause(2, nonempty_remainder,
+                                      select(_Value, _NonemptyList, [a, a]),
+                                      source(sample, 2))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(empty_remainder/0,
+                                mode(all_arguments_unbound),
+                                determinism(det), success_counts([1])),
+                        Results)),
+    assertion(memberchk(predicate(nonempty_remainder/0,
+                                mode(all_arguments_unbound),
+                                determinism(multi), success_counts([2])),
+                        Results)).
+
+test(select_with_aliased_unbound_value_and_list_remains_unsupported) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(aliased_select/1, ['?'], [any],
+                           [mnn_clause(1, aliased_select(Value),
+                                      select(Value, Value, []),
+                                      source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(aliased_select/1,
+                                mode(all_arguments_unbound),
+                                unavailable(unsupported_goal(select(_, _, _))),
+                                unsupported_body), Results)).
+
 test(select_with_aliased_unbound_arguments_remains_unsupported) :-
     Program = mnn_program(
                   sample, meta(sample, []),
