@@ -97,9 +97,9 @@ exposes one independently checked finite-generator conversion. See
   Unsupported or ambiguous cases are left unchanged. It does not yet implement
   closed-form discovery, a cost model, or the general PLOp rewrite set. See
   [`docs/current_features.md`](docs/current_features.md#plop-pipeline).
-- **AlgebraPLOp (initial slice):** deterministically recognizes exact constant
-  and affine integer sequences and checks all provided samples; it does not infer
-  inverses, program positions, or proof-backed formulas. See
+- **AlgebraPLOp (initial slice):** deterministically recognizes exact constant,
+  affine, and quadratic integer sequences and checks all provided samples; it
+  does not infer inverses, program positions, or proof-backed formulas. See
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
 
 ## Requirements
