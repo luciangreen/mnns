@@ -45,9 +45,11 @@ remaining work.
   built-ins are evaluated for success or failure, bounded literal `between/3`
   calls are classified, and `once/1` caps reported successes at one. Choicepoint
   and cut transformations are not implemented yet. Finite built-in
-  `member/2` calls over ground proper lists are also classified, preserving
-  duplicate successes; `select/3` over ground proper lists counts duplicate
-  positions and honors ground value/remainder patterns; and `length/2` calls
+  `member/2` calls over ground proper lists are also classified for variable,
+  ground, and partially instantiated element patterns, preserving duplicate
+  successes without binding the analyzed program; `select/3` over ground proper
+  lists counts duplicate positions and honors ground value/remainder patterns;
+  and `length/2` calls
   over ground proper lists are classified when the length is unbound or a
   nonnegative integer. Ground proper-list `nth0/3` and `nth1/3` calls are
   classified for variable or integer indices and variable or ground elements,

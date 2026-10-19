@@ -95,9 +95,6 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     Goal = member(Value, List),
     ground(List),
     is_list(List),
-    (   var(Value)
-    ;   ground(Value)
-    ),
     \+ member(mnn_pred(member/2, _, _, _, _), Predicates),
     !,
     member_outcomes(Value, List, Outcomes).
@@ -451,9 +448,7 @@ member_outcomes(Value, List, [2]) :-
 
 member_success_count(_, [], Count, Count).
 member_success_count(Value, [Element|Elements], Count0, Count) :-
-    (   var(Value)
-    ->  Count1 is min(2, Count0 + 1)
-    ;   Value == Element
+    (   member_value_matches(Value, Element)
     ->  Count1 is min(2, Count0 + 1)
     ;   Count1 = Count0
     ),
@@ -461,6 +456,10 @@ member_success_count(Value, [Element|Elements], Count0, Count) :-
     ->  Count = 2
     ;   member_success_count(Value, Elements, Count1, Count)
     ).
+
+member_value_matches(Value, Element) :-
+    copy_term(Value, ValueCopy),
+    ValueCopy = Element.
 
 select_outcomes(Value, List, Rest, Outcomes) :-
     select_success_count(List, [], Value, Rest, 0, Count),

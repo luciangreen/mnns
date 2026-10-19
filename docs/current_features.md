@@ -113,10 +113,12 @@ success or failure, while exceptions are reported as unavailable. Bounded
 also classified, with success counts capped at two. Supported `once/1` goals
 retain possible failure but cap every positive success count at one; unsupported
 inner goals remain unavailable. The built-in `member/2` is classified for a
-ground proper list with a variable or ground element argument; duplicate matches
-count as multiple successes. Unsupported list/value shapes and locally defined
-`member/2` predicates are not assumed to be the built-in. Built-in `length/2`
-calls are classified for a ground proper list and an unbound or nonnegative
+ground proper list with a variable, ground, or partially instantiated element
+pattern. Each candidate is matched on a copy, preserving variable sharing without
+binding the analyzed program; duplicate matches count as multiple successes.
+Variable, improper, or non-ground lists and locally defined `member/2` predicates
+are unsupported. Built-in `length/2` calls are classified for a ground proper
+list and an unbound or nonnegative
 integer length: the unbound or matching length succeeds once, and a mismatch
 fails. Variable/improper lists and locally defined `length/2` predicates are not
 treated as this built-in case. Built-in `select/3` is classified for ground
