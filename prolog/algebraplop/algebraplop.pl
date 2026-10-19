@@ -35,6 +35,19 @@ infer_valid_sequence(Samples,
     verify_quadratic([Fourth|Rest], Third, FollowingDifference,
                      SecondDifference),
     !.
+infer_valid_sequence(Samples,
+                     formula(polynomial(Coefficients), verified_on(Samples))) :-
+    length(Samples, Count),
+    MaximumDegree is Count - 2,
+    between(3, MaximumDegree, Degree),
+    PrefixCount is Degree + 1,
+    length(Prefix, PrefixCount),
+    append(Prefix, HeldOut, Samples),
+    forward_coefficients(Prefix, Coefficients),
+    last(Coefficients, LeadingCoefficient),
+    LeadingCoefficient =\= 0,
+    verify_polynomial_samples(HeldOut, PrefixCount, Coefficients),
+    !.
 infer_valid_sequence(_, no_formula).
 
 verify_affine([], _, _).
@@ -49,3 +62,43 @@ verify_quadratic([Value|Values], Previous, Difference, SecondDifference) :-
     Value =:= Expected,
     NextDifference is Difference + SecondDifference,
     verify_quadratic(Values, Expected, NextDifference, SecondDifference).
+
+forward_coefficients([Value], [Value]) :-
+    !.
+forward_coefficients(Values, [FirstDifference|Coefficients]) :-
+    Values = [First|_],
+    FirstDifference = First,
+    adjacent_differences(Values, Differences),
+    forward_coefficients(Differences, Coefficients).
+
+adjacent_differences([_], []) :-
+    !.
+adjacent_differences([First, Second|Values], [Difference|Differences]) :-
+    Difference is Second - First,
+    adjacent_differences([Second|Values], Differences).
+
+verify_polynomial_samples([], _, _).
+verify_polynomial_samples([Sample|Samples], Position, Coefficients) :-
+    newton_value(Coefficients, Position, Expected),
+    Sample =:= Expected,
+    NextPosition is Position + 1,
+    verify_polynomial_samples(Samples, NextPosition, Coefficients).
+
+newton_value(Coefficients, Position, Value) :-
+    newton_value(Coefficients, Position, 0, 0, Value).
+
+newton_value([], _, _, Value, Value).
+newton_value([Coefficient|Coefficients], Position, Order, Accumulator, Value) :-
+    binomial(Position, Order, Binomial),
+    NextAccumulator is Accumulator + Coefficient * Binomial,
+    NextOrder is Order + 1,
+    newton_value(Coefficients, Position, NextOrder, NextAccumulator, Value).
+
+binomial(_, 0, 1) :-
+    !.
+binomial(Number, Order, Value) :-
+    Order > 0,
+    Order =< Number,
+    PreviousOrder is Order - 1,
+    binomial(Number, PreviousOrder, Previous),
+    Value is Previous * (Number - Order + 1) // Order.

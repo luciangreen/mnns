@@ -265,20 +265,26 @@ swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 `mnn_algebraplop:infer_sequence_formula/2` is an initial, conservative sequence
 inference slice. It accepts a proper list of at least three integers, treats the
 first value as position zero, and returns an exact constant, affine
-`linear(Slope, Intercept)`, or quadratic
-`quadratic(Intercept, FirstDifference, SecondDifference)` formula. The quadratic
-formula uses the Newton forward-difference form: at zero-based position `i`, its
-value is `Intercept + FirstDifference*i +
-SecondDifference*i*(i-1)/2`. It requires at least four samples so a fourth or
-later sample checks the candidate fitted from the first three. Every supplied
-sample is verified. Successful results use `verified_on(Samples)`; they are
-sample-verified, not accompanied by a proof. Unsupported or inconsistent samples
-return `no_formula`. The procedure is deterministic.
+`linear(Slope, Intercept)`, quadratic
+`quadratic(Intercept, FirstDifference, SecondDifference)`, or higher-degree
+`polynomial(NewtonCoefficients)` formula. For a polynomial, coefficient `k` is
+the first value in the `k`th forward-difference row; at zero-based position `i`,
+the result is the sum of `NewtonCoefficients[k] * binomial(i, k)`. For example,
+`polynomial([1, 7, 12, 6])` describes the cubic sequence beginning
+`1, 8, 27, 64, 125`.
 
-It does not infer exponentials, higher-degree or piecewise formulas, inverses,
-formulas from program index calculations, splice-index loops, or `r_spec`
-provenance. It also does not replace program code. In particular,
-`[2,4,8,16]` and prime samples return `no_formula`.
+The quadratic candidate is fitted from three samples and requires at least one
+held-out sample. Higher-degree candidates are fitted from degree-plus-one
+samples, require at least one held-out sample, and are tried in ascending degree
+through at most `sample_count - 2`. Every supplied sample is verified.
+Successful results use `verified_on(Samples)`; they are sample-verified, not
+accompanied by a proof. Unsupported or inconsistent samples return `no_formula`.
+The procedure is deterministic.
+
+It does not infer exponentials or piecewise formulas, inverses, formulas from
+program index calculations, splice-index loops, or `r_spec` provenance. It also
+does not replace program code. In particular, `[2,4,8,16]` and prime samples
+return `no_formula`.
 
 Run this focused suite from the repository root:
 
@@ -329,10 +335,11 @@ The current work is an initial subset, not a completed version 1 suite:
   packets, cut conversion, and fallback diagnostics are not implemented.
 - **Stage 6 is in progress only for the proof-gated pipeline described above**;
   its full rewrite search and closed-form discovery remain unimplemented.
-- **Stage 7 has an initial exact constant/affine sequence-inference slice** as
-  described above; inverse discovery, program-position extraction,
-  splice-index loops, `r_spec` provenance, complexity ranking, and proof-backed
-  formulas remain unimplemented. **Stages 8–14 are not started:** S2A/Starlog,
+- **Stage 7 has an initial exact constant/affine/quadratic and higher-degree
+  polynomial sequence-inference slice** as described above; inverse discovery,
+  program-position extraction, splice-index loops, `r_spec` provenance,
+  complexity ranking, and proof-backed formulas remain unimplemented. **Stages
+  8–14 are not started:** S2A/Starlog,
   the AIOC pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 
