@@ -117,7 +117,11 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   classifies selected normalized goals and acyclic user calls in the distinct
   unbound-argument mode. Built-in `member/2` also classifies an unbound list as
   multi when the element pattern is independent of that list; `select/3` with
-  three distinct unbound arguments is likewise classified as multi. Other
+  three distinct unbound arguments is likewise classified as multi. With an
+  unbound list, a ground selected value and unbound remainder is multi; a ground
+  proper-list remainder gives one success when empty and multiple successes
+  when nonempty for a ground selected value or independent unbound selected
+  value. Other
   built-in list cases include ground-list `member/2`,
   `select/3`, `nth0/3`, `nth1/3`, and `length/2`, plus `length(List, N)` for a
   variable `List` and fixed nonnegative integer `N`. This last case is

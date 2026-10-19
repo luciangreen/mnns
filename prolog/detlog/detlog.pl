@@ -106,6 +106,27 @@ goal_outcomes(Goal, Predicates, _, [2]) :-
     \+ identical_member(List, ValueVariables),
     \+ member(mnn_pred(member/2, _, _, _, _), Predicates),
     !.
+goal_outcomes(Goal, Predicates, _, [2]) :-
+    nonvar(Goal),
+    Goal = select(Value, List, Rest),
+    ground(Value),
+    var(List),
+    var(Rest),
+    \+ member(mnn_pred(select/3, _, _, _, _), Predicates),
+    !.
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    nonvar(Goal),
+    Goal = select(Value, List, Rest),
+    var(List),
+    (   var(Value),
+        Value \== List
+    ;   ground(Value)
+    ),
+    ground(Rest),
+    is_list(Rest),
+    \+ member(mnn_pred(select/3, _, _, _, _), Predicates),
+    !,
+    select_unbound_list_outcomes(Rest, Outcomes).
 goal_outcomes(Goal, Predicates, _, Outcomes) :-
     nonvar(Goal),
     Goal = select(Value, List, Rest),
@@ -568,6 +589,10 @@ select_outcomes(Value, List, Rest, Outcomes) :-
     ->  Outcomes = [1]
     ;   Outcomes = [2]
     ).
+
+select_unbound_list_outcomes([], [1]) :-
+    !.
+select_unbound_list_outcomes(_, [2]).
 
 select_success_count([], _, _, _, Count, Count).
 select_success_count([Element|Elements], Prefix, Value, Rest,
