@@ -19,6 +19,7 @@ sharing a change.
 | Sandboxed execution | `prolog/runner/sandbox_runner.pl` | `swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"` | [Sandboxed execution](#sandboxed-execution) |
 | Proof checker and renderer | `prolog/proof/` | `swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"` | [Proof checking](proof_rules.md) |
 | PID analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
+| Tail recursion analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Detlog determinism analysis | `prolog/detlog/detlog.pl` | `swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"` | [Detlog analysis](detlog.md) |
 | loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
 
@@ -126,7 +127,10 @@ ground proper list with a variable, ground, or partially instantiated element
 pattern. Each candidate is matched on a copy, preserving variable sharing without
 binding the analyzed program; duplicate matches count as multiple successes.
 Variable, improper, or non-ground lists and locally defined `member/2` predicates
-are unsupported. Built-in `length/2` calls are classified for a ground proper
+are unsupported for this finite-list case. An unbound list with an independent
+variable, ground, or structured element pattern is classified as multi because
+matching elements can occur at multiple positions; an element pattern that
+aliases the list is unsupported. Built-in `length/2` calls are classified for a ground proper
 list and an unbound or nonnegative
 integer length: the unbound or matching length succeeds once, and a mismatch
 fails. Variable/improper lists and locally defined `length/2` predicates are not

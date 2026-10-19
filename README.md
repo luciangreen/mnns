@@ -51,6 +51,8 @@ remaining work.
   ground, and partially instantiated element patterns, preserving duplicate
   successes without binding the analyzed program; `select/3` over ground proper
   lists counts duplicate positions and honors ground value/remainder patterns;
+  `member/2` over an unbound list is classified as multi when the element pattern
+  does not alias that list;
   and `length/2` calls
   over ground proper lists are classified when the length is unbound or a
   nonnegative integer, while variable lists with fixed nonnegative lengths are
