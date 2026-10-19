@@ -81,11 +81,11 @@ exposes one independently checked finite-generator conversion. See
   checked proof.
   See [`docs/loop2.md`](docs/loop2.md).
 - **PLOp pipeline (initial slice):** whole-program and single-predicate entry
-  points reuse the finite-generator conversion and apply it only when the
-  independent proof checker accepts the result. This slice accepts at most one
-  conversion per run; unsupported or ambiguous cases are left unchanged. It does
-  not yet implement closed-form discovery, a cost model, or the general PLOp
-  rewrite set. See [`docs/current_features.md`](docs/current_features.md#plop-pipeline).
+  points reuse the finite-generator conversion and apply multiple conversions
+  only when the independent proof checker accepts the complete sequential proof.
+  Unsupported or ambiguous cases are left unchanged. It does not yet implement
+  closed-form discovery, a cost model, or the general PLOp rewrite set. See
+  [`docs/current_features.md`](docs/current_features.md#plop-pipeline).
 
 ## Requirements
 
@@ -104,7 +104,7 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-loop2, and Detlog tests. Focused commands for every PlUnit group are listed in
+loop2, Detlog, and PLOp tests. Focused commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 
 ```sh
