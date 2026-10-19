@@ -87,10 +87,14 @@ certified. For filtered member, select, and bounded `between/3` conversions,
 comparisons must be ground after matching each value (and remainder for
 `select/3`), and templates must be ground for every passing solution. Arithmetic
 exceptions are not certified. These proof subsets exclude filters on built-in generators other than
-`member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded `between/3`, rule generators, nested
-findall, oversized ranges, and other list generators. The
-renderer creates Markdown
-explanations but does not certify proofs. General
+`member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded `between/3`.
+It also independently checks finite acyclic rule generators whose clauses are
+ground facts or use only conjunction, disjunction, `true`, `fail`, supported
+arithmetic comparisons, and other supported source-predicate calls. Unsupported
+goals, recursive dependencies, non-ground passing templates, and arithmetic
+exceptions are rejected. Nested findall, oversized ranges, and other list
+generators remain unsupported. The renderer creates Markdown explanations but
+does not certify proofs. General
 purity analysis, general clause/goal reordering, and most proof rules in the
 requirements remain unsupported.
 
@@ -175,13 +179,14 @@ preserving those control structures.
 
 Each conversion creates a uniquely named recursive list-copy predicate and
 preserves the existing predicates and their clause order. The report records
-finiteness and filter side conditions for the findall-to-fold lemma, but the
-independent proof checker validates only ground-fact conversions with supported
-arithmetic comparisons and the documented direct ground-list `member/2`,
-`select/3`, `nth0/3`/`nth1/3` index, `length/2`, and bounded `between/3`
-subsets, including supported arithmetic filters on bounded `between/3`. Rule
-generators, other filters on built-in generators, and other conversions remain
-unchecked; do not treat them as proof-certified. See [`loop2.md`](loop2.md).
+finiteness and filter side conditions for the findall-to-fold lemma. The
+independent proof checker validates ground-fact conversions, finite acyclic rule
+generators with restricted pure bodies, and the documented direct ground-list
+`member/2`, `select/3`, `nth0/3`/`nth1/3` index, `length/2`, and bounded
+`between/3` subsets. It supports whitelisted arithmetic filters on these rule
+generators and on the built-in subsets documented in [`proof_rules.md`](proof_rules.md).
+Other filters and conversions remain unchecked; do not treat them as
+proof-certified. See [`loop2.md`](loop2.md).
 
 ## Test commands
 
@@ -213,12 +218,11 @@ The current work is an initial subset, not a completed version 1 suite:
 - **Stages 1–5 are in progress.** Their implemented slices and limits are
   documented above and in the subsystem guides. In particular, Stage 4 still
   lacks nested `findall/3` conversion and independent checking of most conversion
-  proofs; the checker verifies ground-fact generators with supported arithmetic
-  filters, ground-list `member/2` and `select/3` with or without supported
-  arithmetic filters, `nth0/3`/`nth1/3` with supported filter cases, `length/2`
-  with or without supported arithmetic filters, and direct
-  no-filter index/length conversions, plus bounded `between/3` conversions with
-  supported arithmetic filters. Stage 5
+  proofs; the checker verifies ground-fact and finite acyclic rule generators
+  with supported arithmetic filters, ground-list `member/2` and `select/3` with
+  or without supported arithmetic filters, `nth0/3`/`nth1/3` with supported
+  filter cases, `length/2` with or without supported arithmetic filters, and
+  bounded `between/3` conversions with supported arithmetic filters. Stage 5
   has only conservative success-count analysis;
   mode inference, Detlog code generation, and choicepoint/cut transformations
   are not implemented.

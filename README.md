@@ -28,10 +28,11 @@ remaining work.
   conversions over ground facts, `member/2`, `select/3`, `nth0/3`, and `nth1/3`,
   with supported arithmetic-comparison filters. It also checks filtered and
   no-filter conversions over `length/2`, plus bounded `between/3` conversions with or
-  without supported arithmetic-comparison filters. The `nth0/3` and `nth1/3`
+  without supported arithmetic-comparison filters, and finite acyclic rule
+  generators with restricted pure bodies. The `nth0/3` and `nth1/3`
   filter cases require distinct unbound index and element variables. Selection
   order, fact order, and duplicate answers are preserved; indices are checked
-  as zero-based for `nth0/3` and one-based for `nth1/3`. Unsupported rules and
+  as zero-based for `nth0/3` and one-based for `nth1/3`. Unsupported proof rules and
   broader findall conversions are rejected.
   See [`docs/proof_rules.md`](docs/proof_rules.md).
 - **PID analysis:** classifies recursive predicates, checks a limited set of

@@ -325,6 +325,67 @@ test(reject_ground_fact_findall_to_fold_with_changed_values) :-
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
+test(accept_finite_acyclic_rule_findall_to_fold) :-
+    rule_findall_to_fold_programs(Original, Program),
+    Program = mnn_program(_, _,
+                          [_, _, mnn_pred(_, _, _,
+                                          [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                      _)],
+                                          _)|_],
+                          _, _),
+    assertion(Values == [2, 2, 0]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_rule_findall_to_fold_with_changed_values) :-
+    rule_findall_to_fold_programs(Original, Program0),
+    Program0 = mnn_program(Name, Meta,
+                           [Numbers, Positive,
+                            mnn_pred(Key, Modes, Domains,
+                                     [mnn_clause(Id, Head, LoopCall, Location)],
+                                     Status),
+                            Helper],
+                           ProofData, Trace),
+    LoopCall = mnn_loop2_1(_, Results),
+    Program = mnn_program(
+                  Name, Meta,
+                  [Numbers, Positive,
+                   mnn_pred(Key, Modes, Domains,
+                            [mnn_clause(Id, Head,
+                                        mnn_loop2_1([2, 3, 0], Results),
+                                        Location)],
+                            Status),
+                   Helper],
+                  ProofData, Trace),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_recursive_rule_findall_to_fold) :-
+    rule_findall_to_fold_programs(Original0, Program),
+    Original0 = mnn_program(Name, Meta,
+                            [Numbers, mnn_pred(positive/1, Modes, Domains,
+                                               [mnn_clause(4, positive(Value),
+                                                           _,
+                                                           Source),
+                                                Fact],
+                                               Status),
+                             Results],
+                            ProofData, Trace),
+    Original = mnn_program(
+                   Name, Meta,
+                   [Numbers,
+                    mnn_pred(positive/1, Modes, Domains,
+                             [mnn_clause(4, positive(Value), positive(Value),
+                                         Source),
+                              Fact],
+                             Status),
+                    Results],
+                   ProofData, Trace),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_non_ground_fact_generator_findall_to_fold) :-
     Original = mnn_program(
                    sample, meta(source, [clause(1), clause(2)]),
@@ -1249,6 +1310,35 @@ fact_findall_to_fold_programs(
                              original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
+
+rule_findall_to_fold_programs(Original, Program) :-
+                   Original = mnn_program(
+                                  sample,
+                                  meta(source, [clause(1), clause(2), clause(3), clause(4),
+                                                clause(5), clause(6)]),
+                                  [mnn_pred(num/1, ['?'], [integer],
+                                            [mnn_clause(1, num(1), true, source(source, 1)),
+                                             mnn_clause(2, num(2), true, source(source, 2)),
+                                             mnn_clause(3, num(3), true, source(source, 3))],
+                                            original),
+                                   mnn_pred(positive/1, ['?'], [integer],
+                                            [mnn_clause(4, positive(Value),
+                                                        conj(disj(num(Value), num(Value)),
+                                                             Value > 1),
+                                                        source(source, 4)),
+                                             mnn_clause(5, positive(0), true,
+                                                        source(source, 5))],
+                                            original),
+                                   mnn_pred(numbers/1, ['?'], [list(integer)],
+                                            [mnn_clause(6, numbers(Results),
+                                                        findall(Value,
+                                                                conj(positive(Value),
+                                                                     Value =< 2),
+                                                                Results),
+                                                        source(source, 6))],
+                                            original)],
+                                  proof([]), trace([])),
+                   mnn_loop2:convert_program(Original, Program, _).
 
 nth0_findall_to_fold_programs(
     List, Original, Program) :-
