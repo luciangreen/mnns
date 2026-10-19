@@ -364,10 +364,11 @@ rule_generator_clauses(Predicates, Goal) :-
     functor(Goal, Name, Arity),
     Key = Name/Arity,
     rule_predicate_supported(Predicates, Key, [], Clauses),
-    member(mnn_clause(_, Head, Body, _), Clauses),
-    (   Body \== true
-    ;   \+ ground(Head)
-    ).
+    once(( member(mnn_clause(_, Head, Body, _), Clauses),
+           (   Body \== true
+           ;   \+ ground(Head)
+           )
+         )).
 
 rule_predicate_supported(Predicates, Key, Visited, Clauses) :-
     \+ memberchk(Key, Visited),
@@ -467,10 +468,11 @@ checked_rule_filters([Filter|Filters], Result) :-
     ).
 
 checked_rule_filter(Filter, Result) :-
-    (   checked_filter_result(Filter, Result)
+    (   checked_filter_result(Filter, FilterResult)
     ->  true
     ;   throw(invalid_rule_filter)
-    ).
+    ),
+    Result = FilterResult.
 
 generator_parts(conj(Goal, Filters), Generator, Conditions) :-
     !,
