@@ -142,8 +142,9 @@ locally defined `length/2` predicates are not treated as this built-in case. A
 variable list with a fixed nonnegative integer length is also classified as one
 success; distinct unbound list and length variables are classified as multi.
 Aliased variables remain unsupported. Built-in `select/3` is classified for
-ground proper lists when its selected value and remainder are unbound or ground;
-duplicate positions count separately, and ground patterns constrain the result.
+ground proper lists with unbound, ground, or partially instantiated selected-value
+and remainder patterns; candidates are matched on copies that preserve sharing,
+and duplicate positions count separately.
 When all three arguments are distinct unbound variables, it is classified as
 multi; aliases, other list/value shapes, and locally defined `select/3`
 predicates remain unsupported by the built-in cases. With an unbound list and a

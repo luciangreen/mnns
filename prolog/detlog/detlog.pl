@@ -132,12 +132,6 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     Goal = select(Value, List, Rest),
     ground(List),
     is_list(List),
-    (   var(Value)
-    ;   ground(Value)
-    ),
-    (   var(Rest)
-    ;   ground(Rest)
-    ),
     \+ member(mnn_pred(select/3, _, _, _, _), Predicates),
     !,
     select_outcomes(Value, List, Rest, Outcomes).
