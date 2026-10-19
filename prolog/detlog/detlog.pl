@@ -285,6 +285,17 @@ distinct_variables([Variable|Variables]) :-
     distinct_variables(Variables).
 
 append_ground_mode(Prefix, Suffix, List, Outcomes) :-
+    var(Prefix),
+    var(Suffix),
+    Prefix \== Suffix,
+    ground_proper_list(List),
+    !,
+    length(List, Length),
+    (   Length =:= 0
+    ->  Outcomes = [1]
+    ;   Outcomes = [2]
+    ).
+append_ground_mode(Prefix, Suffix, List, Outcomes) :-
     append_supported_list_mode([Prefix, Suffix, List]),
     copy_term((Prefix, Suffix, List), (PrefixCopy, SuffixCopy, ListCopy)),
     (   append(PrefixCopy, SuffixCopy, ListCopy)
@@ -292,6 +303,11 @@ append_ground_mode(Prefix, Suffix, List, Outcomes) :-
     ;   Outcomes = [0]
     ).
 
+append_supported_list_mode([Prefix, Suffix, List]) :-
+    var(Prefix),
+    var(Suffix),
+    Prefix \== Suffix,
+    ground_proper_list(List).
 append_supported_list_mode([Prefix, Suffix, List]) :-
     (   ground_proper_list(Prefix),
         ground_proper_list(Suffix),
