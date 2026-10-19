@@ -36,6 +36,14 @@ infer_valid_sequence(Samples,
                      SecondDifference),
     !.
 infer_valid_sequence(Samples,
+                     formula(exponential(Initial, Base), verified_on(Samples))) :-
+    Samples = [Initial, Second|Rest],
+    Initial =\= 0,
+    0 is Second mod Initial,
+    Base is Second // Initial,
+    verify_geometric(Rest, Second, Base),
+    !.
+infer_valid_sequence(Samples,
                      formula(polynomial(Coefficients), verified_on(Samples))) :-
     length(Samples, Count),
     MaximumDegree is Count - 2,
@@ -62,6 +70,12 @@ verify_quadratic([Value|Values], Previous, Difference, SecondDifference) :-
     Value =:= Expected,
     NextDifference is Difference + SecondDifference,
     verify_quadratic(Values, Expected, NextDifference, SecondDifference).
+
+verify_geometric([], _, _).
+verify_geometric([Value|Values], Previous, Base) :-
+    Expected is Previous * Base,
+    Value =:= Expected,
+    verify_geometric(Values, Value, Base).
 
 forward_coefficients([Value], [Value]) :-
     !.

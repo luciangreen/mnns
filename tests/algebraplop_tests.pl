@@ -27,6 +27,23 @@ test(infers_quartic_sequence_with_multiple_held_out_samples) :-
         formula(polynomial([0, 1, 14, 36, 24]),
                 verified_on([0, 1, 16, 81, 256, 625]))).
 
+test(infers_geometric_sequence_with_held_out_samples) :-
+    mnn_algebraplop:infer_sequence_formula(
+        [2, 4, 8, 16],
+        formula(exponential(2, 2), verified_on([2, 4, 8, 16]))).
+
+test(infers_geometric_sequence_with_negative_base) :-
+    mnn_algebraplop:infer_sequence_formula(
+        [-2, 4, -8, 16],
+        formula(exponential(-2, -2), verified_on([-2, 4, -8, 16]))).
+
+test(infers_geometric_sequence_with_zero_base) :-
+    mnn_algebraplop:infer_sequence_formula(
+        [5, 0, 0], formula(exponential(5, 0), verified_on([5, 0, 0]))).
+
+test(rejects_geometric_candidate_that_fails_held_out_sample) :-
+    mnn_algebraplop:infer_sequence_formula([2, 4, 8, 15], no_formula).
+
 test(rejects_higher_degree_candidate_that_fails_held_out_sample) :-
     mnn_algebraplop:infer_sequence_formula([0, 1, 8, 27, 80], no_formula).
 
@@ -38,9 +55,6 @@ test(rejects_inconsistent_quadratic_sequence) :-
 
 test(rejects_quadratic_candidate_that_fails_held_out_sample) :-
     mnn_algebraplop:infer_sequence_formula([1, 4, 9, 15], no_formula).
-
-test(rejects_exponential_sequence_as_linear) :-
-    mnn_algebraplop:infer_sequence_formula([2, 4, 8, 16], no_formula).
 
 test(rejects_prime_sequence) :-
     mnn_algebraplop:infer_sequence_formula([2, 3, 5, 7, 11], no_formula).
