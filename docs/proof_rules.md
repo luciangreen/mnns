@@ -105,7 +105,11 @@ generator conversion:
   proper list and `Length` is a variable or nonnegative integer. A variable
   length produces the list's length once; a matching bound length produces one
   result, and a nonmatching bound length produces none. The template must be
-  ground in every produced solution.
+  ground in every produced solution. The generator may also be followed by
+  whitelisted arithmetic comparisons (`>`, `>=`, `<`, `=<`, `=:=`, `=\=`).
+  Comparisons must be ground after matching the list length, and the template
+  must be ground for each solution that passes the filters; arithmetic
+  exceptions are not certified.
 - `findall(Template, between(Low, High, Value), Results)`, where the bounds are
   integer literals and `Value` is a variable or integer. The inclusive range
   must contain at most 10,000 integers; reversed bounds produce no results.
@@ -154,9 +158,10 @@ These checks cover ground-fact calls with or without whitelisted arithmetic filt
 ground-list `member/2` and `select/3` with or without supported
 arithmetic-comparison filters,
 the stated distinct-variable `nth0/3` and `nth1/3` index forms with or without
-supported arithmetic filters, the stated `length/2` form, and bounded
+supported arithmetic filters, the stated `length/2` form with or without
+supported arithmetic filters, and bounded
 `between/3`. They do not certify rule generators, filters on built-in generators
-other than `member/2`, `select/3`, `nth0/3`, and `nth1/3`,
+other than `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and `between/3`,
 nested findall, other list generators, or arbitrary `findall/3` rewrites. Ground
 domain and mode annotations are required but are not inferred.
 The checker does not import or invoke the loop2 converter.
