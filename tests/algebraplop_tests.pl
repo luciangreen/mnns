@@ -15,6 +15,21 @@ test(infers_exact_quadratic_sequence_with_zero_based_positions) :-
         [1, 4, 9, 16],
         formula(quadratic(1, 3, 2), verified_on([1, 4, 9, 16]))).
 
+test(infers_cubic_sequence_with_held_out_sample) :-
+    mnn_algebraplop:infer_sequence_formula(
+        [1, 8, 27, 64, 125],
+        formula(polynomial([1, 7, 12, 6]),
+                verified_on([1, 8, 27, 64, 125]))).
+
+test(infers_quartic_sequence_with_multiple_held_out_samples) :-
+    mnn_algebraplop:infer_sequence_formula(
+        [0, 1, 16, 81, 256, 625],
+        formula(polynomial([0, 1, 14, 36, 24]),
+                verified_on([0, 1, 16, 81, 256, 625]))).
+
+test(rejects_higher_degree_candidate_that_fails_held_out_sample) :-
+    mnn_algebraplop:infer_sequence_formula([0, 1, 8, 27, 80], no_formula).
+
 test(rejects_quadratic_fit_without_held_out_sample) :-
     mnn_algebraplop:infer_sequence_formula([1, 4, 9], no_formula).
 
