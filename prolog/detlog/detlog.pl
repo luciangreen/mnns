@@ -98,6 +98,14 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     \+ member(mnn_pred(member/2, _, _, _, _), Predicates),
     !,
     member_outcomes(Value, List, Outcomes).
+goal_outcomes(Goal, Predicates, _, [2]) :-
+    nonvar(Goal),
+    Goal = member(Value, List),
+    var(List),
+    term_variables(Value, ValueVariables),
+    \+ identical_member(List, ValueVariables),
+    \+ member(mnn_pred(member/2, _, _, _, _), Predicates),
+    !.
 goal_outcomes(Goal, Predicates, _, Outcomes) :-
     nonvar(Goal),
     Goal = select(Value, List, Rest),

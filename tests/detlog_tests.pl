@@ -539,6 +539,71 @@ test(classifies_member_over_ground_lists) :-
                                  determinism(failure), success_counts([0])),
                         Results)).
 
+test(classifies_member_with_unbound_list_as_multi) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(variable_pattern/1, ['?'], [any],
+                            [mnn_clause(1, variable_pattern(_Value),
+                                       member(_Value, _List),
+                                       source(sample, 1))],
+                            original),
+                   mnn_pred(ground_pattern/0, [], [],
+                            [mnn_clause(2, ground_pattern,
+                                       member(item, _List),
+                                       source(sample, 2))],
+                            original),
+                   mnn_pred(structured_pattern/1, ['?'], [any],
+                            [mnn_clause(3, structured_pattern(Inner),
+                                       member(box(Inner), _List),
+                                       source(sample, 3))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(variable_pattern/1,
+                                 mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                        Results)),
+    assertion(memberchk(predicate(ground_pattern/0,
+                                 mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                        Results)),
+    assertion(memberchk(predicate(structured_pattern/1,
+                                 mode(all_arguments_unbound),
+                                 determinism(multi), success_counts([2])),
+                        Results)).
+
+test(member_with_aliased_value_and_list_remains_unsupported) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(aliased/1, ['?'], [any],
+                            [mnn_clause(1, aliased(Value),
+                                       member(Value, Value),
+                                       source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(aliased/1, mode(all_arguments_unbound),
+                                 unavailable(unsupported_goal(member(_, _))),
+                                 unsupported_body), Results)).
+
+test(local_member_definition_is_not_treated_as_builtin) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(member/2, ['?', '?'], [any, any],
+                            [mnn_clause(1, member(_, _), true,
+                                       source(sample, 1))],
+                            original),
+                   mnn_pred(caller/2, ['?', '?'], [any, any],
+                            [mnn_clause(2, caller(Value, List),
+                                       member(Value, List),
+                                       source(sample, 2))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(caller/2, mode(all_arguments_unbound),
+                                 determinism(det), success_counts([1])),
+                        Results)).
+
 test(classifies_select_over_ground_proper_lists) :-
     Program = mnn_program(
                   sample, meta(sample, []),
