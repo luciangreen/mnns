@@ -31,7 +31,9 @@ infer_valid_sequence(Samples,
     FirstDifference is Second - Intercept,
     NextDifference is Third - Second,
     SecondDifference is NextDifference - FirstDifference,
-    verify_quadratic([Fourth|Rest], Third, NextDifference, SecondDifference),
+    FollowingDifference is NextDifference + SecondDifference,
+    verify_quadratic([Fourth|Rest], Third, FollowingDifference,
+                     SecondDifference),
     !.
 infer_valid_sequence(_, no_formula).
 
