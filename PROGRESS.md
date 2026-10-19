@@ -41,9 +41,10 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   `findall(Template, select(Value, GroundList, Rest), Results)` when each
   selected template is ground, and `findall(Length, length(GroundList, Length),
   Results)` for variable or nonnegative integer lengths. It also checks bounded
-  no-filter `between/3` conversions with integer bounds and a variable or integer
-  value, for ranges up to 10,000, and calls to predicates whose clauses are all
-  ground facts, with supported arithmetic-comparison filters. Fact order,
+  `between/3` conversions with integer bounds and a variable or integer value,
+  for ranges up to 10,000, including supported arithmetic-comparison filters,
+  and calls to predicates whose clauses are all ground facts with supported
+  arithmetic-comparison filters. Fact order,
   duplicate facts, and bound or
   partially instantiated call patterns are checked by rebuilding the output;
   every matching template must be ground. Selection order, duplicate positions,
@@ -52,7 +53,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   these checked steps can be independently verified and rendered as Markdown
   reports. Filters on ground-fact generators are checked only for whitelisted
   arithmetic comparisons with ground operands. The checker also validates
-  supported arithmetic-comparison   filters on ground-list `member/2`, `nth0/3`, and `nth1/3` conversions, plus
+  supported arithmetic-comparison filters on ground-list `member/2`, `nth0/3`,
+  and `nth1/3` conversions, plus
   supported arithmetic filters on bounded integer-literal `between/3`.
   Rule generators, filters on other built-in
   generators, other findall

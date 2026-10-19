@@ -110,7 +110,9 @@ generator conversion:
   each range value. An integer `Value` produces a result only when it lies in
   the range and passes every comparison. The template must be ground in every
   produced solution; comparisons that raise arithmetic exceptions are not
-  certified.
+  certified. Expressions allow numeric constants, variables grounded by the
+  range value, unary `+`, `-`, and `abs`, and binary `+`, `-`, `*`, `/`, `//`,
+  `mod`, and `rem`.
 - `findall(Template, Goal, Results)`, where `Goal` calls a predicate in the
   original program whose clauses are all ground facts. The checker matches the
   call against each fact in clause order, preserving duplicate facts and bound

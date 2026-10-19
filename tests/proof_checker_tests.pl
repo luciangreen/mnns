@@ -214,6 +214,7 @@ test(accept_bounded_between_findall_to_fold_with_bound_value) :-
 
 test(accept_bounded_between_findall_to_fold_with_arithmetic_filters) :-
     filtered_between_findall_to_fold_programs(
+        Value,
         conj(Value > 2, Value =< 4), Original, Program),
     Program = mnn_program(_, _,
                           [mnn_pred(_, _, _,
@@ -226,6 +227,7 @@ test(accept_bounded_between_findall_to_fold_with_arithmetic_filters) :-
 
 test(reject_filtered_between_findall_to_fold_with_changed_values) :-
     filtered_between_findall_to_fold_programs(
+        Value,
         Value > 2, Original, Program0),
     replace_loop_values(Program0, [3], Program),
     findall_to_fold_proof(Proof),
@@ -234,6 +236,7 @@ test(reject_filtered_between_findall_to_fold_with_changed_values) :-
 
 test(reject_between_findall_to_fold_with_unsupported_filter) :-
     filtered_between_findall_to_fold_programs(
+        Value,
         member(Value, [2, 4]), Original, Program),
     assertion(Program =@= Original),
     findall_to_fold_proof(Proof),
@@ -1231,7 +1234,7 @@ between_findall_to_fold_programs(
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
 
-filtered_between_findall_to_fold_programs(Filter, Original, Program) :-
+filtered_between_findall_to_fold_programs(Value, Filter, Original, Program) :-
     Original = mnn_program(
                    sample, meta(source, [clause(1)]),
                    [mnn_pred(numbers/1, ['?'], [any],

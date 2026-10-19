@@ -27,9 +27,9 @@ remaining work.
   introduction, narrow single-occurrence unfold/fold steps, and `findall/3`
   conversions over ground facts, `member/2`, `nth0/3`, and `nth1/3`, with
   supported arithmetic-comparison filters. It also checks no-filter conversions
-  over `select/3` and `length/2`, plus bounded `between/3` conversions with
-  supported arithmetic-comparison filters. The `nth0/3` and `nth1/3` filter cases
-  require distinct unbound index and element variables. Selection
+  over `select/3` and `length/2`, plus bounded `between/3` conversions with or
+  without supported arithmetic-comparison filters. The `nth0/3` and `nth1/3`
+  filter cases require distinct unbound index and element variables. Selection
   order, fact order, and duplicate answers are preserved; indices are checked
   as zero-based for `nth0/3` and one-based for `nth1/3`. Unsupported rules and
   broader findall conversions are rejected.
