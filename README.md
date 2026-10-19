@@ -91,7 +91,6 @@ exposes one independently checked finite-generator conversion. See
 
 Install SWI-Prolog 9.x or 10.x. On Debian or Ubuntu:
 
-swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 ```sh
 sudo apt-get install swi-prolog-nox
 ```
@@ -111,6 +110,7 @@ loop2, and Detlog tests. Focused commands for every PlUnit group are listed in
 ```sh
 swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"
 swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
+swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 ```
 
 The full suite is also run on pushes and pull requests by
