@@ -28,7 +28,9 @@ exposes one independently checked finite-generator conversion. See
   reordering of restricted ground type tests, restricted definition
   introduction, narrow single-occurrence unfold/fold steps, and `findall/3`
   conversions over ground facts, `member/2`, `select/3`, `nth0/3`, and `nth1/3`,
-  with supported arithmetic-comparison filters. It also checks filtered and
+  with supported arithmetic-comparison filters. Ground-list `member/2` checks
+  allow constrained values and any template that is ground for every matching
+  solution. It also checks filtered and
   no-filter conversions over `length/2`, plus bounded `between/3` conversions with or
   without supported arithmetic-comparison filters, and finite acyclic rule
   generators with restricted pure bodies. The `nth0/3` and `nth1/3`
