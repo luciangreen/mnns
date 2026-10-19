@@ -182,6 +182,26 @@ test(accept_ground_length_findall_to_fold_with_mismatched_length) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_length_findall_to_fold_with_arithmetic_filter) :-
+    filtered_length_findall_to_fold_programs(
+        Length, Length, [a, b], Length > 1, Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [2]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_filtered_length_findall_to_fold_with_changed_values) :-
+    filtered_length_findall_to_fold_programs(
+        Length, Length, [a, b], Length > 1, Original, Program0),
+    replace_loop_values(Program0, [changed], Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_length_findall_to_fold_with_changed_values) :-
     length_findall_to_fold_programs(
         _, [a, b], Original, Program0),
@@ -1268,6 +1288,21 @@ length_findall_to_fold_programs(
                                                  length(List, Length),
                                                  Results),
                                          source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+filtered_length_findall_to_fold_programs(
+    Template, Length, List, Filter, Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                             [mnn_clause(
+                       1, numbers(Results),
+                       findall(Template,
+                               conj(length(List, Length), Filter),
+                               Results),
+                       source(source, 1))],
                              original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).

@@ -281,6 +281,28 @@ findall_candidate_values(_, Template, Generator, Values) :-
     maplist(supported_arithmetic_filter, Filters),
     between_candidate_numbers(Low, High, Numbers),
     between_candidate_values(Numbers, Value, Template, Filters, Values).
+findall_candidate_values(_, Template, Generator, Values) :-
+    generator_parts(Generator, length(List, Length), Filters),
+    Filters \= [],
+    ground(List),
+    is_list(List),
+    (   var(Length)
+    ;   integer(Length),
+        Length >= 0
+    ),
+    maplist(supported_arithmetic_filter, Filters),
+    length(List, ActualLength),
+    copy_term((Length, Template, Filters),
+              (LengthCopy, TemplateCopy, FiltersCopy)),
+    (   LengthCopy = ActualLength
+    ->  checked_filters_result(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy]
+        ;   Values = []
+        )
+    ;   Values = []
+    ).
 findall_candidate_values(_, Template, length(List, Length), Values) :-
     ground(List),
     is_list(List),
