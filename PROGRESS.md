@@ -121,8 +121,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   `select/3`, `nth0/3`, `nth1/3`, and `length/2`, plus `length(List, N)` for a
   variable `List` and fixed nonnegative integer `N`. This last case is
   deterministic, including `N = 0`; negative lengths, other non-ground list
-  shapes, and locally defined `length/2` are unavailable. General mode inference
-  and choicepoint/cut code transformations remain unimplemented.
+  shapes, and locally defined `length/2` are unavailable. Ground calls to
+  predicates consisting only of ground facts are counted exactly, including
+  failed calls and duplicate matching facts; rule calls, non-ground fact heads,
+  recursive calls, and other bound/repeated-argument calls remain unavailable.
+  General mode inference and choicepoint/cut code transformations remain
+  unimplemented.
 
 ## Remaining stages
 
@@ -132,7 +136,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, ground-fact and finite acyclic rule generators with restricted pure bodies and supported arithmetic filters, ground-list member/select/nth0/nth1/length conversions with supported arithmetic filters, no-filter nth0-index/nth1-index/length conversions, and bounded integer-literal between conversions with supported arithmetic filters) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; independent proof checks cover ground facts and finite acyclic rule chains with restricted pure bodies, plus documented built-in generator subsets; nested findall and general checked conversion proofs remain) |
-| 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes `member/2` over an unbound list for independent element patterns, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths; covers `append/3` with three distinct unbound arguments, ground inputs, one unbound argument, two unbound inputs with a ground output, and two unbound arguments with an unbound output and one ground input; general mode inference, other bound/repeated-argument calls, and choicepoint/cut transformations remain) |
+| 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes `member/2` over an unbound list for independent element patterns, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths, selected `append/3` modes, and exact counts for ground calls to ground-fact-only predicates; general mode inference, other bound/repeated-argument calls, and choicepoint/cut transformations remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | Not started |
 | 7 | AlgebraPLOp positional algebra | Not started |
 | 8 | S2A synthesis and Starlog view | Not started |

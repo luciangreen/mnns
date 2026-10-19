@@ -74,7 +74,11 @@ Pairwise non-unifiable clause heads are treated as exclusive. Calls to acyclic
 user predicates in the same program are analyzed recursively when every call
 argument is a distinct unbound variable (zero-arity calls satisfy this condition).
 Their success counts are propagated to the caller; recursive calls are reported
-as unavailable.
+as unavailable. A separate ground-call case counts a call exactly when its
+predicate consists only of ground facts; unmatched calls fail and duplicate
+matching facts count as distinct successes. Ground calls to predicates with rules
+or non-ground fact heads remain unavailable. This does not extend analysis to
+general bound-argument or repeated-variable modes.
 Bound arguments and repeated variables in a call are unsupported. The reported
 classes are:
 
@@ -116,4 +120,5 @@ modes, including empty and nonempty ground lists and unsupported repeated or
 non-ground arguments.
 The `length/2` tests cover ground lists and variable lists with fixed nonnegative
 lengths, as well as unsupported improper lists, negative lengths, and local
-definitions.
+definitions. Ground user-call tests cover matching, missing and duplicate facts,
+as well as rejection of non-fact definitions.
