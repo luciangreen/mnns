@@ -1298,11 +1298,11 @@ filtered_length_findall_to_fold_programs(
                    sample, meta(source, [clause(1)]),
                    [mnn_pred(numbers/1, ['?'], [any],
                              [mnn_clause(
-                       1, numbers(Results),
-                       findall(Template,
-                               conj(length(List, Length), Filter),
-                               Results),
-                       source(source, 1))],
+                                  1, numbers(Results),
+                                  findall(Template,
+                                          conj(length(List, Length), Filter),
+                                          Results),
+                                  source(source, 1))],
                              original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).

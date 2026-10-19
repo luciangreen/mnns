@@ -73,7 +73,9 @@ while honoring value and remainder patterns. The index
 cases emit zero-based or one-based indices, respectively, and accept an empty
 ground list. It also checks no-filter conversions for `length/2` over a ground
 proper list, with a variable or nonnegative integer length; a mismatch yields no
-values. It checks bounded `between/3` conversions with integer bounds and a
+values. The `length/2` conversion also accepts whitelisted arithmetic-comparison
+filters that become ground after matching the list length; arithmetic exceptions
+are not certified. It checks bounded `between/3` conversions with integer bounds and a
 variable or integer third argument when the inclusive range has at most 10,000
 values; supported arithmetic-comparison filters may follow the generator.
 Reversed bounds and nonmatching integer values yield no results.
@@ -85,7 +87,7 @@ certified. For filtered member, select, and bounded `between/3` conversions,
 comparisons must be ground after matching each value (and remainder for
 `select/3`), and templates must be ground for every passing solution. Arithmetic
 exceptions are not certified. These proof subsets exclude filters on built-in generators other than
-`member/2`, `select/3`, `nth0/3`, `nth1/3`, and bounded `between/3`, rule generators, nested
+`member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded `between/3`, rule generators, nested
 findall, oversized ranges, and other list generators. The
 renderer creates Markdown
 explanations but does not certify proofs. General
@@ -210,7 +212,8 @@ The current work is an initial subset, not a completed version 1 suite:
   lacks nested `findall/3` conversion and independent checking of most conversion
   proofs; the checker verifies ground-fact generators with supported arithmetic
   filters, ground-list `member/2` and `select/3` with or without supported
-  arithmetic filters, `nth0/3`/`nth1/3` with supported filter cases, and direct
+  arithmetic filters, `nth0/3`/`nth1/3` with supported filter cases, `length/2`
+  with or without supported arithmetic filters, and direct
   no-filter index/length conversions, plus bounded `between/3` conversions with
   supported arithmetic filters. Stage 5
   has only conservative success-count analysis;
