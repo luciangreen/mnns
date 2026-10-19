@@ -175,6 +175,17 @@ finite_generator_values(_, Generator, Template, Values,
     length(List, Count),
     !.
 finite_generator_values(_, Generator, Template, Values,
+                        finite_ground_append, Count, FilterCount) :-
+    generator_parts(Generator, append(Prefix, Suffix, List), Filters),
+    ground(List),
+    is_list(List),
+    maplist(supported_filter, Filters),
+    length(Filters, FilterCount),
+    append_candidate_values(List, Prefix, Suffix, Template, Filters, Values),
+    length(List, ListLength),
+    Count is ListLength + 1,
+    !.
+finite_generator_values(_, Generator, Template, Values,
                         finite_ground_between, Count, FilterCount) :-
     generator_parts(Generator, between(Low, High, Value), Filters),
     integer(Low),
@@ -490,6 +501,30 @@ select_candidate_values([Candidate|Candidates], Prefix, Value, Rest,
     ),
     select_candidate_values(Candidates, [Candidate|Prefix], Value, Rest,
                            Template, Filters, RemainingValues).
+
+append_candidate_values(List, Prefix, Suffix, Template, Filters, Values) :-
+    append_candidate_values(List, [], Prefix, Suffix, Template, Filters, Values).
+
+append_candidate_values(Remaining, ReversedPrefix, Prefix, Suffix,
+                        Template, Filters, Values) :-
+    reverse(ReversedPrefix, CandidatePrefix),
+    copy_term((Prefix, Suffix, Template, Filters),
+              (PrefixCopy, SuffixCopy, TemplateCopy, FiltersCopy)),
+    (   PrefixCopy = CandidatePrefix,
+        SuffixCopy = Remaining
+    ->  evaluate_filters(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|Rest]
+        ;   Values = Rest
+        )
+    ;   Values = Rest
+    ),
+    (   Remaining = [Head|Tail]
+    ->  append_candidate_values(Tail, [Head|ReversedPrefix],
+                                Prefix, Suffix, Template, Filters, Rest)
+    ;   Rest = []
+    ).
 
 evaluate_filters([], true).
 evaluate_filters([Filter|Filters], Result) :-

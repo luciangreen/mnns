@@ -41,7 +41,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   Results)` with or without supported arithmetic-comparison filters when each
   passing selected template is ground, and `findall(Length, length(GroundList,
   Length), Results)` for variable or nonnegative integer lengths, with or without
-  supported arithmetic-comparison filters. It also checks bounded
+  supported arithmetic-comparison filters. Ground-list `append/3` splits are
+  checked with or without supported arithmetic-comparison filters when each
+  passing template is ground. It also checks bounded
   `between/3` conversions with integer bounds and a variable or integer value,
   for ranges up to 10,000, including supported arithmetic-comparison filters,
   and calls to predicates whose clauses are all ground facts with supported
@@ -60,7 +62,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   these checked steps can be independently verified and rendered as Markdown
   reports. Filters on ground-fact generators are checked only for whitelisted
   arithmetic comparisons with ground operands. The checker also validates
-  supported arithmetic-comparison filters on ground-list `member/2`, `select/3`,
+  supported arithmetic-comparison filters on ground-list `append/3`, `member/2`,
+  `select/3`,
   `nth0/3`, and `nth1/3` conversions, plus
   supported arithmetic filters on bounded integer-literal `between/3`.
   Filters on the other built-in generators, nested findall, other findall
@@ -85,8 +88,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 - **Stage 4 — loop2: in progress.** `mnn_loop2:convert_program/3` converts
   `findall/3` over a predicate consisting only of ground facts, including calls
   with bound or partially instantiated arguments; `member/2`, `select/3`,
-  `nth0/3`, and `nth1/3` over ground proper lists; and `length/2` over a ground
-  proper list with a variable or nonnegative integer length. Each matching
+  `nth0/3`, and `nth1/3` over ground proper lists; `append/3` over a ground
+  proper result list; and `length/2` over a ground proper list with a variable or
+  nonnegative integer length. Each matching
   template instance must be ground. List order, duplicate answers, indices, and
   selection remainders are preserved. It also handles `between/3` with integer
   literal bounds and a
@@ -100,7 +104,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   filters, variable bounds, recursive dependencies, unsupported rule bodies,
   and nested `findall/3` remain unsupported. Most conversion proofs are not
   independently checked; the proof checker validates ground-fact generators
-  with supported arithmetic-comparison filters and ground-list `member/2`,
+  with supported arithmetic-comparison filters and ground-list `append/3`,
+  `member/2`,
   `select/3`, `nth0/3`, and `nth1/3` subsets with supported arithmetic filters,
   plus direct no-filter `nth0/3`/`nth1/3` index and `length/2` subsets and bounded
   integer-literal `between/3` with supported arithmetic filters, and finite
@@ -150,9 +155,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, ground-fact and finite acyclic rule generators with restricted pure bodies and supported arithmetic filters, ground-list member/select/nth0/nth1/length conversions with supported arithmetic filters, no-filter nth0-index/nth1-index/length conversions, and bounded integer-literal between conversions with supported arithmetic filters) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground-test reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, ground-fact and finite acyclic rule generators with restricted pure bodies and supported arithmetic filters, ground-list append/member/select/nth0/nth1/length conversions with supported arithmetic filters, no-filter nth0-index/nth1-index/length conversions, and bounded integer-literal between conversions with supported arithmetic filters) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
-| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; independent proof checks cover ground facts and finite acyclic rule chains with restricted pure bodies, plus documented built-in generator subsets; nested findall and general checked conversion proofs remain) |
+| 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `append/3`, `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; independent proof checks cover ground facts and finite acyclic rule chains with restricted pure bodies, plus documented built-in generator subsets; nested findall and general checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes ground-list `select/3` with partially instantiated value/remainder patterns, `member/2` over an unbound list for independent element patterns, `select/3` with three distinct unbound arguments, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths or distinct unbound list/length variables, selected `append/3` modes, and counts capped at two for ground calls to ground-fact-only predicates; restricted pure `once/1` compilation includes built-in `member/2` and `between/3` when not shadowed by source definitions; general mode inference, other bound/repeated-argument calls, choicepoint splicing, choice packets, and cut conversion remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | Not started |

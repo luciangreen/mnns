@@ -101,6 +101,13 @@ generator conversion:
   ground after matching the selected value and remainder; arithmetic exceptions
   are not certified, and the template must be ground for each selected solution
   that passes the filters.
+- `findall(Template, append(Prefix, Suffix, List), Results)`, where `List` is a
+  ground proper list and every split that passes the filters grounds
+  `Template`. Prefix and suffix may be constrained by term patterns; splits are
+  checked in increasing prefix length. The generator may be followed by
+  whitelisted arithmetic comparisons, which must be ground after matching each
+  split. Arithmetic exceptions and passing non-ground templates are not
+  certified.
 - `findall(Length, length(List, Length), Results)`, where `List` is a ground
   proper list and `Length` is a variable or nonnegative integer. A variable
   length produces the list's length once; a matching bound length produces one

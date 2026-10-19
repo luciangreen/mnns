@@ -197,7 +197,7 @@ swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog
 A direct call to a predicate made entirely of ground facts (including calls
 with bound or partially instantiated arguments), a call through a finite acyclic
 chain of supported facts and rules (also matching bound call arguments against
-rule heads), or `member/2`, `select/3`, `nth0/3` or `nth1/3` over a ground proper
+rule heads), or `member/2`, `select/3`, `append/3`, `nth0/3` or `nth1/3` over a ground proper
 list, or `between/3` with integer literal bounds and a variable
 or integer generator argument, or `length/2` over a ground proper list with a
 variable or nonnegative integer length. Rule bodies
@@ -206,9 +206,11 @@ predicate calls, and whitelisted arithmetic comparisons; recursive dependencies
 and other goals are left unchanged. These generators may be followed by
 arithmetic comparisons over values bound by the generator. Between ranges up to
 10,000 values are supported, including reversed and singleton ranges; larger
-ranges are left unchanged. Member, selection, and index-based generators
-preserve list order and duplicates, including selection remainders and the
-zero-based or one-based indices from `nth0/3` and `nth1/3`. The supported
+ranges are left unchanged. Member, selection, append-split, and index-based generators preserve their
+enumeration order and duplicate templates, including selection remainders and
+the zero-based or one-based indices from `nth0/3` and `nth1/3`. `append/3`
+enumerates prefixes in increasing length; its third argument must be a ground
+proper list. The supported
 comparisons are `>`, `>=`, `<`, `=<`, `=:=`, and `=\=`;
 arithmetic expressions allow numeric constants, unary `+`, `-`, `abs`, and
 binary `+`, `-`, `*`, `/`, `//`, `mod`, and `rem`. Ground templates are required
@@ -223,7 +225,7 @@ preserves the existing predicates and their clause order. The report records
 finiteness and filter side conditions for the findall-to-fold lemma. The
 independent proof checker validates ground-fact conversions, finite acyclic rule
 generators with restricted pure bodies, and the documented direct ground-list
-`member/2`, `select/3`, `nth0/3`/`nth1/3` index, `length/2`, and bounded
+`append/3`, `member/2`, `select/3`, `nth0/3`/`nth1/3` index, `length/2`, and bounded
 `between/3` subsets. It supports whitelisted arithmetic filters on these rule
 generators and on the built-in subsets documented in [`proof_rules.md`](proof_rules.md).
 Other filters and conversions remain unchecked; do not treat them as

@@ -665,6 +665,74 @@ test(accept_ground_member_findall_to_fold_with_arithmetic_filter) :-
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
 
+test(accept_ground_append_findall_to_fold) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(splits/1, ['?'], [any],
+                             [mnn_clause(1, splits(Results),
+                                         findall(Prefix-Suffix,
+                                                 append(Prefix, Suffix,
+                                                        [a, b]),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program0, _),
+    Program0 = mnn_program(_, _,
+                           [mnn_pred(_, _, _,
+                                     [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                 _)],
+                                     _)|_],
+                           _, _),
+    assertion(Values == [[]-[a, b], [a]-[b], [a, b]-[]]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program0, Original, Proof, accepted),
+    replace_loop_values(Program0, [changed], Program),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(accept_ground_append_findall_to_fold_with_arithmetic_filter) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(values/1, ['?'], [any],
+                             [mnn_clause(1, values(Results),
+                                         findall(Value,
+                                                 conj(append([Value], _,
+                                                             [1, 2, 3]),
+                                                      Value > 0),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program0, _),
+    Program0 = mnn_program(_, _,
+                           [mnn_pred(_, _, _,
+                                     [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                 _)],
+                                     _)|_],
+                           _, _),
+    assertion(Values == [1]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program0, Original, Proof, accepted).
+
+test(reject_append_findall_to_fold_with_unsupported_filter) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(values/1, ['?'], [any],
+                             [mnn_clause(1, values(Results),
+                                         findall(Value,
+                                                 conj(append([Value], _,
+                                                             [1, 2, 3]),
+                                                      member(Value, [1, 2])),
+                                                 Results),
+                                         source(source, 1))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, loop2_report([])),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_findall_to_fold_with_unsupported_member_filter) :-
     Original = mnn_program(
                    sample, meta(source, [clause(1)]),
