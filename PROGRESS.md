@@ -168,6 +168,13 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   nonnegative candidate within that bound. Program-position extraction,
   complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed
   formulas remain unimplemented.
+- **Stage 8 — S2A and Starlog: in progress (explicit table mode only).** The
+  `mnn_s2a:s2a/4` entry point can emit a standalone module containing a lookup
+  fact for each distinct ground example when `allow_table(true)` is supplied.
+  Conflicting input/output examples and unsupported spec shapes are rejected.
+  This mode does not generalize to held-out inputs and emits no formal proof;
+  structural discovery, arithmetic/list templates, formal example proofs, and
+  Starlog remain unimplemented.
 
 ## Remaining stages
 
@@ -180,7 +187,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes ground-list `select/3` with partially instantiated value/remainder patterns, `member/2` over an unbound list for independent element patterns, `select/3` with three distinct unbound arguments, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths or distinct unbound list/length variables, selected `append/3` modes, and counts capped at two for ground calls to ground-fact-only predicates; restricted pure `once/1` compilation includes built-in `member/2` and `between/3` when not shadowed by source definitions; general mode inference, other bound/repeated-argument calls, choicepoint splicing, choice packets, and cut conversion remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
-| 8 | S2A synthesis and Starlog view | Not started |
+| 8 | S2A synthesis and Starlog view | In progress (explicit opt-in table mode; no generalization or formal proof; Starlog not started) |
 | 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | Not started |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |

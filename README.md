@@ -105,6 +105,10 @@ exposes one independently checked finite-generator conversion. See
   evaluated at exact nonnegative positions; program positions and proof-backed
   formulas remain unsupported. See
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
+- **S2A (initial table mode):** explicitly opted-in example tables can be emitted
+  as a standalone IR module. This mode does not generalize beyond listed inputs
+  and has no formal proof certificate. See
+  [`docs/current_features.md`](docs/current_features.md#s2a-example-tables).
 
 ## Requirements
 
@@ -123,7 +127,7 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-loop2, Detlog, PLOp, and AlgebraPLOp tests. Focused commands for every PlUnit group are listed in
+loop2, Detlog, PLOp, AlgebraPLOp, and S2A tests. Focused commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 
 ```sh
