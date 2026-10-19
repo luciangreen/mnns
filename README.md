@@ -25,9 +25,9 @@ remaining work.
 - **Proof checker and renderer:** independently checks identity, one adjacent
   reordering of restricted ground type tests, restricted definition
   introduction, narrow single-occurrence unfold/fold steps, and `findall/3`
-  conversions over ground facts, `member/2`, `nth0/3`, and `nth1/3`, with
-  supported arithmetic-comparison filters. It also checks no-filter conversions
-  over `select/3` and `length/2`, plus bounded `between/3` conversions with or
+  conversions over ground facts, `member/2`, `select/3`, `nth0/3`, and `nth1/3`,
+  with supported arithmetic-comparison filters. It also checks no-filter
+  conversions over `length/2`, plus bounded `between/3` conversions with or
   without supported arithmetic-comparison filters. The `nth0/3` and `nth1/3`
   filter cases require distinct unbound index and element variables. Selection
   order, fact order, and duplicate answers are preserved; indices are checked

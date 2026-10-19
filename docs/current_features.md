@@ -65,10 +65,11 @@ supported arithmetic-comparison filters on the member generator, and one
 reconstructing the generated values, helper, and complete output IR. The
 `nth0/3` and `nth1/3` index forms also accept whitelisted arithmetic-comparison
 filters when the index and element are distinct unbound variables; comparisons
-must be ground after each list item is matched. It also checks no-filter
-`findall(Template, select(Value, GroundList, Rest), Results)` conversions when
-every selected solution grounds the template, preserving selection order and
-duplicate positions while honoring value and remainder patterns. The index
+must be ground after each list item is matched. It also checks
+`findall(Template, select(Value, GroundList, Rest), Results)` conversions with or
+without supported arithmetic-comparison filters when each passing selected
+solution grounds the template, preserving selection order and duplicate positions
+while honoring value and remainder patterns. The index
 cases emit zero-based or one-based indices, respectively, and accept an empty
 ground list. It also checks no-filter conversions for `length/2` over a ground
 proper list, with a variable or nonnegative integer length; a mismatch yields no
@@ -80,11 +81,11 @@ It also verifies conversions over predicates made entirely of ground facts with
 supported arithmetic-comparison filters, matching bound or partially
 instantiated call arguments and preserving clause order and duplicate facts.
 Filters must be ground after matching each fact; arithmetic exceptions are not
-certified. For filtered member conversions and filtered bounded `between/3`
-conversions, comparisons must be ground after matching each value and templates
-must be ground for every passing solution. Arithmetic exceptions are not
-certified. These proof subsets exclude filters on built-in generators other than
-`member/2`, `nth0/3`, `nth1/3`, and bounded `between/3`, rule generators, nested
+certified. For filtered member, select, and bounded `between/3` conversions,
+comparisons must be ground after matching each value (and remainder for
+`select/3`), and templates must be ground for every passing solution. Arithmetic
+exceptions are not certified. These proof subsets exclude filters on built-in generators other than
+`member/2`, `select/3`, `nth0/3`, `nth1/3`, and bounded `between/3`, rule generators, nested
 findall, oversized ranges, and other list generators. The
 renderer creates Markdown
 explanations but does not certify proofs. General
@@ -208,9 +209,10 @@ The current work is an initial subset, not a completed version 1 suite:
   documented above and in the subsystem guides. In particular, Stage 4 still
   lacks nested `findall/3` conversion and independent checking of most conversion
   proofs; the checker verifies ground-fact generators with supported arithmetic
-  filters, ground-list `member/2` with or without supported arithmetic filters,
-  and direct no-filter `select/3`, `nth0/3`/`nth1/3`, and `length/2`
-  conversions, plus bounded no-filter `between/3`. Stage 5
+  filters, ground-list `member/2` and `select/3` with or without supported
+  arithmetic filters, `nth0/3`/`nth1/3` with supported filter cases, and direct
+  no-filter index/length conversions, plus bounded `between/3` conversions with
+  supported arithmetic filters. Stage 5
   has only conservative success-count analysis;
   mode inference, Detlog code generation, and choicepoint/cut transformations
   are not implemented.

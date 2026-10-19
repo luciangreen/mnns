@@ -388,6 +388,58 @@ test(accept_ground_select_findall_to_fold_with_pattern) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_select_findall_to_fold_with_arithmetic_filter) :-
+    List = [1, 2, 1, 3],
+    Template = pair(Value, Rest),
+    Generator = conj(select(Value, List, Rest), Value =\= 2),
+    select_findall_to_fold_programs(Template, Generator, Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [pair(1, [2, 1, 3]), pair(1, [1, 2, 3]),
+                         pair(3, [1, 2, 1])]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_ground_select_findall_to_fold_with_unsupported_filter) :-
+    List = [1, 2, 3],
+    Template = pair(Value, Rest),
+    Generator = conj(select(Value, List, Rest), Value \= 2),
+    select_findall_to_fold_programs(Template, Generator, Original, Program),
+    assertion(Program =@= Original),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_ground_select_findall_to_fold_with_changed_filtered_values) :-
+    List = [1, 2, 1, 3],
+    Template = pair(Value, Rest),
+    Generator = conj(select(Value, List, Rest), Value =\= 2),
+    select_findall_to_fold_programs(Template, Generator, Original, Program0),
+    Program0 = mnn_program(Name, Meta, [Predicate, Helper], ProofData, Trace),
+    Predicate = mnn_pred(numbers/1, Modes, Domains,
+                          [mnn_clause(1, numbers(Results),
+                                      mnn_loop2_1(Values, Results), Source)],
+                          Status),
+    assertion(Values == [pair(1, [2, 1, 3]), pair(1, [1, 2, 3]),
+                         pair(3, [1, 2, 1])]),
+    Program = mnn_program(
+                  Name, Meta,
+                  [mnn_pred(numbers/1, Modes, Domains,
+                            [mnn_clause(1, numbers(Results),
+                                        mnn_loop2_1([pair(1, [2, 1, 3]),
+                                                     pair(3, [1, 2, 1])],
+                                                    Results),
+                                        Source)],
+                            Status),
+                   Helper],
+                  ProofData, Trace),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_ground_select_findall_to_fold_on_empty_list) :-
     select_findall_to_fold_programs(Value, select(Value, [], _),
                                     Original, Program),
