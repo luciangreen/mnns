@@ -71,4 +71,51 @@ test(keeps_user_predicate_once_unchanged) :-
             [kept_once(caller/0, 1, unsupported_goal(helper))])),
     assertion(Transformed = Program).
 
+test(compiles_builtin_member_once_and_preserves_first_answer, [nondet]) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(choose/1, ['?'], [any],
+                            [mnn_clause(1, choose(Value),
+                                        once(member(Value, [a, b])),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(choose/1, _, _,
+                                    [mnn_clause(_, _, Compiled, _)],
+                                    original)], _, _),
+        detlog_transform_report(
+            [compiled_once(choose/1, 1, member(_, [a, b]))])),
+    assertion(Compiled = ite(Condition, true, fail)),
+    Condition = member(CompiledValue, [a, b]),
+    findall(OriginalValue,
+            once(member(OriginalValue, [a, b])),
+            OriginalAnswers),
+    findall(CompiledValue,
+            (call(Condition) -> true ; fail),
+            CompiledAnswers),
+    assertion(OriginalAnswers == [a]),
+    assertion(CompiledAnswers == OriginalAnswers).
+
+test(keeps_once_for_program_defined_member) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1), clause(2)]),
+                  [mnn_pred(caller/2, ['?', '+'], [any, any],
+                            [mnn_clause(1, caller(Value, List),
+                                        once(member(Value, List)),
+                                        source(sample, 1))],
+                            original),
+                   mnn_pred(member/2, ['?', '+'], [any, any],
+                            [mnn_clause(2, member(Value, [Value|_]), true,
+                                        source(sample, 2))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program, Transformed,
+        detlog_transform_report(
+            [kept_once(caller/2, 1,
+                       unsupported_goal(member(_, _)))])),
+    assertion(Transformed = Program).
+
 :- end_tests(mnn_detlog_transform).

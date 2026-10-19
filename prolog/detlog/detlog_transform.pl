@@ -8,81 +8,96 @@ transform_program(
     mnn_program(Name, Meta, Predicates, Proof, Trace),
     mnn_program(Name, Meta, TransformedPredicates, Proof, Trace),
     detlog_transform_report(Events)) :-
-    transform_predicates(Predicates, TransformedPredicates, Events).
+    transform_predicates(Predicates, Predicates, TransformedPredicates, Events).
 
-transform_predicates([], [], []).
+transform_predicates([], _, [], []).
 transform_predicates(
     [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
+    SourcePredicates,
     [mnn_pred(Key, Modes, Domains, TransformedClauses, Status)|Transformed],
     Events) :-
-    transform_clauses(Clauses, Key, TransformedClauses, ClauseEvents),
-    transform_predicates(Predicates, Transformed, PredicateEvents),
+    transform_clauses(Clauses, Key, SourcePredicates,
+                      TransformedClauses, ClauseEvents),
+    transform_predicates(Predicates, SourcePredicates,
+                         Transformed, PredicateEvents),
     append(ClauseEvents, PredicateEvents, Events).
 
-transform_clauses([], _, [], []).
+transform_clauses([], _, _, [], []).
 transform_clauses(
     [mnn_clause(Id, Head, Body, Location)|Clauses], Key,
+    SourcePredicates,
     [mnn_clause(Id, Head, TransformedBody, Location)|Transformed],
     Events) :-
-    transform_goal(Body, Key, Id, TransformedBody, ClauseEvents),
-    transform_clauses(Clauses, Key, Transformed, OtherEvents),
+    transform_goal(Body, Key, Id, SourcePredicates,
+                   TransformedBody, ClauseEvents),
+    transform_clauses(Clauses, Key, SourcePredicates,
+                      Transformed, OtherEvents),
     append(ClauseEvents, OtherEvents, Events).
 
-transform_goal(once(Goal), Key, Id, ite(Condition, true, fail),
+transform_goal(once(Goal), Key, Id, SourcePredicates,
+               ite(Condition, true, fail),
                [compiled_once(Key, Id, Goal)|Events]) :-
-    pure_goal(Goal),
+    pure_goal(Goal, SourcePredicates),
     !,
-    transform_goal(Goal, Key, Id, Condition, Events).
-transform_goal(once(Goal), Key, Id, once(Goal),
+    transform_goal(Goal, Key, Id, SourcePredicates, Condition, Events).
+transform_goal(once(Goal), Key, Id, _, once(Goal),
                [kept_once(Key, Id, unsupported_goal(Goal))]) :-
     !.
-transform_goal(conj(Left, Right), Key, Id, conj(NewLeft, NewRight), Events) :-
+transform_goal(conj(Left, Right), Key, Id, SourcePredicates,
+               conj(NewLeft, NewRight), Events) :-
     !,
-    transform_goal(Left, Key, Id, NewLeft, LeftEvents),
-    transform_goal(Right, Key, Id, NewRight, RightEvents),
+    transform_goal(Left, Key, Id, SourcePredicates, NewLeft, LeftEvents),
+    transform_goal(Right, Key, Id, SourcePredicates, NewRight, RightEvents),
     append(LeftEvents, RightEvents, Events).
-transform_goal(disj(Left, Right), Key, Id, disj(NewLeft, NewRight), Events) :-
+transform_goal(disj(Left, Right), Key, Id, SourcePredicates,
+               disj(NewLeft, NewRight), Events) :-
     !,
-    transform_goal(Left, Key, Id, NewLeft, LeftEvents),
-    transform_goal(Right, Key, Id, NewRight, RightEvents),
+    transform_goal(Left, Key, Id, SourcePredicates, NewLeft, LeftEvents),
+    transform_goal(Right, Key, Id, SourcePredicates, NewRight, RightEvents),
     append(LeftEvents, RightEvents, Events).
-transform_goal(ite(If, Then, Else), Key, Id, ite(NewIf, NewThen, NewElse),
-               Events) :-
+transform_goal(ite(If, Then, Else), Key, Id, SourcePredicates,
+               ite(NewIf, NewThen, NewElse), Events) :-
     !,
-    transform_goal(If, Key, Id, NewIf, IfEvents),
-    transform_goal(Then, Key, Id, NewThen, ThenEvents),
-    transform_goal(Else, Key, Id, NewElse, ElseEvents),
+    transform_goal(If, Key, Id, SourcePredicates, NewIf, IfEvents),
+    transform_goal(Then, Key, Id, SourcePredicates, NewThen, ThenEvents),
+    transform_goal(Else, Key, Id, SourcePredicates, NewElse, ElseEvents),
     append([IfEvents, ThenEvents, ElseEvents], Events).
-transform_goal(not(Goal), Key, Id, not(NewGoal), Events) :-
+transform_goal(not(Goal), Key, Id, SourcePredicates, not(NewGoal), Events) :-
     !,
-    transform_goal(Goal, Key, Id, NewGoal, Events).
-transform_goal(Goal, _, _, Goal, []).
+    transform_goal(Goal, Key, Id, SourcePredicates, NewGoal, Events).
+transform_goal(Goal, _, _, _, Goal, []).
 
-pure_goal(true) :-
+pure_goal(true, _) :-
     !.
-pure_goal(fail) :-
+pure_goal(fail, _) :-
     !.
-pure_goal(conj(Left, Right)) :-
+pure_goal(conj(Left, Right), Predicates) :-
     !,
-    pure_goal(Left),
-    pure_goal(Right).
-pure_goal(disj(Left, Right)) :-
+    pure_goal(Left, Predicates),
+    pure_goal(Right, Predicates).
+pure_goal(disj(Left, Right), Predicates) :-
     !,
-    pure_goal(Left),
-    pure_goal(Right).
-pure_goal(ite(If, Then, Else)) :-
+    pure_goal(Left, Predicates),
+    pure_goal(Right, Predicates).
+pure_goal(ite(If, Then, Else), Predicates) :-
     !,
-    pure_goal(If),
-    pure_goal(Then),
-    pure_goal(Else).
-pure_goal(not(Goal)) :-
+    pure_goal(If, Predicates),
+    pure_goal(Then, Predicates),
+    pure_goal(Else, Predicates).
+pure_goal(not(Goal), Predicates) :-
     !,
-    pure_goal(Goal).
-pure_goal(Goal) :-
+    pure_goal(Goal, Predicates).
+pure_goal(Goal, Predicates) :-
     nonvar(Goal),
     callable(Goal),
     functor(Goal, Name, Arity),
-    pure_builtin(Name/Arity).
+    Key = Name/Arity,
+    pure_builtin(Key),
+    \+ source_predicate(Predicates, Key).
+
+source_predicate(Predicates, Key) :-
+    member(mnn_pred(FoundKey, _, _, _, _), Predicates),
+    FoundKey == Key.
 
 pure_builtin((=)/2).
 pure_builtin((\=)/2).
@@ -104,3 +119,4 @@ pure_builtin(ground/1).
 pure_builtin(integer/1).
 pure_builtin(number/1).
 pure_builtin(is_list/1).
+pure_builtin(member/2).

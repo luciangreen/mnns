@@ -176,13 +176,14 @@ mode inference are not implemented; see
 if-then-else form `ite(Goal, true, fail)` when `Goal` consists only of `true`,
 `fail`, normalized conjunction, disjunction, if-then-else, negation, and the
 pure unification, arithmetic-comparison, or type-test built-ins listed in
-[`detlog.md`](detlog.md). It leaves unsupported `once/1` goals unchanged and
-reports each compiled or retained occurrence as `compiled_once/3` or
-`kept_once/3`. Program metadata, clause order, and source locations are retained.
-The resulting control construct commits to the first success, matching
-`once/1` for this side-effect-free subset. This report is not an independently
-checked proof, and the transform does not implement general mode inference,
-choicepoint splicing, choice packets, or cut conversion.
+[`detlog.md`](detlog.md), plus built-in `member/2`. It does not treat a
+program-defined predicate as a built-in. It leaves unsupported `once/1` goals
+unchanged and reports each compiled or retained occurrence as `compiled_once/3`
+or `kept_once/3`. Program metadata, clause order, and source locations are
+retained. The resulting control construct commits to the first success,
+matching `once/1` for this side-effect-free subset. This report is not an
+independently checked proof, and the transform does not implement general mode
+inference, choicepoint splicing, choice packets, or cut conversion.
 
 Run this focused suite from the repository root:
 
