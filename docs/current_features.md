@@ -21,6 +21,7 @@ sharing a change.
 | PID analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Tail recursion analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Detlog determinism analysis | `prolog/detlog/detlog.pl` | `swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"` | [Detlog analysis](detlog.md) |
+| Detlog `once/1` compilation | `prolog/detlog/detlog_transform.pl` | `swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"` | [Detlog transformation](detlog.md#restricted-once-compilation) |
 | loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
 
@@ -168,6 +169,26 @@ instantiated append calls are unavailable. Choicepoint/cut conversion and genera
 mode inference are not implemented; see
 [`detlog.md`](detlog.md).
 
+### Restricted `once/1` compilation
+
+`mnn_detlog_transform:transform_program/3` compiles `once(Goal)` to the IR
+if-then-else form `ite(Goal, true, fail)` when `Goal` consists only of `true`,
+`fail`, normalized conjunction, disjunction, if-then-else, negation, and the
+pure unification, arithmetic-comparison, or type-test built-ins listed in
+[`detlog.md`](detlog.md). It leaves unsupported `once/1` goals unchanged and
+reports each compiled or retained occurrence as `compiled_once/3` or
+`kept_once/3`. Program metadata, clause order, and source locations are retained.
+The resulting control construct commits to the first success, matching
+`once/1` for this side-effect-free subset. This report is not an independently
+checked proof, and the transform does not implement general mode inference,
+choicepoint splicing, choice packets, or cut conversion.
+
+Run this focused suite from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
+```
+
 ## loop2 conversion
 
 `mnn_loop2:convert_program/3` currently handles a `findall/3` whose generator is
@@ -249,6 +270,7 @@ swipl -q -g "load_files('tests/test_corpus.pl'), run_tests(mnn_ir_corpus), halt"
 swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"
 swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"
 swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"
+swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
 swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
 swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
@@ -269,9 +291,9 @@ The current work is an initial subset, not a completed version 1 suite:
   or without supported arithmetic filters, `nth0/3`/`nth1/3` with supported
   filter cases, `length/2` with or without supported arithmetic filters, and
   bounded `between/3` conversions with supported arithmetic filters. Stage 5
-  has only conservative success-count analysis;
-  mode inference, Detlog code generation, and choicepoint/cut transformations
-  are not implemented.
+  adds only restricted compilation of pure `once/1` goals to the conservative
+  success-count analysis; general mode inference, choicepoint splicing, choice
+  packets, cut conversion, and fallback diagnostics are not implemented.
 - **Stage 6 is in progress only for the proof-gated pipeline described above**;
   its full rewrite search and closed-form discovery remain unimplemented.
 - **Stages 7–14 are not started:** AlgebraPLOp, S2A/Starlog, the AIOC
