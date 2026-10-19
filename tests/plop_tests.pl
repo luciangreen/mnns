@@ -24,8 +24,8 @@ test(single_predicate_entry_point_uses_shared_pipeline) :-
 test(single_predicate_entry_point_keeps_unselected_conversion) :-
     findall_program(Original),
     mnn_plop:optimize_predicate(
-        Original, numbers/1, Optimized,
-        plop_report([kept(requested_predicate_not_converted(numbers/1))],
+        Original, num/1, Optimized,
+        plop_report([kept(requested_predicate_not_converted(num/1))],
                     Proof, unchanged)),
     assertion(Optimized =@= Original),
     mnn_proof_checker:check_proof(Optimized, Original, Proof, accepted).
