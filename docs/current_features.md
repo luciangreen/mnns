@@ -143,7 +143,9 @@ success; distinct unbound list and length variables are classified as multi.
 Aliased variables remain unsupported. Built-in `select/3` is classified for
 ground proper lists when its selected value and remainder are unbound or ground;
 duplicate positions count separately, and ground patterns constrain the result.
-Other list/value shapes and locally defined `select/3` predicates are unsupported.
+When all three arguments are distinct unbound variables, it is classified as
+multi; aliases, other list/value shapes, and locally defined `select/3`
+predicates remain unsupported by the built-in cases.
 Ground proper-list `nth0/3` and `nth1/3` calls are classified when the index is
 variable or integer and the element is variable or ground; zero-/one-based
 indexing and duplicate matching elements are accounted for. Shared unbound
