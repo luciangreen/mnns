@@ -54,7 +54,8 @@ exposes one independently checked finite-generator conversion. See
   `member/2` calls over ground proper lists are also classified for variable,
   ground, and partially instantiated element patterns, preserving duplicate
   successes without binding the analyzed program; `select/3` over ground proper
-  lists counts duplicate positions and honors ground value/remainder patterns;
+  lists counts duplicate positions and matches partially instantiated
+  value/remainder patterns on copies;
   `select/3` with three distinct unbound arguments, supported unbound-list
   patterns, and `member/2` over an unbound list are classified as multi or
   deterministic for their supported independent patterns;

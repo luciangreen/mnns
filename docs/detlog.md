@@ -31,12 +31,13 @@ non-ground lists and program-defined `member/2` predicates are unavailable for
 this finite-list case. An unbound list with an element pattern independent of
 that list is classified as multi: a matching element can occur at multiple
 positions. A value/list alias such as `member(List, List)` remains unavailable.
-The built-in `select/3` is classified for a ground proper list when the selected
-value and remainder are each either unbound or ground. Counts are capped at two;
-duplicate positions remain distinct successes, and ground value or remainder
-patterns constrain the counted solutions. Variable or improper lists,
-partially instantiated value or remainder patterns, and a program-defined
-`select/3` remain unavailable for this finite-list case. When all three arguments
+The built-in `select/3` is classified for a ground proper list with arbitrary
+selected-value and remainder patterns, including partially instantiated terms.
+Each candidate value/remainder pair is matched against a copy of both patterns,
+preserving sharing between them without binding the analyzed program. Counts are
+capped at two; duplicate positions remain distinct successes. Variable or
+improper lists and a program-defined `select/3` remain unavailable for this
+finite-list case. When all three arguments
 are distinct unbound variables, the call is classified as multi because the
 built-in admits at least two list/value/remainder solutions. Repeated-variable
 calls and program-defined `select/3` predicates are not treated as this mode.
@@ -154,8 +155,9 @@ lengths, and distinct unbound list and length variables, as well as unsupported
 aliases, improper lists, negative lengths, and local definitions. Ground
 user-call tests cover matching, missing and duplicate facts,
 as well as rejection of non-fact definitions.
-The `select/3` tests cover ground proper lists, the distinct-unbound mode, and
-unbound lists with ground selected values or proper-list remainders, including
+The `select/3` tests cover ground proper lists with unbound, ground, or partially
+instantiated selected-value and remainder patterns, the distinct-unbound mode,
+and unbound lists with ground selected values or proper-list remainders, including
 duplicate positions, constrained results, aliases, and local definitions.
 The Detlog transformation tests check compiled `once/1` answer preservation on
 the supported pure subset and verify that cuts and user-predicate calls remain
