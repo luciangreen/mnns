@@ -286,9 +286,19 @@ Successful results use `verified_on(Samples)`; they are sample-verified, not
 accompanied by a proof. Unsupported or inconsistent samples return `no_formula`.
 The procedure is deterministic.
 
-It does not infer non-integer-base exponentials or piecewise formulas, inverses,
-formulas from program index calculations, splice-index loops, or `r_spec`
-provenance. It also does not replace program code. In particular,
+`mnn_algebraplop:invert_sequence_formula/3` inverts constant and affine formulas
+returned by the inference predicate. It returns `position(Index)` for an exact
+nonnegative integer position, `all_positions` when a matching constant formula
+(including a zero-slope affine formula) has infinitely many positions, and
+`no_position` for a non-integer target, a value outside the sequence, a negative
+position, or an unsupported formula. The inverse is exact for the supported
+formula, but does not establish that the formula itself is correct beyond its
+reported sample verification.
+
+Non-integer-base exponentials, piecewise formulas, inverses of other formula
+families, formulas from program index calculations, splice-index loops, and
+`r_spec` provenance remain unsupported. The module also does not replace program
+code. In particular,
 `[2,4,8,16]` is reported as `exponential(2, 2)`, while prime samples return
 `no_formula`.
 

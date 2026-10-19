@@ -72,4 +72,60 @@ test(inference_is_deterministic) :-
         Deterministic = true),
     assertion(Deterministic == true).
 
+test(inverts_affine_sequence_at_nonnegative_position) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(linear(2, 3), verified_on([3, 5, 7, 9])),
+        9, position(3)).
+
+test(inverts_affine_sequence_with_negative_slope) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(linear(-2, 7), verified_on([7, 5, 3, 1])),
+        3, position(2)).
+
+test(rejects_value_not_on_affine_sequence) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(linear(2, 3), verified_on([3, 5, 7, 9])),
+        8, no_position).
+
+test(rejects_affine_solution_at_negative_position) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(linear(2, 3), verified_on([3, 5, 7, 9])),
+        1, no_position).
+
+test(inverts_constant_formula_to_all_positions) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(constant(4), verified_on([4, 4, 4])),
+        4, all_positions).
+
+test(rejects_value_not_matching_constant_formula) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(constant(4), verified_on([4, 4, 4])),
+        5, no_position).
+
+test(handles_zero_slope_affine_formula) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(linear(0, 4), verified_on([4, 4, 4])),
+        4, all_positions),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(linear(0, 4), verified_on([4, 4, 4])),
+        5, no_position).
+
+test(rejects_unsupported_or_invalid_inverse_inputs) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(2, 2), verified_on([2, 4, 8])),
+        8, no_position),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(linear(2, 3), verified_on([3, 5, 7])),
+        8.0, no_position),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(linear(slope, 3), verified_on([3, 5, 7])),
+        7, no_position).
+
+test(inverse_is_deterministic) :-
+    call_cleanup(
+        mnn_algebraplop:invert_sequence_formula(
+            formula(linear(2, 3), verified_on([3, 5, 7, 9])), 9, _),
+        Deterministic = true),
+    assertion(Deterministic == true).
+
 :- end_tests(mnn_algebraplop).
