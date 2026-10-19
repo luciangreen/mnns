@@ -24,7 +24,7 @@ sharing a change.
 | Detlog `once/1` compilation | `prolog/detlog/detlog_transform.pl` | `swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"` | [Detlog transformation](detlog.md#restricted-once-compilation) |
 | loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
-| AlgebraPLOp sequence inference (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
+| AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 
 Run the complete suite, including every group above, with:
 
@@ -319,6 +319,13 @@ and the zero tail for base `0`. Values outside the sequence, non-integer targets
 negative positions, and unsupported formulas return `no_position`. Inversion is
 exact for the supplied formula but does not establish that the formula itself is
 correct beyond its reported sample verification.
+
+`mnn_algebraplop:evaluate_sequence_formula/3` evaluates any supported constant,
+linear, quadratic, Newton-polynomial, or integer-base exponential formula at a
+zero-based nonnegative integer position. It returns `value(Integer)` for a valid
+formula and position, and `no_value` for unsupported formulas, malformed
+coefficients, or invalid positions. This exact evaluation uses the formula as
+given; `verified_on(Samples)` is metadata and is not independently rechecked.
 
 Piecewise formulas, formulas from program index calculations, splice-index loops,
 and `r_spec` provenance remain unsupported. The module also does not replace
