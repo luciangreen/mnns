@@ -203,13 +203,16 @@ proof-certified. See [`loop2.md`](loop2.md).
 
 `mnn_plop:optimize_program/3` and `mnn_plop:optimize_predicate/4` share one
 conservative pipeline. It calls the existing loop2 finite-generator conversion,
-then submits the candidate and a `findall_to_fold` proof step to the independent
-proof checker. A candidate is returned only when the checker accepts it.
+then submits the candidate and its sequential `findall_to_fold` proof steps to
+the independent proof checker. A candidate is returned only when the checker
+accepts the complete sequence.
 
-At most one supported conversion may be applied in a run. If the converter finds
-multiple conversions, the input is returned unchanged. The single-predicate entry
-point also keeps the input unchanged unless its one conversion changes only the
-requested predicate. Both entry points return `plop_report(Events, Proof, Status)`;
+The pipeline can apply multiple supported conversions in one run. It records each
+conversion as a sequential proof step, and returns the transformed program only
+when the independent checker accepts the complete sequence. The single-predicate
+entry point likewise requires every change to be confined to the requested
+predicate; it keeps the input unchanged if conversions would also modify another
+predicate. Both entry points return `plop_report(Events, Proof, Status)`;
 unchanged inputs include an identity proof, and accepted output includes the
 checked rewrite proof. The pipeline does not infer costs and does not yet perform
 unfold/fold search, memoization, common-subgoal hoisting, closed-form discovery,

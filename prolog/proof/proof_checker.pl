@@ -207,7 +207,7 @@ findall_to_fold_program(
     is_list(Predicates),
     findall(PredicateIndex-ClauseIndex,
             findall_candidate(Predicates, PredicateIndex, ClauseIndex, _, _),
-            [PredicateIndex-ClauseIndex]),
+            [PredicateIndex-ClauseIndex|_]),
             findall_candidate(Predicates, PredicateIndex, ClauseIndex,
                               Values, Results),
     fresh_loop_name(Predicates, Loop),

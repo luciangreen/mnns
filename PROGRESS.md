@@ -128,11 +128,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   General mode inference and choicepoint/cut code transformations remain
   unimplemented.
 - **Stage 6 — PLOp: in progress (initial pipeline only).** Whole-program and
-  single-predicate entry points share a proof-gated pipeline for one supported
-  `findall/3`-to-loop conversion. The independent checker must accept the
-  conversion; multiple conversions and changes outside a requested predicate are
-  left unchanged. General rewrite search, cost estimation, closed-form discovery,
-  and other PLOp optimizations remain unimplemented.
+  single-predicate entry points share a proof-gated pipeline that can apply
+  multiple supported `findall/3`-to-loop conversions as sequentially checked proof
+  steps. The independent checker must accept the complete conversion sequence;
+  changes outside a requested predicate are left unchanged. General rewrite
+  search, cost estimation, closed-form discovery, and other PLOp optimizations
+  remain unimplemented.
 
 ## Remaining stages
 
@@ -143,7 +144,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains, ground proper-list `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; independent proof checks cover ground facts and finite acyclic rule chains with restricted pure bodies, plus documented built-in generator subsets; nested findall and general checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes `member/2` over an unbound list for independent element patterns, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths, selected `append/3` modes, and counts capped at two for ground calls to ground-fact-only predicates; general mode inference, other bound/repeated-argument calls, and choicepoint/cut transformations remain) |
-| 6 | PLOp optimization pipeline and proved closed forms | In progress (one proof-gated finite-generator conversion; general rewrite search, cost estimates and closed forms remain) |
+| 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | Not started |
 | 8 | S2A synthesis and Starlog view | Not started |
 | 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | Not started |

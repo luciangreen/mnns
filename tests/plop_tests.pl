@@ -30,7 +30,33 @@ test(single_predicate_entry_point_keeps_unselected_conversion) :-
     assertion(Optimized =@= Original),
     mnn_proof_checker:check_proof(Optimized, Original, Proof, accepted).
 
-test(keeps_program_with_multiple_supported_conversions) :-
+test(optimizes_multiple_supported_conversions_with_sequential_proof) :-
+    findall_program(Original0),
+    Original0 = mnn_program(Name, Meta, OriginalPredicates, Proof0, Trace),
+    OriginalPredicates = [Facts, Values],
+    Values = mnn_pred(_, Modes, Domains, [_], Status),
+    Clause2 = mnn_clause(4, values_again(Again),
+                         findall(X, num(X), Again), source(test, 4)),
+    Original = mnn_program(
+                   Name, Meta,
+                   [Facts,
+                    Values,
+                    mnn_pred(values_again/1, Modes, Domains,
+                             [Clause2], Status)],
+                   Proof0, Trace),
+    mnn_plop:optimize_program(
+        Original, Optimized,
+        plop_report([applied(findall_to_fold, Conversions)], Proof, accepted)),
+    assertion(Conversions = [_, _]),
+    assertion(Optimized \=@= Original),
+    mnn_proof_checker:check_proof(Optimized, Original, Proof, accepted),
+    Optimized = mnn_program(_, _, Predicates, _, _),
+    assertion(member(mnn_pred(mnn_loop2_1/2, _, _, _, generated(loop2)),
+                     Predicates)),
+    assertion(member(mnn_pred(mnn_loop2_2/2, _, _, _, generated(loop2)),
+                     Predicates)).
+
+test(multiple_conversions_are_rejected_outside_requested_predicate) :-
     findall_program(Original0),
     Original0 = mnn_program(Name, Meta, Predicates, Proof0, Trace),
     Predicates = [Facts, Values],
@@ -44,10 +70,11 @@ test(keeps_program_with_multiple_supported_conversions) :-
                     mnn_pred(values_again/1, Modes, Domains,
                              [Clause2], Status)],
                    Proof0, Trace),
-    mnn_plop:optimize_program(
-        Original, Optimized,
-        plop_report([kept(multiple_conversions(2))], _, unchanged)),
-    assertion(Optimized =@= Original).
+    mnn_plop:optimize_predicate(
+        Original, values/1, Optimized,
+        plop_report([kept(proof_rejected)], Proof, unchanged)),
+    assertion(Optimized =@= Original),
+    mnn_proof_checker:check_proof(Optimized, Original, Proof, accepted).
 
 test(reports_unknown_single_predicate) :-
     findall_program(Program),

@@ -30,27 +30,22 @@ run_candidate([], Program, _, _, Program,
               [kept(no_supported_conversion)], Proof, unchanged) :-
     !,
     identity_proof(Proof).
-run_candidate([Conversion], Program, Candidate, Scope, Optimized,
+run_candidate(Conversions, Program, Candidate, Scope, Optimized,
               [applied(findall_to_fold, Conversions)], Proof, accepted) :-
-    Conversions = [Conversion],
+    Conversions \= [],
     scope_accepts(Scope, Program, Candidate),
-    findall_proof(Proof),
+    length(Conversions, Count),
+    findall_proof(Count, Proof),
     mnn_proof_checker:check_proof(Candidate, Program, Proof, accepted),
     !,
     Optimized = Candidate.
-run_candidate(Conversions, Program, _, _, Program,
-              [kept(multiple_conversions(Count))], Proof, unchanged) :-
-    length(Conversions, Count),
-    Count > 1,
-    !,
-    identity_proof(Proof).
-run_candidate([_], Program, Candidate, predicate(Key), Program,
+run_candidate([_|_], Program, Candidate, predicate(Key), Program,
               [kept(requested_predicate_not_converted(Key))], Proof,
               unchanged) :-
     !,
     identity_proof(Proof),
     target_is_unchanged(Program, Candidate, Key).
-run_candidate([_], Program, _, _, Program,
+run_candidate([_|_], Program, _, _, Program,
               [kept(proof_rejected)], Proof, unchanged) :-
     !,
     identity_proof(Proof).
@@ -100,11 +95,19 @@ valid_predicate_key(Name/Arity) :-
     integer(Arity),
     Arity >= 0.
 
-findall_proof(
-    proof([proof_step(
-               1, findall_to_fold, [],
+findall_proof(Count, proof(Steps)) :-
+    findall_proof_steps(1, Count, Steps).
+
+findall_proof_steps(Id, Count, [Step|Steps]) :-
+    Id =< Count,
+    Step = proof_step(
+               Id, findall_to_fold, [],
                equivalent(domain(supported_finite_generator_subset),
-                          modes(preserved)))])).
+                          modes(preserved))),
+    NextId is Id + 1,
+    findall_proof_steps(NextId, Count, Steps).
+findall_proof_steps(Id, Count, []) :-
+    Id > Count.
 
 identity_proof(
     proof([proof_step(
