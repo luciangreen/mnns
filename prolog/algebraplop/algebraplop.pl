@@ -16,6 +16,11 @@ invert_sequence_formula(Formula, Value, Result) :-
         integer(Slope),
         integer(Intercept)
     ->  inverse_linear_position(Slope, Intercept, Value, Result)
+    ;   integer(Value),
+        Formula = formula(exponential(Initial, Base), verified_on(_)),
+        integer(Initial),
+        integer(Base)
+    ->  inverse_exponential_positions(Initial, Base, Value, Result)
     ;   Result = no_position
     ),
     !.
@@ -36,6 +41,49 @@ inverse_linear_position(Slope, Intercept, Value, Result) :-
         )
     ;   Result = no_position
     ).
+
+inverse_exponential_positions(0, _, 0, all_positions) :-
+    !.
+inverse_exponential_positions(0, _, _, no_position) :-
+    !.
+inverse_exponential_positions(Initial, 1, Value, Result) :-
+    !,
+    (   Value =:= Initial
+    ->  Result = all_positions
+    ;   Result = no_position
+    ).
+inverse_exponential_positions(Initial, -1, Value, Result) :-
+    !,
+    (   Value =:= Initial
+    ->  Result = positions(0, 2)
+    ;   NegatedInitial is -Initial,
+    (   Value =:= NegatedInitial
+    ->  Result = positions(1, 2)
+    ;   Result = no_position
+    )
+    ).
+inverse_exponential_positions(Initial, 0, Value, Result) :-
+    !,
+    (   Value =:= Initial
+    ->  Result = position(0)
+    ;   Value =:= 0
+    ->  Result = positions(1, 1)
+    ;   Result = no_position
+    ).
+inverse_exponential_positions(Initial, Base, Value, Result) :-
+    (   geometric_position(Initial, Base, Value, Position)
+    ->  Result = position(Position)
+    ;   Result = no_position
+    ).
+
+geometric_position(Initial, _, Initial, 0) :-
+    !.
+geometric_position(Initial, Base, Value, Position) :-
+    abs(Base) > 1,
+    0 is Value mod Base,
+    Quotient is Value // Base,
+    geometric_position(Initial, Base, Quotient, PreviousPosition),
+    Position is PreviousPosition + 1.
 
 infer_sequence_formula(Samples, Result) :-
     (   is_list(Samples),

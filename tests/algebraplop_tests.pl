@@ -112,7 +112,7 @@ test(handles_zero_slope_affine_formula) :-
 
 test(rejects_unsupported_or_invalid_inverse_inputs) :-
     mnn_algebraplop:invert_sequence_formula(
-        formula(exponential(2, 2), verified_on([2, 4, 8])),
+        formula(polynomial([1, 2, 1]), verified_on([1, 3, 6])),
         8, no_position),
     mnn_algebraplop:invert_sequence_formula(
         formula(linear(2, 3), verified_on([3, 5, 7])),
@@ -120,6 +120,66 @@ test(rejects_unsupported_or_invalid_inverse_inputs) :-
     mnn_algebraplop:invert_sequence_formula(
         formula(linear(slope, 3), verified_on([3, 5, 7])),
         7, no_position).
+
+test(inverts_geometric_sequence) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(2, 3), verified_on([2, 6, 18, 54])),
+        54, position(3)).
+
+test(inverts_geometric_sequence_with_negative_base) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(-2, -2), verified_on([-2, 4, -8, 16])),
+        -8, position(2)).
+
+test(inverts_geometric_sequence_with_negative_initial_value) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(-3, 2), verified_on([-3, -6, -12])),
+        -12, position(2)).
+
+test(rejects_value_not_on_geometric_sequence) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(2, 3), verified_on([2, 6, 18, 54])),
+        36, no_position).
+
+test(inverts_constant_geometric_sequences) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(5, 1), verified_on([5, 5, 5])),
+        5, all_positions),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(5, 1), verified_on([5, 5, 5])),
+        4, no_position),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(0, 2), verified_on([0, 0, 0])),
+        0, all_positions).
+
+test(inverts_alternating_geometric_sequences) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(3, -1), verified_on([3, -3, 3, -3])),
+        3, positions(0, 2)),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(3, -1), verified_on([3, -3, 3, -3])),
+        -3, positions(1, 2)),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(3, -1), verified_on([3, -3, 3, -3])),
+        2, no_position).
+
+test(inverts_zero_base_geometric_sequence) :-
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(5, 0), verified_on([5, 0, 0])),
+        5, position(0)),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(5, 0), verified_on([5, 0, 0])),
+        0, positions(1, 1)),
+    mnn_algebraplop:invert_sequence_formula(
+        formula(exponential(5, 0), verified_on([5, 0, 0])),
+        1, no_position).
+
+test(geometric_inverse_is_deterministic) :-
+    call_cleanup(
+        mnn_algebraplop:invert_sequence_formula(
+            formula(exponential(-2, -2), verified_on([-2, 4, -8])), -8, _),
+        Deterministic = true),
+    assertion(Deterministic == true).
 
 test(inverse_is_deterministic) :-
     call_cleanup(

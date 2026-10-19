@@ -17,7 +17,7 @@ sharing a change.
 | Program IR, parser and emitter | `prolog/ir/ir.pl` | `swipl -q -g "load_files('tests/ir_tests.pl'), run_tests(mnn_ir), halt"` | [IR section](#program-ir) |
 | Round-trip corpus | `tests/corpus/` | `swipl -q -g "load_files('tests/test_corpus.pl'), run_tests(mnn_ir_corpus), halt"` | [IR section](#program-ir) |
 | Sandboxed execution | `prolog/runner/sandbox_runner.pl` | `swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"` | [Sandboxed execution](#sandboxed-execution) |
-| Proof checker and renderer | `prolog/proof/` | `swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"` | [Proof checking](proof_rules.md) |
+| Proof checker and renderer | `prolog/proof/` | `swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"` | [Proof checking](proof_rules.md); [Proof rendering](#proof-rendering) |
 | PID analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Tail recursion analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Detlog determinism analysis | `prolog/detlog/detlog.pl` | `swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"` | [Detlog analysis](detlog.md) |
@@ -102,6 +102,25 @@ generators remain unsupported. The renderer creates Markdown explanations but
 does not certify proofs. General
 purity analysis, general clause/goal reordering, and most proof rules in the
 requirements remain unsupported.
+
+## Proof rendering
+
+`mnn_proof_renderer:render_proof(Program, Original, Proof, Markdown)` first calls
+the independent proof checker and returns a Markdown report containing its
+result. Accepted supported steps receive explanatory summaries; rejected or
+unsupported proofs are displayed as quoted Prolog terms and marked with the
+checker result. The report includes domain and mode annotations but does not
+infer them. Identity, restricted goal reordering, definition introduction,
+unfold, fold, and supported `findall_to_fold` steps can be rendered. Rendering
+does not itself certify a proof; certification comes from the independent
+checker. See [`proof_rules.md`](proof_rules.md) for supported proof rules and
+their limitations.
+
+Run the renderer tests with the proof-checker suite:
+
+```sh
+swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"
+```
 
 ## PID analysis
 
@@ -286,19 +305,20 @@ Successful results use `verified_on(Samples)`; they are sample-verified, not
 accompanied by a proof. Unsupported or inconsistent samples return `no_formula`.
 The procedure is deterministic.
 
-`mnn_algebraplop:invert_sequence_formula/3` inverts constant and affine formulas
-returned by the inference predicate. It returns `position(Index)` for an exact
-nonnegative integer position, `all_positions` when a matching constant formula
-(including a zero-slope affine formula) has infinitely many positions, and
-`no_position` for a non-integer target, a value outside the sequence, a negative
-position, or an unsupported formula. The inverse is exact for the supported
-formula, but does not establish that the formula itself is correct beyond its
-reported sample verification.
+`mnn_algebraplop:invert_sequence_formula/3` inverts constant, affine, and
+integer-base geometric formulas. It returns `position(Index)` for a unique exact
+nonnegative integer position, `all_positions` when every position matches, and
+`positions(First, Step)` for an infinite arithmetic progression of matching
+positions (`First + k*Step`, for nonnegative integer `k`). The latter covers
+alternating values for base `-1` and the zero tail for base `0`. Values outside
+the sequence, non-integer targets, negative positions, and unsupported formulas
+return `no_position`. Inversion is exact for the supplied formula but does not
+establish that the formula itself is correct beyond its reported sample
+verification.
 
-Non-integer-base exponentials, piecewise formulas, inverses of other formula
-families, formulas from program index calculations, splice-index loops, and
-`r_spec` provenance remain unsupported. The module also does not replace program
-code. In particular,
+Polynomial inverses, piecewise formulas, formulas from program index
+calculations, splice-index loops, and `r_spec` provenance remain unsupported.
+The module also does not replace program code. In particular,
 `[2,4,8,16]` is reported as `exponential(2, 2)`, while prime samples return
 `no_formula`.
 
@@ -352,10 +372,11 @@ The current work is an initial subset, not a completed version 1 suite:
 - **Stage 6 is in progress only for the proof-gated pipeline described above**;
   its full rewrite search and closed-form discovery remain unimplemented.
 - **Stage 7 has an initial exact constant/affine/quadratic, higher-degree
-  polynomial, and integer-base geometric sequence-inference slice** as described
-  above; inverse discovery,
-  program-position extraction, splice-index loops, `r_spec` provenance,
-  complexity ranking, and proof-backed formulas remain unimplemented. **Stages
+  polynomial, and integer-base geometric sequence-inference slice**, with exact
+  inverses for constant, affine, and integer-base geometric formulas as described
+  above; polynomial inverse discovery, program-position extraction, splice-index
+  loops, `r_spec` provenance, complexity ranking, and proof-backed formulas remain
+  unimplemented. **Stages
   8–14 are not started:** S2A/Starlog,
   the AIOC pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
