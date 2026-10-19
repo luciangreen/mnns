@@ -100,7 +100,9 @@ exposes one independently checked finite-generator conversion. See
 - **AlgebraPLOp (initial slice):** deterministically recognizes exact constant,
   affine, quadratic, higher-degree integer polynomial, and integer-base geometric
   sequences and checks all provided samples, including held-out samples for fitted
-  formulas; it does not infer inverses, program positions, or proof-backed formulas. See
+  formulas. Exact inverse lookup is available for constant and affine formulas;
+  other formula inverses, program positions, and proof-backed formulas remain
+  unsupported. See
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
 
 ## Requirements

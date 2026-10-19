@@ -1,6 +1,41 @@
 :- module(mnn_algebraplop,
-          [ infer_sequence_formula/2
+          [ infer_sequence_formula/2,
+            invert_sequence_formula/3
           ]).
+
+invert_sequence_formula(Formula, Value, Result) :-
+    (   integer(Value),
+        Formula = formula(constant(Constant), verified_on(_)),
+        integer(Constant)
+    ->  (   Value =:= Constant
+        ->  Result = all_positions
+        ;   Result = no_position
+        )
+    ;   integer(Value),
+        Formula = formula(linear(Slope, Intercept), verified_on(_)),
+        integer(Slope),
+        integer(Intercept)
+    ->  inverse_linear_position(Slope, Intercept, Value, Result)
+    ;   Result = no_position
+    ),
+    !.
+
+inverse_linear_position(0, Intercept, Value, Result) :-
+    !,
+    (   Value =:= Intercept
+    ->  Result = all_positions
+    ;   Result = no_position
+    ).
+inverse_linear_position(Slope, Intercept, Value, Result) :-
+    Difference is Value - Intercept,
+    (   0 is Difference mod Slope
+    ->  Position is Difference // Slope,
+        (   Position >= 0
+        ->  Result = position(Position)
+        ;   Result = no_position
+        )
+    ;   Result = no_position
+    ).
 
 infer_sequence_formula(Samples, Result) :-
     (   is_list(Samples),
