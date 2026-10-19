@@ -24,6 +24,7 @@ sharing a change.
 | Detlog `once/1` compilation | `prolog/detlog/detlog_transform.pl` | `swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"` | [Detlog transformation](detlog.md#restricted-once-compilation) |
 | loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
+| AlgebraPLOp sequence inference (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 
 Run the complete suite, including every group above, with:
 
@@ -259,6 +260,28 @@ Run PLOp tests with:
 swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 ```
 
+## AlgebraPLOp sequence inference
+
+`mnn_algebraplop:infer_sequence_formula/2` is an initial, conservative sequence
+inference slice. It accepts a proper list of at least three integers, treats the
+first value as position zero, and returns either an exact constant formula or an
+exact affine formula `linear(Slope, Intercept)`. The formula is checked against
+every supplied value, including values after the first two that act as held-out
+checks. Successful results use `verified_on(Samples)`; they are sample-verified,
+not accompanied by a proof. Unsupported or inconsistent samples return
+`no_formula`. The procedure is deterministic.
+
+It does not infer exponentials, piecewise formulas, inverses, formulas from
+program index calculations, splice-index loops, or `r_spec` provenance. It also
+does not replace program code. In particular, `[2,4,8,16]` and prime samples
+return `no_formula`.
+
+Run this focused suite from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"
+```
+
 ## Test commands
 
 Run every test, including the corpus and all subsystem tests:
@@ -279,6 +302,7 @@ swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog
 swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
 swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
+swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"
 ```
 
 The single canonical full-suite command is also used in CI. Individual test
@@ -301,8 +325,11 @@ The current work is an initial subset, not a completed version 1 suite:
   packets, cut conversion, and fallback diagnostics are not implemented.
 - **Stage 6 is in progress only for the proof-gated pipeline described above**;
   its full rewrite search and closed-form discovery remain unimplemented.
-- **Stages 7–14 are not started:** AlgebraPLOp, S2A/Starlog, the AIOC
-  pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
+- **Stage 7 has an initial exact constant/affine sequence-inference slice** as
+  described above; inverse discovery, program-position extraction,
+  splice-index loops, `r_spec` provenance, complexity ranking, and proof-backed
+  formulas remain unimplemented. **Stages 8–14 are not started:** S2A/Starlog,
+  the AIOC pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 
 See [`PROGRESS.md`](../PROGRESS.md) for the complete stage table and the

@@ -97,6 +97,10 @@ exposes one independently checked finite-generator conversion. See
   Unsupported or ambiguous cases are left unchanged. It does not yet implement
   closed-form discovery, a cost model, or the general PLOp rewrite set. See
   [`docs/current_features.md`](docs/current_features.md#plop-pipeline).
+- **AlgebraPLOp (initial slice):** deterministically recognizes exact constant
+  and affine integer sequences and checks all provided samples; it does not infer
+  inverses, program positions, or proof-backed formulas. See
+  [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
 
 ## Requirements
 
@@ -115,7 +119,7 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-loop2, Detlog, and PLOp tests. Focused commands for every PlUnit group are listed in
+loop2, Detlog, PLOp, and AlgebraPLOp tests. Focused commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 
 ```sh
