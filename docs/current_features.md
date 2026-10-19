@@ -286,19 +286,20 @@ Successful results use `verified_on(Samples)`; they are sample-verified, not
 accompanied by a proof. Unsupported or inconsistent samples return `no_formula`.
 The procedure is deterministic.
 
-`mnn_algebraplop:invert_sequence_formula/3` inverts constant and affine formulas
-returned by the inference predicate. It returns `position(Index)` for an exact
-nonnegative integer position, `all_positions` when a matching constant formula
-(including a zero-slope affine formula) has infinitely many positions, and
-`no_position` for a non-integer target, a value outside the sequence, a negative
-position, or an unsupported formula. The inverse is exact for the supported
-formula, but does not establish that the formula itself is correct beyond its
-reported sample verification.
+`mnn_algebraplop:invert_sequence_formula/3` inverts constant, affine, and
+integer-base geometric formulas. It returns `position(Index)` for a unique exact
+nonnegative integer position, `all_positions` when every position matches, and
+`positions(First, Step)` for an infinite arithmetic progression of matching
+positions (`First + k*Step`, for nonnegative integer `k`). The latter covers
+alternating values for base `-1` and the zero tail for base `0`. Values outside
+the sequence, non-integer targets, negative positions, and unsupported formulas
+return `no_position`. Inversion is exact for the supplied formula but does not
+establish that the formula itself is correct beyond its reported sample
+verification.
 
-Non-integer-base exponentials, piecewise formulas, inverses of other formula
-families, formulas from program index calculations, splice-index loops, and
-`r_spec` provenance remain unsupported. The module also does not replace program
-code. In particular,
+Polynomial inverses, piecewise formulas, formulas from program index
+calculations, splice-index loops, and `r_spec` provenance remain unsupported.
+The module also does not replace program code. In particular,
 `[2,4,8,16]` is reported as `exponential(2, 2)`, while prime samples return
 `no_formula`.
 
@@ -352,10 +353,11 @@ The current work is an initial subset, not a completed version 1 suite:
 - **Stage 6 is in progress only for the proof-gated pipeline described above**;
   its full rewrite search and closed-form discovery remain unimplemented.
 - **Stage 7 has an initial exact constant/affine/quadratic, higher-degree
-  polynomial, and integer-base geometric sequence-inference slice** as described
-  above; inverse discovery,
-  program-position extraction, splice-index loops, `r_spec` provenance,
-  complexity ranking, and proof-backed formulas remain unimplemented. **Stages
+  polynomial, and integer-base geometric sequence-inference slice**, with exact
+  inverses for constant, affine, and integer-base geometric formulas as described
+  above; polynomial inverse discovery, program-position extraction, splice-index
+  loops, `r_spec` provenance, complexity ranking, and proof-backed formulas remain
+  unimplemented. **Stages
   8–14 are not started:** S2A/Starlog,
   the AIOC pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
