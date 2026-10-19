@@ -270,6 +270,17 @@ findall_candidate_values(_, Template, Generator, Values) :-
     is_list(List),
     maplist(supported_arithmetic_filter, Filters),
     nth_candidate_values(List, 1, Index, Value, Template, Filters, Values).
+findall_candidate_values(_, Template, Generator, Values) :-
+    generator_parts(Generator, between(Low, High, Value), Filters),
+    Filters \= [],
+    integer(Low),
+    integer(High),
+    (   var(Value)
+    ;   integer(Value)
+    ),
+    maplist(supported_arithmetic_filter, Filters),
+    between_candidate_numbers(Low, High, Numbers),
+    between_candidate_values(Numbers, Value, Template, Filters, Values).
 findall_candidate_values(_, Template, length(List, Length), Values) :-
     ground(List),
     is_list(List),
@@ -444,15 +455,23 @@ between_candidate_numbers(Low, High, Numbers) :-
         findall(Number, between(Low, High, Number), Numbers)
     ).
 
-between_candidate_values([], _, _, []).
-between_candidate_values([Number|Numbers], Value, Template, Values) :-
-    copy_term((Value, Template), (ValueCopy, TemplateCopy)),
+between_candidate_values(Numbers, Value, Template, Values) :-
+    between_candidate_values(Numbers, Value, Template, [], Values).
+
+between_candidate_values([], _, _, _, []).
+between_candidate_values([Number|Numbers], Value, Template, Filters, Values) :-
+    copy_term((Value, Template, Filters),
+              (ValueCopy, TemplateCopy, FiltersCopy)),
     (   ValueCopy = Number
-    ->  ground(TemplateCopy),
-        Values = [TemplateCopy|Rest]
+    ->  checked_filters_result(FiltersCopy, FilterResult),
+        (   FilterResult == true
+        ->  ground(TemplateCopy),
+            Values = [TemplateCopy|Rest]
+        ;   Values = Rest
+        )
     ;   Values = Rest
     ),
-    between_candidate_values(Numbers, Value, Template, Rest).
+    between_candidate_values(Numbers, Value, Template, Filters, Rest).
 
 select_candidate_values(List, Value, Rest, Template, Values) :-
     findall(candidate(TemplateCopy, Match),
