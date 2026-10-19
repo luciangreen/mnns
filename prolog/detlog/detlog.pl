@@ -115,6 +115,15 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
 goal_outcomes(Goal, Predicates, _, Outcomes) :-
     nonvar(Goal),
     Goal = length(List, Length),
+    var(List),
+    integer(Length),
+    Length >= 0,
+    \+ member(mnn_pred(length/2, _, _, _, _), Predicates),
+    !,
+    Outcomes = [1].
+goal_outcomes(Goal, Predicates, _, Outcomes) :-
+    nonvar(Goal),
+    Goal = length(List, Length),
     ground(List),
     is_list(List),
     (   var(Length)

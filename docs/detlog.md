@@ -40,7 +40,10 @@ proper list and its length argument is unbound or a nonnegative integer. An
 unbound length succeeds exactly once; a matching nonnegative integer succeeds
 once and a mismatch fails. Variable or improper lists, negative or non-integer
 length arguments, and a program-defined `length/2` are not handled by this
-built-in case.
+built-in case. A variable list paired with a fixed nonnegative integer length is
+also classified as deterministic: it has exactly one solution, including for
+length zero. Other non-ground list patterns and negative lengths remain
+unavailable.
 The built-ins `nth0/3` and `nth1/3` are classified for ground proper lists when
 the index is an unbound variable or integer and the element is an unbound
 variable or ground term. An unbound index and element must be distinct variables.
@@ -108,3 +111,6 @@ values, out-of-range indices, and unsupported list or variable shapes. Run the
 complete suite with `swipl -q -s tests/run.pl`. The append tests cover all
 distinct-unbound, ground, one-unbound, and two-unbound modes, including empty and
 nonempty ground lists and unsupported repeated or non-ground arguments.
+The `length/2` tests cover ground lists and variable lists with fixed nonnegative
+lengths, as well as unsupported improper lists, negative lengths, and local
+definitions.

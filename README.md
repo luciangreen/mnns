@@ -53,7 +53,8 @@ remaining work.
   lists counts duplicate positions and honors ground value/remainder patterns;
   and `length/2` calls
   over ground proper lists are classified when the length is unbound or a
-  nonnegative integer. Ground proper-list `nth0/3` and `nth1/3` calls are
+  nonnegative integer, while variable lists with fixed nonnegative lengths are
+  classified as deterministic. Ground proper-list `nth0/3` and `nth1/3` calls are
   classified for variable or integer indices and variable or ground elements,
   preserving zero-/one-based indexing and duplicate-position counts. `append/3`
   is classified as multi when all three
