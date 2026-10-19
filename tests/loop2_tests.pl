@@ -191,13 +191,43 @@ test(leaves_recursive_and_unbound_rule_generators_unchanged, [nondet]) :-
                            original),
                   Predicates)).
 
-test(leaves_unsupported_builtin_generators_unchanged, [nondet]) :-
+test(converts_ground_append_generator_preserving_split_order, [nondet]) :-
     with_converted_program(
-        [(values(Values) :- findall(X, append(X, [3], [1, 2, 3]), Values))],
+        [(values(Values) :-
+              findall(Prefix-Suffix,
+                      append(Prefix, Suffix, [1, 2, 3]),
+                      Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_append(4),
+                                        safe_arithmetic_filters(0),
+                                        deterministic_loop))])),
+    run_converted(Converted, values(Values),
+                  [[[[]-[1, 2, 3], [1]-[2, 3], [1, 2]-[3], [1, 2, 3]-[]]]]).
+
+test(converts_ground_append_with_pattern_and_arithmetic_filter, [nondet]) :-
+    with_converted_program(
+        [(values(Values) :-
+              findall(Value,
+                      (append([Value], Suffix, [1, 2, 3]), Value > 0),
+                      Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_ground_append(4),
+                                        safe_arithmetic_filters(1),
+                                        deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[1]]]).
+
+test(leaves_append_on_non_ground_list_unchanged, [nondet]) :-
+    with_converted_program(
+        [(values(List, Values) :-
+              findall(Prefix, append(Prefix, _, List), Values))],
         Converted, loop2_report([])),
     Converted = mnn_program(_, _, Predicates, _, _),
     assertion(member(
-                  mnn_pred(values/1, _, _,
+                  mnn_pred(values/2, _, _,
                            [mnn_clause(_, _, findall(_, append(_, _, _), _), _)],
                            original),
                   Predicates)).

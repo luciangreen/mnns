@@ -79,9 +79,9 @@ exposes one independently checked finite-generator conversion. See
   and `between/3`, to IR if-then-else, preserving unsupported and locally defined
   predicates unchanged. It does not yet implement choicepoint splicing, choice
   packets, or cut conversion. See [`docs/detlog.md`](docs/detlog.md).
-- **loop2 conversion:** converts `findall/3` over ground facts, `member/2` or
-  `select/3` on a ground proper list, `nth0/3` or `nth1/3` on a ground proper
-  list, bounded `between/3` ranges, or `length/2` on a ground proper list,
+- **loop2 conversion:** converts `findall/3` over ground facts, `member/2`,
+  `select/3`, or `append/3` on a ground proper list, `nth0/3` or `nth1/3` on a
+  ground proper list, bounded `between/3` ranges, or `length/2` on a ground proper list,
   optionally with supported arithmetic filters, into deterministic list-copy
   loops. Bound or partially instantiated arguments are matched against fact and
   rule heads or list-generator patterns. List order, selection remainders,

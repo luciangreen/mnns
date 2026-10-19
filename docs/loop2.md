@@ -24,6 +24,10 @@ The current supported subset is deliberately narrow:
   comparisons. Selection order, duplicate positions, and each resulting
   remainder list are preserved; element and remainder arguments may be
   constrained by term patterns.
+- `append/3` when its third argument is a ground proper list, optionally
+  followed by arithmetic comparisons. Every prefix/suffix split is considered
+  in increasing prefix length; patterns on either side constrain the matching
+  split, and duplicate template results are preserved.
 - `nth0/3` or `nth1/3` over a ground proper list, optionally followed by
   arithmetic comparisons. The index may be a variable or integer, and the
   element may be constrained by a term pattern. Zero-based and one-based index
@@ -62,12 +66,15 @@ meta-call, or unsupported body goal prevents conversion. Each conversion report
 cites the `findall_to_fold` lemma and records the generator-specific finiteness
 condition (ground facts, finite acyclic rules, a ground list, or a bounded
 `between/3` range), safe-arithmetic-filter condition, and deterministic-loop
-condition. The report is an obligation, not itself a checked proof. The
+condition. For `append/3`, the finite condition is a ground proper list with
+exactly one more split than list elements. The report is an obligation, not
+itself a checked proof. The
 independent proof checker validates conversions over predicates consisting
 entirely of ground facts, including supported arithmetic-comparison filters, and
 finite acyclic rule generators whose clauses use only ground facts, conjunction,
 disjunction, `true`, `fail`, supported arithmetic comparisons, and calls to other
-supported source predicates. It also checks ground-list `member/2` and
+supported source predicates. It also checks ground-list `append/3`,
+`member/2` and
 `select/3` with or without supported arithmetic-comparison filters,
 `nth0/3`/`nth1/3` indices with supported filters, `length/2`, and bounded
 `between/3`. For rule generators, clause and answer order and duplicate

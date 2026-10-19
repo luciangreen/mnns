@@ -329,6 +329,10 @@ findall_candidate_values(_, Template, select(Value, List, Rest), Values) :-
     ground(List),
     is_list(List),
     select_candidate_values(List, Value, Rest, Template, Values).
+findall_candidate_values(_, Template, append(Prefix, Suffix, List), Values) :-
+    ground(List),
+    is_list(List),
+    append_candidate_values(List, Prefix, Suffix, Template, Values).
 findall_candidate_values(_, Template, Generator, Values) :-
     generator_parts(Generator, select(Value, List, Rest), Filters),
     Filters \= [],
@@ -336,6 +340,13 @@ findall_candidate_values(_, Template, Generator, Values) :-
     is_list(List),
     maplist(supported_arithmetic_filter, Filters),
     select_candidate_values(List, Value, Rest, Template, Filters, Values).
+findall_candidate_values(_, Template, Generator, Values) :-
+    generator_parts(Generator, append(Prefix, Suffix, List), Filters),
+    Filters \= [],
+    ground(List),
+    is_list(List),
+    maplist(supported_arithmetic_filter, Filters),
+    append_candidate_values(List, Prefix, Suffix, Template, Filters, Values).
 findall_candidate_values(_, Template, Generator, Values) :-
     generator_parts(Generator, member(Value, List), Filters),
     Filters \= [],
@@ -662,6 +673,48 @@ select_candidate_values([Candidate|Candidates], Prefix, Value, Rest, Template,
     ),
     select_candidate_values(Candidates, [Candidate|Prefix], Value, Rest,
                            Template, Filters, RemainingValues).
+
+append_candidate_values(List, Prefix, Suffix, Template, Values) :-
+    findall(TemplateCopy,
+            ( copy_term((Prefix, Suffix, Template),
+                        (PrefixCopy, SuffixCopy, TemplateCopy)),
+              append(PrefixCopy, SuffixCopy, List),
+              (   ground(TemplateCopy)
+              ->  true
+              ;   throw(ungrounded_append_template)
+              )
+            ),
+            Values).
+
+append_candidate_values(List, Prefix, Suffix, Template, Filters, Values) :-
+    findall(candidate(TemplateCopy, FilterResult),
+            ( copy_term((Prefix, Suffix, Template, Filters),
+                        (PrefixCopy, SuffixCopy, TemplateCopy, FiltersCopy)),
+              append(PrefixCopy, SuffixCopy, List),
+              maplist(supported_arithmetic_filter, FiltersCopy),
+              (   checked_filters_result(FiltersCopy, FilterResult)
+              ->  true
+              ;   throw(invalid_append_filter)
+              ),
+              (   FilterResult == true
+              ->  (   ground(TemplateCopy)
+                  ->  true
+                  ;   throw(ungrounded_append_template)
+                  )
+              ;   true
+              )
+            ),
+            Candidates),
+    checked_append_candidate_values(Candidates, Values).
+
+checked_append_candidate_values([], []).
+checked_append_candidate_values([candidate(Template, Result)|Candidates],
+                               Values) :-
+    (   Result == true
+    ->  Values = [Template|Rest]
+    ;   Values = Rest
+    ),
+    checked_append_candidate_values(Candidates, Rest).
 
 member_candidate_values([], _, _, _, []).
 member_candidate_values([Candidate|Candidates], Value, Template, Filters,
