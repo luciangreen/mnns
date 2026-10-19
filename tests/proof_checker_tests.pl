@@ -132,7 +132,7 @@ test(accept_ground_member_findall_template_with_bound_pattern) :-
 
 test(reject_ground_member_findall_template_with_unbound_values) :-
     member_template_findall_to_fold_programs(
-        label(Unbound), Value, [a], Original, Program),
+        label(_Unbound), _Value, [a], Original, Program),
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(
         Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
