@@ -111,8 +111,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   recursive list-copy helper for each conversion.
   Its report cites the findall-to-fold lemma and records finiteness, safe-filter,
   and determinism side conditions as an obligation; the independent checker
-  validates the documented ground-fact, ground-list, and bounded `between/3`
-  subsets.
+  validates the documented ground-fact, finite acyclic rule, ground-list, and
+  bounded `between/3` subsets.
 
 ## Remaining stages
 

@@ -139,6 +139,20 @@ test(converts_finite_multiclause_rule_generator_in_clause_order, [nondet]) :-
                                         deterministic_loop))])),
     run_converted(Converted, numbers(Values), [[[2, 3, 0]]]).
 
+test(converts_rule_disjunction_preserving_duplicate_answers, [nondet]) :-
+    with_converted_program(
+        [num(1),
+         num(2),
+         (repeated(X) :- (num(X) ; num(X))),
+         (numbers(Values) :- findall(X, repeated(X), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_acyclic_rules(4),
+                                        safe_arithmetic_filters(0),
+                                        deterministic_loop))])),
+    run_converted(Converted, numbers(Values), [[[1, 2, 1, 2]]]).
+
 test(converts_rule_generator_with_bound_arguments, [nondet]) :-
     with_converted_program(
         [pair(a, 1),

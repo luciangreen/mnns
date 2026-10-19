@@ -32,7 +32,7 @@ remaining work.
   generators with restricted pure bodies. The `nth0/3` and `nth1/3`
   filter cases require distinct unbound index and element variables. Selection
   order, fact order, and duplicate answers are preserved; indices are checked
-  as zero-based for `nth0/3` and one-based for `nth1/3`. Unsupported rules and
+  as zero-based for `nth0/3` and one-based for `nth1/3`. Unsupported proof rules and
   broader findall conversions are rejected.
   See [`docs/proof_rules.md`](docs/proof_rules.md).
 - **PID analysis:** classifies recursive predicates, checks a limited set of
