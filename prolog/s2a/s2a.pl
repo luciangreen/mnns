@@ -11,12 +11,13 @@ s2a(Name, Spec, Options, Result) :-
     ->  Result = no_algorithm(invalid_options)
     ;   \+ memberchk(allow_table(true), Options)
     ->  Result = no_algorithm(no_generalization_candidate)
-    ;   \+ maplist(example_pair, Spec, Pairs)
-    ->  Result = no_algorithm(unsupported_spec_shape)
-    ;   conflicting_input(Pairs, Input)
-    ->  Result = no_algorithm(conflicting_examples(Input))
-    ;   unique_pairs(Pairs, UniquePairs),
-        build_program(Name, UniquePairs, Result)
+    ;   maplist(example_pair, Spec, Pairs)
+    ->  (   conflicting_input(Pairs, Input)
+        ->  Result = no_algorithm(conflicting_examples(Input))
+        ;   unique_pairs(Pairs, UniquePairs),
+            build_program(Name, UniquePairs, Result)
+        )
+    ;   Result = no_algorithm(unsupported_spec_shape)
     ),
     !.
 
