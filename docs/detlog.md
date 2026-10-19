@@ -108,11 +108,12 @@ swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 
 The focused suite covers the supported `member/2` patterns, including partially
 instantiated and repeated-variable patterns, duplicate matches, no matches,
-unbound lists, and unsupported aliases and list shapes. It also covers `nth0/3` and `nth1/3`, including duplicate
-values, out-of-range indices, and unsupported list or variable shapes. Run the
-complete suite with `swipl -q -s tests/run.pl`. The append tests cover all
-distinct-unbound, ground, one-unbound, and two-unbound modes, including empty and
-nonempty ground lists and unsupported repeated or non-ground arguments.
+unbound lists, and unsupported aliases and list shapes. It also covers `nth0/3`
+and `nth1/3`, including duplicate values, out-of-range indices, and unsupported
+list or variable shapes. Run the complete suite with `swipl -q -s tests/run.pl`.
+The append tests cover all distinct-unbound, ground, one-unbound, and two-unbound
+modes, including empty and nonempty ground lists and unsupported repeated or
+non-ground arguments.
 The `length/2` tests cover ground lists and variable lists with fixed nonnegative
 lengths, as well as unsupported improper lists, negative lengths, and local
 definitions.

@@ -130,12 +130,12 @@ Variable, improper, or non-ground lists and locally defined `member/2` predicate
 are unsupported for this finite-list case. An unbound list with an independent
 variable, ground, or structured element pattern is classified as multi because
 matching elements can occur at multiple positions; an element pattern that
-aliases the list is unsupported. Built-in `length/2` calls are classified for a ground proper
-list and an unbound or nonnegative
-integer length: the unbound or matching length succeeds once, and a mismatch
-fails. Variable/improper lists and locally defined `length/2` predicates are not
-treated as this built-in case. A variable list with a fixed nonnegative integer
-length is also classified as one success. Built-in `select/3` is classified for
+aliases the list is unsupported. Built-in `length/2` calls are classified for a
+ground proper list and an unbound or nonnegative integer length: the unbound or
+matching length succeeds once, and a mismatch fails. Variable/improper lists and
+locally defined `length/2` predicates are not treated as this built-in case. A
+variable list with a fixed nonnegative integer length is also classified as one
+success. Built-in `select/3` is classified for
 ground proper lists when its selected value and remainder are unbound or ground;
 duplicate positions count separately, and ground patterns constrain the result.
 Other list/value shapes and locally defined `select/3` predicates are unsupported.
