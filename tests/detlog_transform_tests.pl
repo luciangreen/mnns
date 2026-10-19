@@ -98,6 +98,32 @@ test(compiles_builtin_member_once_and_preserves_first_answer, [nondet]) :-
     assertion(OriginalAnswers == [a]),
     assertion(CompiledAnswers == OriginalAnswers).
 
+test(compiles_builtin_between_once_and_preserves_first_answer, [nondet]) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(choose/1, ['?'], [any],
+                            [mnn_clause(1, choose(Value),
+                                        once(between(1, 3, Value)),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(choose/1, _, _,
+                                    [mnn_clause(_, _, Compiled, _)],
+                                    original)], _, _),
+        detlog_transform_report(
+            [compiled_once(choose/1, 1, between(1, 3, _))])),
+    assertion(Compiled = ite(between(1, 3, CompiledValue), true, fail)),
+    findall(OriginalValue,
+            once(between(1, 3, OriginalValue)),
+            OriginalAnswers),
+    findall(CompiledValue,
+            (between(1, 3, CompiledValue) -> true ; fail),
+            CompiledAnswers),
+    assertion(OriginalAnswers == [1]),
+    assertion(CompiledAnswers == OriginalAnswers).
+
 test(keeps_once_for_program_defined_member) :-
     Program = mnn_program(
                   sample, meta(sample, [clause(1), clause(2)]),
@@ -116,6 +142,26 @@ test(keeps_once_for_program_defined_member) :-
         detlog_transform_report(
             [kept_once(caller/2, 1,
                        unsupported_goal(member(_, _)))])),
+    assertion(Transformed = Program).
+
+test(keeps_once_for_program_defined_between) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1), clause(2)]),
+                  [mnn_pred(caller/1, ['?'], [any],
+                            [mnn_clause(1, caller(Value),
+                                        once(between(1, 3, Value)),
+                                        source(sample, 1))],
+                            original),
+                   mnn_pred(between/3, ['+', '+', '?'], [any, any, any],
+                            [mnn_clause(2, between(_, _, _), true,
+                                        source(sample, 2))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program, Transformed,
+        detlog_transform_report(
+            [kept_once(caller/1, 1,
+                       unsupported_goal(between(_, _, _)))])),
     assertion(Transformed = Program).
 
 :- end_tests(mnn_detlog_transform).
