@@ -140,7 +140,10 @@ distinct unbound variables; repeated-argument calls and locally defined
 `append/3` predicates are not treated as the built-in. `append/3` is also
 classified as deterministic or failing when all arguments are ground proper lists
 or exactly one argument is unbound and the other two are ground proper lists.
-Other partially instantiated append calls are unavailable. Choicepoint/cut conversion and general mode inference are not implemented; see
+With two distinct unbound arguments and a ground proper-list result, the empty
+list has one split and is deterministic, while a nonempty list has multiple
+splits and is classified as multi. Other partially instantiated append calls are
+unavailable. Choicepoint/cut conversion and general mode inference are not implemented; see
 [`detlog.md`](detlog.md).
 
 ## loop2 conversion

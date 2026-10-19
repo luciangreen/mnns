@@ -252,6 +252,29 @@ test(classifies_append_with_distinct_unbound_arguments_as_multi) :-
                                  determinism(multi), success_counts([2])),
                         Results)).
 
+test(classifies_append_splits_for_two_unbound_arguments) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(empty_split/0, [], [],
+                           [mnn_clause(1, empty_split,
+                             append(_EmptyPrefix, _EmptySuffix, []),
+                             source(sample, 1))],
+                           original),
+                   mnn_pred(nonempty_splits/0, [], [],
+                           [mnn_clause(2, nonempty_splits,
+                             append(_Prefix, _Suffix, [a, b]),
+                             source(sample, 2))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(empty_split/0, mode(all_arguments_unbound),
+                        determinism(det), success_counts([1])),
+                        Results)),
+    assertion(memberchk(predicate(nonempty_splits/0,
+                        mode(all_arguments_unbound),
+                        determinism(multi), success_counts([2])),
+                        Results)).
+
 test(classifies_append_when_two_arguments_are_ground_lists) :-
     Program = mnn_program(
                   sample, meta(sample, []),
@@ -289,6 +312,32 @@ test(classifies_append_when_two_arguments_are_ground_lists) :-
     assertion(memberchk(predicate(mismatch/0, mode(all_arguments_unbound),
                                  determinism(failure), success_counts([0])),
                         Results)).
+
+test(two_unbound_append_arguments_require_distinct_variables_and_ground_list) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(non_ground_list/0, [], [],
+                           [mnn_clause(1, non_ground_list,
+                             append(_Prefix, _Suffix, [a|_]),
+                             source(sample, 1))],
+                           original),
+                   mnn_pred(repeated_arguments/0, [], [],
+                           [mnn_clause(2, repeated_arguments,
+                             append(Shared, Shared, [a]),
+                             source(sample, 2))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_detlog:analyze_determinism(Program, detlog_report(Results)),
+    assertion(memberchk(predicate(non_ground_list/0,
+                        mode(all_arguments_unbound),
+                        unavailable(unsupported_goal(
+                            append(_, _, [a|_]))),
+                        unsupported_body), Results)),
+    assertion(memberchk(predicate(repeated_arguments/0,
+                        mode(all_arguments_unbound),
+                        unavailable(unsupported_goal(
+                            append(_, _, [a]))),
+                        unsupported_body), Results)).
 
 test(append_modes_with_non_ground_lists_remain_unsupported) :-
     Program = mnn_program(

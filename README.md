@@ -58,7 +58,9 @@ remaining work.
   is classified as multi when all three
   arguments are distinct unbound variables, and as deterministic or failing
   when all three arguments are ground proper lists or one argument is unbound
-  and the other two are ground proper lists. See
+  and the other two are ground proper lists. With two distinct unbound arguments
+  and a ground proper-list result, empty input is deterministic and nonempty
+  input is multi. See
   [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` or
   `select/3` on a ground proper list, `nth0/3` or `nth1/3` on a ground proper
