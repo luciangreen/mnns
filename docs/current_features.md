@@ -291,9 +291,9 @@ The current work is an initial subset, not a completed version 1 suite:
   or without supported arithmetic filters, `nth0/3`/`nth1/3` with supported
   filter cases, `length/2` with or without supported arithmetic filters, and
   bounded `between/3` conversions with supported arithmetic filters. Stage 5
-  has only conservative success-count analysis;
-  mode inference, Detlog code generation, and choicepoint/cut transformations
-  are not implemented.
+  adds only restricted compilation of pure `once/1` goals to the conservative
+  success-count analysis; general mode inference, choicepoint splicing, choice
+  packets, cut conversion, and fallback diagnostics are not implemented.
 - **Stage 6 is in progress only for the proof-gated pipeline described above**;
   its full rewrite search and closed-form discovery remain unimplemented.
 - **Stages 7–14 are not started:** AlgebraPLOp, S2A/Starlog, the AIOC

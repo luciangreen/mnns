@@ -2,6 +2,8 @@
           [ transform_program/3
           ]).
 
+:- use_module(library(lists)).
+
 transform_program(
     mnn_program(Name, Meta, Predicates, Proof, Trace),
     mnn_program(Name, Meta, TransformedPredicates, Proof, Trace),

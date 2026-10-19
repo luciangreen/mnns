@@ -49,7 +49,7 @@ exposes one independently checked finite-generator conversion. See
   built-ins are evaluated for success or failure, and ground calls to
   predicates consisting only of ground facts count matching and duplicate
   successes up to two. Bounded literal `between/3`
-  calls are classified,   and `once/1` caps reported successes at one. General choicepoint and cut
+  calls are classified, and `once/1` caps reported successes at one. General choicepoint and cut
   transformations are not implemented yet. Finite built-in
   `member/2` calls over ground proper lists are also classified for variable,
   ground, and partially instantiated element patterns, preserving duplicate
