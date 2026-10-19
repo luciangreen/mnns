@@ -250,6 +250,26 @@ findall_candidate_values(_, Template, nth1(Index, List, Value), Indices) :-
     ground(List),
     is_list(List),
     list_indices(List, 1, Indices).
+findall_candidate_values(_, Template, Generator, Values) :-
+    generator_parts(Generator, nth0(Index, List, Value), Filters),
+    Filters \= [],
+    var(Index),
+    var(Value),
+    Index \== Value,
+    ground(List),
+    is_list(List),
+    maplist(supported_arithmetic_filter, Filters),
+    nth_candidate_values(List, 0, Index, Value, Template, Filters, Values).
+findall_candidate_values(_, Template, Generator, Values) :-
+    generator_parts(Generator, nth1(Index, List, Value), Filters),
+    Filters \= [],
+    var(Index),
+    var(Value),
+    Index \== Value,
+    ground(List),
+    is_list(List),
+    maplist(supported_arithmetic_filter, Filters),
+    nth_candidate_values(List, 1, Index, Value, Template, Filters, Values).
 findall_candidate_values(_, Template, length(List, Length), Values) :-
     ground(List),
     is_list(List),
@@ -465,6 +485,25 @@ member_candidate_values([Candidate|Candidates], Value, Template, Filters,
         ;   Values = Rest
         )
     ;   member_candidate_values(Candidates, Value, Template, Filters, Values)
+    ).
+
+nth_candidate_values([], _, _, _, _, _, []).
+nth_candidate_values([Candidate|Candidates], IndexValue, Index, Value,
+                     Template, Filters, Values) :-
+    copy_term((Index, Value, Template, Filters),
+              (IndexCopy, ValueCopy, TemplateCopy, FiltersCopy)),
+    (   IndexCopy = IndexValue,
+        ValueCopy = Candidate
+    ->  checked_filters_result(FiltersCopy, FilterResult)
+    ;   FilterResult = false
+    ),
+    NextIndex is IndexValue + 1,
+    nth_candidate_values(Candidates, NextIndex, Index, Value, Template,
+                         Filters, Rest),
+    (   FilterResult == true
+    ->  ground(TemplateCopy),
+        Values = [TemplateCopy|Rest]
+    ;   Values = Rest
     ).
 
 collect_select_values([], []).
