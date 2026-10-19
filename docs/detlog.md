@@ -111,15 +111,34 @@ separate goals. The bounded `between/3` case is a literal-range special case, no
 general generator mode inference. In particular, do not use its report as a
 proof of equivalence.
 
-Detlog code generation is not implemented: no choicepoint splicing, choice
-packets, cut conversion, runtime constructs, or fallback diagnostics are emitted
-yet. Red-cut safety proofs and source/output answer-sequence comparisons also
-remain future work.
+## Restricted `once/1` compilation
+
+`mnn_detlog_transform:transform_program/3` provides an initial code-generation
+slice. It lowers `once(Goal)` to `ite(Goal, true, fail)` when `Goal` contains
+only `true`, `fail`, normalized conjunction, disjunction, if-then-else,
+negation, and these pure built-ins: `=/2`, `\=/2`, `==/2`, `\==/2`, `is/2`,
+arithmetic comparisons, and the type tests `var/1`, `nonvar/1`, `atom/1`,
+`atomic/1`, `compound/1`, `ground/1`, `integer/1`, `number/1`, and
+`is_list/1`. The if-then-else commits to the first condition solution and
+retains failure when the condition has no solution. Restricting the condition
+to this side-effect-free subset avoids changing effects or cut scope.
+
+Unsupported `once/1` goals remain unchanged. The report is
+`detlog_transform_report(Events)`, with `compiled_once(Predicate, ClauseId,
+Goal)` and `kept_once(Predicate, ClauseId, unsupported_goal(Goal))` entries.
+Other program fields, clause order, and source locations are preserved. This is
+a bounded transformation report, not an independently checked proof.
+
+This does not yet implement general mode inference, choicepoint splicing,
+choice-packet generation, cut conversion, or fallback diagnostics. Red-cut
+safety proofs and broader source/output answer-sequence checking remain future
+work.
 
 Run the focused tests from the repository root:
 
 ```sh
 swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
+swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
 ```
 
 The focused suite covers the supported `member/2` patterns, including partially
@@ -138,3 +157,6 @@ as well as rejection of non-fact definitions.
 The `select/3` tests cover ground proper lists, the distinct-unbound mode, and
 unbound lists with ground selected values or proper-list remainders, including
 duplicate positions, constrained results, aliases, and local definitions.
+The Detlog transformation tests check compiled `once/1` answer preservation on
+the supported pure subset and verify that cuts and user-predicate calls remain
+unchanged.

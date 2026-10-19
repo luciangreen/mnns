@@ -8,8 +8,9 @@ and finite-generator loop conversion.
 
 This repository implements only a subset of the full vision in
 [`PROGRAM_REQUIREMENTS.md`](PROGRAM_REQUIREMENTS.md). It includes an initial
-Detlog analysis but not Detlog transformations, and does not yet provide the
-end-user MNN compiler, S2A/Starlog, the general PLOp optimizer, AIOC,
+Detlog analysis and a restricted pure `once/1` compilation slice, but not general
+Detlog transformations. It does not yet provide the end-user MNN compiler,
+S2A/Starlog, the general PLOp optimizer, AIOC,
 neural-network, chatbot, or agent features. A proof-gated PLOp pipeline currently
 exposes one independently checked finite-generator conversion. See
 [`PROGRESS.md`](PROGRESS.md) for the current implementation and remaining work.
@@ -48,8 +49,8 @@ exposes one independently checked finite-generator conversion. See
   built-ins are evaluated for success or failure, and ground calls to
   predicates consisting only of ground facts count matching and duplicate
   successes up to two. Bounded literal `between/3`
-  calls are classified, and `once/1` caps reported successes at one. Choicepoint
-  and cut transformations are not implemented yet. Finite built-in
+  calls are classified,   and `once/1` caps reported successes at one. General choicepoint and cut
+  transformations are not implemented yet. Finite built-in
   `member/2` calls over ground proper lists are also classified for variable,
   ground, and partially instantiated element patterns, preserving duplicate
   successes without binding the analyzed program; `select/3` over ground proper
@@ -72,6 +73,10 @@ exposes one independently checked finite-generator conversion. See
   input is multi; the two modes with an unbound output and one ground input are
   also multi. See
   [`docs/detlog.md`](docs/detlog.md).
+- **Detlog `once/1` compilation (restricted):** lowers `once/1` over a
+  documented pure built-in/control-flow subset to IR if-then-else, preserving
+  unsupported goals unchanged. It does not yet implement choicepoint splicing,
+  choice packets, or cut conversion. See [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2` or
   `select/3` on a ground proper list, `nth0/3` or `nth1/3` on a ground proper
   list, bounded `between/3` ranges, or `length/2` on a ground proper list,
