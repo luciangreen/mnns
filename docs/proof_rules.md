@@ -37,12 +37,15 @@ restricted use, so their order does not affect answers. It also permits two
 ground comparisons from `>`, `>=`, `<`, `=<`, `=:=`, and `=\=`, provided both
 expressions use only numeric constants and the supported arithmetic operators
 listed below. A comparison can be paired with another allowed ground test or
-comparison. The checker evaluates the expressions without executing the source
-program and rejects comparisons that raise arithmetic exceptions. These
-comparisons do not bind variables, so swapping them preserves success or failure.
-Variable-bearing goals, other predicates, extra changes, and unsupported proof
-rules are rejected. Domain and mode annotations must be ground, but this
-restricted rule does not infer them.
+comparison. Ground `is/2` assignments can also be paired with these goals when
+the left and right arguments are ground, the right-hand expression uses only
+the supported arithmetic operators, and evaluating it raises no exception.
+The checker evaluates comparisons and assignment expressions without executing
+the source program. All accepted goals are ground and do not bind variables;
+swapping them therefore preserves success or failure and cannot move an
+arithmetic exception across another goal. Variable-bearing goals, other
+predicates, extra changes, and unsupported proof rules are rejected. Domain and
+mode annotations must be ground, but this restricted rule does not infer them.
 
 The unfold and fold rules use the same proof-step shape, with `unfold` or `fold`
 as the rule name. They accept exactly one occurrence change in one clause body.

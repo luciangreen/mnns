@@ -24,8 +24,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   command).
 - **Stage 2 — proof system: in progress.** The independent checker accepts
   identity proofs, narrowly scoped `reorder_goals` rewrites (swapping one
-  adjacent pair of ground, pure unary type tests or safe ground arithmetic
-  comparisons per step), and one-occurrence
+  adjacent pair of ground, pure unary type tests, safe ground arithmetic
+  comparisons, or safe ground `is/2` assignments per step), and one-occurrence
   `introduce_definition` rewrites that factor one ground pure goal into a fresh
   zero-arity helper or a one-variable pure goal into a fresh unary helper.
   One-occurrence `unfold` and `fold` rewrites support matching
@@ -64,7 +64,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   the expected output and deterministic copy helper. Ordered sequences of
   these checked steps can be independently verified and rendered as Markdown
   reports. Filters on ground-fact generators are checked only for whitelisted
-  arithmetic comparisons with ground operands. The checker also validates
+  arithmetic comparisons with ground operands. Ground `is/2` reordering checks
+  evaluate only the supported arithmetic expression grammar and reject
+  arithmetic exceptions. The checker also validates
   supported arithmetic-comparison filters on ground-list `append/3`, `member/2`,
   `select/3`, `nth0/3`, and `nth1/3` conversions, plus supported arithmetic
   filters on bounded integer-literal `between/3`.
@@ -225,7 +227,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | Stage | Deliverable | Status |
 | --- | --- | --- |
 | 1 | IR, parser, emitter, sandboxed runner, test harness, CI | In progress |
-| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground unary-test and safe ground arithmetic-comparison reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, ground-fact and finite acyclic rule generators with restricted pure bodies including copied-term unification that rejects cycles and source-defined `=/2`, supported arithmetic filters, and nested findall over supported finite built-in generators; ground-list append/member/select/nth0/nth1/length conversions with supported arithmetic filters; member templates may use constrained values if every successful template is ground; no-filter nth0-index/nth1-index/length conversions; and bounded integer-literal between conversions with supported arithmetic filters) |
+| 2 | Proof term format, independent checker, rewrite rules, rendering | In progress (identity, restricted ground unary-test, safe ground arithmetic-comparison and safe ground `is/2` reordering, ground or unary-variable definition introduction, narrow type-test unfold/fold, ground-fact and finite acyclic rule generators with restricted pure bodies including copied-term unification that rejects cycles and source-defined `=/2`, supported arithmetic filters, and nested findall over supported finite built-in generators; ground-list append/member/select/nth0/nth1/length conversions with supported arithmetic filters; member templates may use constrained values if every successful template is ground; no-filter nth0-index/nth1-index/length conversions; and bounded integer-literal between conversions with supported arithmetic filters) |
 | 3 | PID termination measures and induction obligations | In progress (call-graph classification, shared structural subterm and guarded natural-number measures for mutual recursion with guards that preserve nonnegative values, recursive calls inside normalized once/1, schematic measure-backed clause obligations, and syntactic tail-recursion classification; user specifications, broader measure forms, and full termination proofs remain) |
 | 4 | loop2 finite-generator loop conversions | In progress (ground facts, finite acyclic rule chains including copied-term pure unification that rejects cycles and source-defined `=/2`, nested findall over supported built-in finite generators, ground proper-list `append/3`, `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded ground `between/3` ranges with restricted arithmetic filters; independent proof checks cover ground facts and finite acyclic rule chains with restricted pure bodies; general checked conversion proofs remain) |
 | 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes ground-list `select/3` with partially instantiated value/remainder patterns, `member/2` over an unbound list for independent element patterns, `select/3` with three distinct unbound arguments, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths or distinct unbound list/length variables, ground-list `nth0/3` and `nth1/3` with arbitrary element patterns including index/element sharing, selected `append/3` modes, and counts capped at two for exact or partially instantiated calls to ground-fact-only predicates when variables are not shared across arguments; restricted pure `once/1` compilation includes built-in `member/2`, `between/3`, `length/2`, `nth0/3`, and `nth1/3` when not shadowed by source definitions; a redundant cut is removed after a deterministic guard and a terminal cut after a supported guard in a singleton clause is lowered to committed if-then-else IR; general mode inference, other bound/repeated-argument calls, choicepoint splicing, choice packets, operational `if_commit/3`, red-cut proofs, and proof-checked cut rewriting remain) |

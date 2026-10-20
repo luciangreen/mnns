@@ -132,6 +132,11 @@ safe_ground_test(Goal) :-
     ground(Goal),
     supported_arithmetic_filter(Goal),
     checked_filter_result(Goal, _).
+safe_ground_test(is(Expected, Expression)) :-
+    ground(Expected),
+    arithmetic_expression(Expression),
+    ground(Expression),
+    checked_arithmetic_value(Expression, _).
 
 valid_definition_rewrite_proof(Program, Original, Proof) :-
     ground(Proof),
