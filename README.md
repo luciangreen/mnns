@@ -140,11 +140,6 @@ feature and its focused test suite.
   initial bundle writer and verifier emit and re-check only proof-certified
   bundles. See [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).
-- **Prolog-to-ANN front end (M1):** parses source clauses and finite-domain
-  declarations with variable names and locations, splits body disjunctions,
-  orders arithmetic checks, and rejects cycles through negation. Grounding and
-  network generation are not implemented yet. See
-  [`docs/prolog2ann.md`](docs/prolog2ann.md).
 
 ## Requirements
 
