@@ -120,11 +120,13 @@ only `true`, `fail`, normalized conjunction, disjunction, if-then-else,
 negation, and these pure built-ins: `=/2`, `\=/2`, `==/2`, `\==/2`, `is/2`,
 arithmetic comparisons, the type tests `var/1`, `nonvar/1`, `atom/1`,
 `atomic/1`, `compound/1`, `ground/1`, `integer/1`, `number/1`, and
-`is_list/1`, plus built-in `member/2` and `between/3`. A call is not compiled as a
+`is_list/1`, plus built-in `member/2`, `between/3`, `append/3`, and `select/3`.
+The compilation does not require these generators to be deterministic: the
+if-then-else commits to their first condition solution, matching `once/1`, and
+retains failure when the condition has no solution. A call is not compiled as a
 built-in when the source program defines that predicate; it remains unchanged
-instead. The if-then-else commits to the first condition solution and retains
-failure when the condition has no solution. Restricting the condition to this
-side-effect-free subset avoids changing effects or cut scope.
+instead. Restricting the condition to this side-effect-free subset avoids
+changing effects or cut scope.
 
 Unsupported `once/1` goals remain unchanged. The report is
 `detlog_transform_report(Events)`, with `compiled_once(Predicate, ClauseId,
@@ -145,8 +147,10 @@ swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog
 swipl -q -s tests/run.pl
 ```
 
-The transformation tests include built-in `member/2` first-answer behavior and
-verify that a program-defined `member/2` is not treated as the built-in.
+The transformation tests include first-answer behavior for built-in `member/2`,
+`between/3`, `append/3`, and `select/3`, failure preservation for `append/3` and
+`select/3`, and checks that program-defined versions of these built-ins are not
+treated as built-ins.
 
 The focused suite covers the supported `member/2` patterns, including partially
 instantiated and repeated-variable patterns, duplicate matches, no matches,
