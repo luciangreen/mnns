@@ -40,6 +40,9 @@ infer_result(Name, Pairs, Options, Result) :-
         ;   integer_quadratic(Pairs, Quadratic, Linear, Constant)
         ->  build_quadratic_program(Name, Pairs, Quadratic, Linear,
                                     Constant, Result)
+        ;   integer_cubic(Pairs, Cubic, Quadratic, Linear, Constant)
+        ->  build_cubic_program(Name, Pairs, Cubic, Quadratic, Linear,
+                                Constant, Result)
         ;   table_or_failure(Name, Pairs, Options, Result)
         )
     ;   memberchk(allow_table(true), Options)
@@ -168,6 +171,69 @@ determinant3(A, B, C, D, E, F, G, H, I, Determinant) :-
                    B * (D * I - F * G) +
                    C * (D * H - E * G).
 
+integer_cubic([pair(Input0, Output0), pair(Input1, Output1),
+               pair(Input2, Output2), pair(Input3, Output3)|Pairs],
+              Cubic, Quadratic, Linear, Constant) :-
+    maplist(integer, [Input0, Output0, Input1, Output1,
+                     Input2, Output2, Input3, Output3]),
+    determinant4(
+        Input0 * Input0 * Input0, Input0 * Input0, Input0, 1,
+        Input1 * Input1 * Input1, Input1 * Input1, Input1, 1,
+        Input2 * Input2 * Input2, Input2 * Input2, Input2, 1,
+        Input3 * Input3 * Input3, Input3 * Input3, Input3, 1,
+        Denominator),
+    Denominator =\= 0,
+    determinant4(
+        Output0, Input0 * Input0, Input0, 1,
+        Output1, Input1 * Input1, Input1, 1,
+        Output2, Input2 * Input2, Input2, 1,
+        Output3, Input3 * Input3, Input3, 1,
+        CubicNumerator),
+    determinant4(
+        Input0 * Input0 * Input0, Output0, Input0, 1,
+        Input1 * Input1 * Input1, Output1, Input1, 1,
+        Input2 * Input2 * Input2, Output2, Input2, 1,
+        Input3 * Input3 * Input3, Output3, Input3, 1,
+        QuadraticNumerator),
+    determinant4(
+        Input0 * Input0 * Input0, Input0 * Input0, Output0, 1,
+        Input1 * Input1 * Input1, Input1 * Input1, Output1, 1,
+        Input2 * Input2 * Input2, Input2 * Input2, Output2, 1,
+        Input3 * Input3 * Input3, Input3 * Input3, Output3, 1,
+        LinearNumerator),
+    determinant4(
+        Input0 * Input0 * Input0, Input0 * Input0, Input0, Output0,
+        Input1 * Input1 * Input1, Input1 * Input1, Input1, Output1,
+        Input2 * Input2 * Input2, Input2 * Input2, Input2, Output2,
+        Input3 * Input3 * Input3, Input3 * Input3, Input3, Output3,
+        ConstantNumerator),
+    0 is CubicNumerator mod Denominator,
+    0 is QuadraticNumerator mod Denominator,
+    0 is LinearNumerator mod Denominator,
+    0 is ConstantNumerator mod Denominator,
+    Cubic is CubicNumerator // Denominator,
+    Quadratic is QuadraticNumerator // Denominator,
+    Linear is LinearNumerator // Denominator,
+    Constant is ConstantNumerator // Denominator,
+    forall(member(pair(Input, Output),
+                  [pair(Input0, Output0), pair(Input1, Output1),
+                   pair(Input2, Output2), pair(Input3, Output3)|Pairs]),
+           ( integer(Input),
+             integer(Output),
+             Output =:= Cubic * Input * Input * Input +
+                      Quadratic * Input * Input + Linear * Input + Constant
+           )),
+    !.
+
+determinant4(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P,
+             Determinant) :-
+    determinant3(F, G, H, J, K, L, N, O, P, FirstMinor),
+    determinant3(E, G, H, I, K, L, M, O, P, SecondMinor),
+    determinant3(E, F, H, I, J, L, M, N, P, ThirdMinor),
+    determinant3(E, F, G, I, J, K, M, N, O, FourthMinor),
+    Determinant is A * FirstMinor - B * SecondMinor +
+                   C * ThirdMinor - D * FourthMinor.
+
 build_affine_program(Name, Pairs, Slope, Intercept,
                      mnn_program(
                          Module,
@@ -205,6 +271,27 @@ build_quadratic_program(Name, Pairs, Quadratic, Linear, Constant,
                       Name/2, ['?', '?'], [any, any],
                       [mnn_clause(2, Head, Body,
                                  generated(s2a_quadratic, 2))],
+                      original)].
+
+build_cubic_program(Name, Pairs, Cubic, Quadratic, Linear, Constant,
+                    mnn_program(
+     Module,
+     meta(s2a_cubic(Name, Cubic, Quadratic, Linear,
+                                  Constant), Events),
+     Predicates, proof([]),
+     trace([s2a_cubic(
+                              Name, Cubic, Quadratic, Linear, Constant,
+                              examples_reproduced(Count))]))) :-
+    atom_concat(mnn_s2a_, Name, Module),
+    length(Pairs, Count),
+    Head =.. [Name, Input, Output],
+    Body = (Output is Cubic * Input * Input * Input +
+                      Quadratic * Input * Input + Linear * Input + Constant),
+    Events = [directive(1, module(Module, [Name/2])), clause(2)],
+    Predicates = [mnn_pred(
+                      Name/2, ['?', '?'], [any, any],
+                      [mnn_clause(2, Head, Body,
+                             generated(s2a_cubic, 2))],
                       original)].
 
 table_or_failure(Name, Pairs, Options, Result) :-

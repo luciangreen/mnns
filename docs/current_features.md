@@ -14,7 +14,7 @@ sharing a change.
 
 | Feature | Implementation | Focused test command | Details |
 | --- | --- | --- | --- |
-| S2A input-address, integer-affine and integer-quadratic inference, plus example tables | `prolog/s2a/s2a.pl` | `swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"` | [S2A synthesis](#s2a-synthesis) |
+| S2A input-address, integer-affine, quadratic, and cubic inference, plus example tables | `prolog/s2a/s2a.pl` | `swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"` | [S2A synthesis](#s2a-synthesis) |
 | Program IR, parser and emitter | `prolog/ir/ir.pl` | `swipl -q -g "load_files('tests/ir_tests.pl'), run_tests(mnn_ir), halt"` | [IR section](#program-ir) |
 | Round-trip corpus | `tests/corpus/` | `swipl -q -g "load_files('tests/test_corpus.pl'), run_tests(mnn_ir_corpus), halt"` | [IR section](#program-ir) |
 | Sandboxed execution | `prolog/runner/sandbox_runner.pl` | `swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"` | [Sandboxed execution](#sandboxed-execution) |
@@ -285,10 +285,18 @@ fractional coefficients and inconsistent samples are rejected. Input-address
 inference takes precedence over affine inference, which takes precedence over
 quadratic inference, and then table fallback.
 
-The trace identifies the inferred address, affine or quadratic formula, or table
-and counts examples reproduced. All modes currently use an empty formal proof:
-address, integer-affine, and integer-quadratic inference reproduce examples but
-do not prove that the inferred relation is the intended function, and table mode
+If no quadratic relation fits, S2A tries an integer-cubic relation
+`Output = A * Input^3 + B * Input^2 + C * Input + D`. It requires at least four
+distinct integer inputs, integer coefficients, and exact agreement with every
+example. The generated clause evaluates the formula for held-out inputs;
+fractional coefficients and inconsistent samples are rejected. Candidate
+precedence is unique input-address projection, affine, quadratic, cubic, then
+the opt-in table fallback.
+
+The trace identifies the inferred address, affine, quadratic, or cubic formula,
+or table, and counts examples reproduced. All modes currently use an empty
+formal proof: address and integer-polynomial inference reproduce examples but do
+not prove that the inferred relation is the intended function, and table mode
 does not generalize to held-out inputs. S2A does not yet infer recursive list
 algorithms such as reverse, broader arithmetic templates, or a formal
 example-reproduction proof.
@@ -480,8 +488,8 @@ The current work is an initial subset, not a completed version 1 suite:
   as described above; program-position extraction, splice-index loops,
   `r_spec` provenance, complexity ranking, and proof-backed formulas remain
   unimplemented.
-- **Stage 8 has initial S2A input-address, integer-affine, and integer-quadratic
-  inference, plus an opt-in example-table fallback.** Recursive list
+- **Stage 8 has initial S2A input-address, integer-affine, integer-quadratic,
+  and integer-cubic inference, plus an opt-in example-table fallback.** Recursive list
   generalization, broader arithmetic/list templates, formal example-reproduction
   proofs, and Starlog remain unimplemented.
 - **Stage 9 is in progress:** the structural-size metric and proof-checked bundle
