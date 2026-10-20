@@ -419,4 +419,60 @@ test(keeps_once_for_program_defined_between) :-
                        unsupported_goal(between(_, _, _)))])),
     assertion(Transformed = Program).
 
+test(removes_redundant_green_cut_after_unification_in_single_clause,
+     [nondet]) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(choose/1, ['?'], [any],
+                            [mnn_clause(1, choose(Value),
+                                        conj(Value = a, !),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(choose/1, _, _,
+                                    [mnn_clause(_, choose(CompiledValue),
+                                                CompiledBody, _)],
+                                    original)], _, _),
+        detlog_transform_report([removed_green_cut(choose/1, 1)])),
+    assertion(CompiledBody == (CompiledValue = a)),
+    findall(OriginalValue,
+            (OriginalValue = a, !),
+            OriginalAnswers),
+    findall(CompiledAnswer,
+            (CompiledAnswer = a),
+            CompiledAnswers),
+    assertion(OriginalAnswers == [a]),
+    assertion(CompiledAnswers == OriginalAnswers).
+
+test(keeps_cut_after_nondeterministic_guard) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(choose/1, ['?'], [any],
+                            [mnn_clause(1, choose(Value),
+                                        conj(member(Value, [a, b]), !),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program, Transformed, detlog_transform_report([])),
+    assertion(Transformed = Program).
+
+test(keeps_cut_in_multi_clause_predicate) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1), clause(2)]),
+                  [mnn_pred(choose/1, ['?'], [any],
+                            [mnn_clause(1, choose(Value),
+                                        conj(Value = a, !),
+                                        source(sample, 1)),
+                             mnn_clause(2, choose(Value),
+                                        Value = b,
+                                        source(sample, 2))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program, Transformed, detlog_transform_report([])),
+    assertion(Transformed = Program).
+
 :- end_tests(mnn_detlog_transform).

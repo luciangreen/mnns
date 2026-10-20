@@ -58,8 +58,10 @@ stage-by-stage implementation status and remaining work.
   consisting only of ground facts count exact and partially instantiated
   patterns up to two successes when variables are not shared across arguments.
   Bounded literal `between/3`
-  calls are classified, and `once/1` caps reported successes at one. General choicepoint and cut
-  transformations are not implemented yet. Finite built-in
+  calls are classified, and `once/1` caps reported successes at one. General
+  choicepoint transformation and operational cut conversion are not implemented;
+  Detlog removes only a redundant cut after a deterministic guard in a singleton
+  clause. Finite built-in
   `member/2` calls over ground proper lists are also classified for variable,
   ground, and partially instantiated element patterns, preserving duplicate
   successes without binding the analyzed program; `select/3` over ground proper
@@ -88,8 +90,10 @@ stage-by-stage implementation status and remaining work.
   documented pure built-in/control-flow subset, including built-in `member/2`,
   `between/3`, `length/2`, `nth0/3`, `nth1/3`, `append/3`, and `select/3`, to IR
   if-then-else, preserving unsupported and locally defined predicates unchanged.
-  It does not yet implement choicepoint splicing, choice packets, or cut
-  conversion. See
+  It also removes only a redundant green cut in a single-clause predicate when
+  preceded by one deterministic unification (or `true`); other cuts are kept.
+  It does not yet implement choicepoint splicing, choice packets, or general
+  cut conversion. See
   [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2`,
   `select/3`, or `append/3` on a ground proper list, `nth0/3` or `nth1/3` on a

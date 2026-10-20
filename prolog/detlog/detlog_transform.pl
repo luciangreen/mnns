@@ -24,6 +24,16 @@ transform_predicates(
 
 transform_clauses([], _, _, [], []).
 transform_clauses(
+    [mnn_clause(Id, Head, conj(Guard, !), Location)], Key,
+    SourcePredicates,
+    [mnn_clause(Id, Head, TransformedGuard, Location)],
+    Events) :-
+    deterministic_unification_guard(Guard),
+    !,
+    transform_goal(Guard, Key, Id, SourcePredicates,
+                   TransformedGuard, GuardEvents),
+    append(GuardEvents, [removed_green_cut(Key, Id)], Events).
+transform_clauses(
     [mnn_clause(Id, Head, Body, Location)|Clauses], Key,
     SourcePredicates,
     [mnn_clause(Id, Head, TransformedBody, Location)|Transformed],
@@ -66,6 +76,11 @@ transform_goal(not(Goal), Key, Id, SourcePredicates, not(NewGoal), Events) :-
     !,
     transform_goal(Goal, Key, Id, SourcePredicates, NewGoal, Events).
 transform_goal(Goal, _, _, _, Goal, []).
+
+deterministic_unification_guard(true).
+deterministic_unification_guard(Goal) :-
+    nonvar(Goal),
+    Goal =.. ['=', _, _].
 
 pure_goal(true, _) :-
     !.
