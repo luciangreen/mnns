@@ -35,11 +35,11 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   variable sharing. It also independently checks ground-list
   `findall(Value, member(Value, GroundList), Results)` conversions, with supported
   arithmetic-comparison filters, including constrained member values and
-  templates that are ground for each matching solution, and conversions for
-  `findall(Index, nth0(Index, GroundList, _), Results)` and
-  `findall(Index, nth1(Index, GroundList, _), Results)`, including supported
-  arithmetic-comparison filters when the index and element are distinct
-  unbound variables, plus `findall(Template, select(Value, GroundList, Rest),
+  templates that are ground for each matching solution, and `nth0/3` and `nth1/3`
+  conversions with variable or integer indices, constrained element patterns,
+  and any template that is ground for each passing solution, with or without
+  supported arithmetic-comparison filters. It also checks
+  `findall(Template, select(Value, GroundList, Rest),
   Results)` with or without supported arithmetic-comparison filters when each
   passing selected template is ground, and `findall(Length, length(GroundList,
   Length), Results)` for variable or nonnegative integer lengths, with or without
@@ -63,11 +63,10 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   the expected output and deterministic copy helper. Ordered sequences of
   these checked steps can be independently verified and rendered as Markdown
   reports. Filters on ground-fact generators are checked only for whitelisted
-  arithmetic comparisons with ground operands. The checker also validates
+  arithmetic comparisons with ground operands.   The checker also validates
   supported arithmetic-comparison filters on ground-list `append/3`, `member/2`,
-  `select/3`,
-  `nth0/3`, and `nth1/3` conversions, plus
-  supported arithmetic filters on bounded integer-literal `between/3`.
+  `select/3`, `nth0/3`, and `nth1/3` conversions, plus supported arithmetic
+  filters on bounded integer-literal `between/3`.
   Nested `findall/3` over supported finite built-in generators inside finite
   acyclic rule generators is independently interpreted, preserving order and
   duplicates while rejecting unground templates and shadowed built-ins. Filters
@@ -117,7 +116,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   and ground-list `append/3`,
   `member/2`,
   `select/3`, `nth0/3`, and `nth1/3` subsets with supported arithmetic filters,
-  plus direct no-filter `nth0/3`/`nth1/3` index and `length/2` subsets and bounded
+  including constrained index/value patterns and ground templates, plus
+  `length/2` subsets and bounded
   integer-literal `between/3` with supported arithmetic filters, and finite
   acyclic rule generators with the restricted pure bodies described above,
   including nested findall over supported finite built-in generators.
