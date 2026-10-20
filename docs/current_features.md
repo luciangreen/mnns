@@ -104,8 +104,10 @@ exceptions are not certified. These proof subsets exclude filters on built-in ge
 `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded `between/3`.
 It also independently checks finite acyclic rule generators whose clauses are
 ground facts or use only conjunction, disjunction, `true`, `fail`, supported
-arithmetic comparisons, other supported source-predicate calls, and nested
-`findall/3` over supported finite built-in generators. Nested built-ins must not
+pure unification, arithmetic comparisons, other supported source-predicate
+calls, and nested `findall/3` over supported finite built-in generators.
+Unification operates on copied terms; conversions that would create cyclic terms
+or encounter a source definition of `=/2` are declined. Nested built-ins must not
 be shadowed; list generators require ground proper lists, and `between/3`
 requires integer literal bounds. Nested templates must be ground for every
 result. Unsupported goals, nested findall over source predicates, recursive

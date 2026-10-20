@@ -149,7 +149,10 @@ generator conversion:
 - `findall(Template, Goal, Results)`, where `Goal` calls a finite, acyclic chain
   of source predicates. Every clause in the chain must be a ground fact or a rule
   whose body contains only `true`, `fail`, conjunction, disjunction, calls to
-  other supported source predicates, and whitelisted arithmetic comparisons.
+  other supported source predicates, pure unification, and whitelisted
+  arithmetic comparisons. Unification is interpreted on copied rule terms; a
+  unification that creates a cyclic term is rejected, as is a source definition
+  of `=/2`.
   Comparisons must be ground when reached and must not raise arithmetic
   exceptions. The checker interprets clause and goal order independently,
   preserves duplicate derivations, and requires a ground template for every

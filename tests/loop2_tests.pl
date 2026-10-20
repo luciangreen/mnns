@@ -168,6 +168,32 @@ test(converts_rule_generator_with_bound_arguments, [nondet]) :-
                                         deterministic_loop))])),
     run_converted(Converted, values(Values), [[[1, 3]]]).
 
+test(converts_rule_generator_with_pure_unification, [nondet]) :-
+    with_converted_program(
+        [num(1),
+         num(2),
+         (tagged(Value, Tag) :- num(Value), Tag = item(Value)),
+         (values(Values) :- findall(Tag, tagged(_, Tag), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_acyclic_rules(2),
+                                       safe_arithmetic_filters(0),
+                                       deterministic_loop))])),
+    run_converted(Converted, values(Values), [[[item(1), item(2)]]]).
+
+test(leaves_cyclic_rule_unification_unchanged, [nondet]) :-
+    with_converted_program(
+        [(cyclic(Value) :- Value = loop(Value)),
+         (values(Values) :- findall(Value, cyclic(Value), Values))],
+        Converted, loop2_report([])),
+    Converted = mnn_program(_, _, Predicates, _, _),
+    assertion(member(
+                  mnn_pred(values/1, _, _,
+                          [mnn_clause(_, _, findall(_, _, _), _)],
+                          original),
+                  Predicates)).
+
 test(converts_nested_findall_over_builtin_generator_in_finite_rule, [nondet]) :-
     with_converted_program(
         [(items(Values) :-

@@ -14,10 +14,12 @@ The current supported subset is deliberately narrow:
   of the call, so nonmatching facts are excluded and source order is preserved.
 - A call to a finite, acyclic chain of facts and rules. Rule bodies may use
   conjunction, disjunction, `true`, `fail`, other supported source-predicate
-  calls, and supported arithmetic comparisons. Clause order and answer order
-  are preserved, including answers from multi-clause rules. Bound or partially
-  instantiated arguments on the generator call are matched against rule heads
-  and act as filters.
+  calls, pure unification, and supported arithmetic comparisons. Unification is
+  evaluated on copied rule terms; if it would create a cyclic term, conversion is
+  declined. A source definition of `=/2` also prevents conversion. Clause order
+  and answer order are preserved, including answers from multi-clause rules.
+  Bound or partially instantiated arguments on the generator call are matched
+  against rule heads and act as filters.
 - Such a finite acyclic rule body may contain a nested `findall/3` whose inner
   generator is one of the supported built-in finite list generators or a bounded
   `between/3` call. The nested generator must use a ground proper list or literal
