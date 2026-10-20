@@ -123,8 +123,10 @@ stage-by-stage implementation status and remaining work.
   [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
 - **AIOC structural size metric (initial):** reports clause, goal, predicate, and
   term-node counts for an IR program, plus an equal-weight total. This measures
-  representation size only; it does not estimate runtime or memory cost. See
-  [`docs/aioc.md`](docs/aioc.md).
+  representation size only; it does not estimate runtime or memory cost. The
+  initial bundle writer and verifier emit and re-check only proof-certified
+  bundles. See [`docs/aioc.md`](docs/aioc.md) and
+  [`docs/bundle.md`](docs/bundle.md).
 
 ## Requirements
 
@@ -143,7 +145,7 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-loop2, Detlog, PLOp, AlgebraPLOp, S2A, and AIOC size-metric tests. Focused
+loop2, Detlog, PLOp, AlgebraPLOp, S2A, AIOC size-metric, and bundle tests. Focused
 commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 

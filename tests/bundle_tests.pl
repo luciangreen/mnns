@@ -34,13 +34,14 @@ test(rejects_unaccepted_proof_without_writing_bundle) :-
                     Directory, rejected),
                 Error,
                 true),
+          assertion(nonvar(Error)),
           assertion(Error = error(domain_error(accepted_proof, _), _)),
           directory_file_path(Directory, 'rejected.pl', ProgramFile),
           assertion(\+ exists_file(ProgramFile))
         ),
         delete_directory_and_contents(Directory)).
 
-test(rejects_modified_program_source) :-
+test(rejects_modified_program_source, [nondet]) :-
     temporary_bundle_directory(Directory),
     setup_call_cleanup(
         true,
@@ -65,6 +66,7 @@ test(rejects_bundle_names_that_escape_directory) :-
               '/tmp', '../outside'),
           Error,
           true),
+    assertion(nonvar(Error)),
     assertion(Error = error(domain_error(bundle_name, '../outside'), _)).
 
 test(bundle_check_reads_program_directives_as_data) :-

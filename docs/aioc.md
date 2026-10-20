@@ -23,6 +23,8 @@ This is a deterministic representation-size metric, not an inference-count,
 runtime, or memory estimate. It does not establish equivalence, assess candidate
 quality, simplify programs, or incorporate them into a library. These broader
 AIOC capabilities remain future work; see [`PROGRESS.md`](../PROGRESS.md).
+The initial proof-checked bundle writer and verifier are described in
+[`bundle.md`](bundle.md).
 
 Run its focused tests from the repository root:
 

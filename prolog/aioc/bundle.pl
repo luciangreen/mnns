@@ -37,8 +37,7 @@ check_bundle(Directory, Name, Result) :-
     must_be(atom, Directory),
     valid_bundle_name(Name),
     bundle_paths(Directory, Name, Paths),
-    Paths = bundle_paths(ProgramFile, OriginalFile, ProofFile, ProofMarkdown,
-                         TraceFile, ReportFile),
+    Paths = bundle_paths(ProgramFile, OriginalFile, ProofFile, _, _, _),
     (   missing_bundle_file(Paths, Missing)
     ->  Result = rejected(missing_bundle_file(Missing))
     ;   mnn_ir:parse_program(ProgramFile, EmittedProgram),
@@ -126,7 +125,6 @@ read_single_term_from_stream(Stream, Term) :-
     ;   read_term(Stream, End, [syntax_errors(error), module(mnn_aioc_bundle)]),
         (   End == end_of_file
         ->  true
-        ;   throw(error(domain_error(single_term_bundle_proof, FileTerm),
-                        _))
+        ;   throw(error(syntax_error(extra_bundle_proof_term), _))
         )
     ).

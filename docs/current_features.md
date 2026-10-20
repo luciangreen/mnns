@@ -27,6 +27,7 @@ sharing a change.
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 | AIOC structural size metric (initial) | `prolog/aioc/size.pl` | `swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"` | [AIOC size metric](aioc.md) |
+| Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
 
 Run the complete suite, including every group above, with:
 
@@ -426,6 +427,8 @@ swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"
 swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
+swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"
+swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"
 ```
 
 The single canonical full-suite command is also used in CI. Individual test
@@ -458,8 +461,10 @@ The current work is an initial subset, not a completed version 1 suite:
   opt-in example-table fallback.** Recursive list generalization, broader
   arithmetic/list templates, formal example-reproduction proofs, and Starlog
   remain unimplemented.
-- **Stages 9–14 are not started:** the AIOC pipeline and bundle interface,
-  quantum-inspired search/export, AMNN/ANN/manual
+- **Stage 9 is in progress:** the structural-size metric and proof-checked bundle
+  writer/verifier are implemented. Incorporation front ends, simplification,
+  candidate assessment, the library, and REPL commands remain.
+- **Stages 10–14 are not started:** quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 
 See [`PROGRESS.md`](../PROGRESS.md) for the complete stage table and the
