@@ -67,7 +67,9 @@ feature and its focused test suite.
   calls are classified, and `once/1` caps reported successes at one. General
   choicepoint transformation and operational cut conversion are not implemented;
   Detlog removes only a redundant cut after a deterministic guard in a singleton
-  clause. Finite built-in
+  clause, and lowers a terminal cut after a supported guard in a singleton
+  clause to committed if-then-else IR; cuts in multi-clause predicates and
+  unsupported cut placements remain unchanged. Finite built-in
   `member/2` calls over ground proper lists are also classified for variable,
   ground, and partially instantiated element patterns, preserving duplicate
   successes without binding the analyzed program; `select/3` over ground proper

@@ -446,7 +446,7 @@ test(removes_redundant_green_cut_after_unification_in_single_clause,
     assertion(OriginalAnswers == [a]),
     assertion(CompiledAnswers == OriginalAnswers).
 
-test(keeps_cut_after_nondeterministic_guard) :-
+test(compiles_terminal_cut_after_nondeterministic_guard, [nondet]) :-
     Program = mnn_program(
                   sample, meta(sample, [clause(1)]),
                   [mnn_pred(choose/1, ['?'], [any],
@@ -454,6 +454,33 @@ test(keeps_cut_after_nondeterministic_guard) :-
                                         conj(member(Value, [a, b]), !),
                                         source(sample, 1))],
                             original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(choose/1, _, _,
+                                   [mnn_clause(_, choose(CompiledValue),
+                                               CompiledBody, _)],
+                                   original)], _, _),
+        detlog_transform_report(
+            [compiled_cut(choose/1, 1, member(_, [a, b]))])),
+    assertion(CompiledBody = ite(member(CompiledValue, [a, b]), true, fail)),
+    findall(OriginalValue,
+            (member(OriginalValue, [a, b]), !),
+            OriginalAnswers),
+    findall(TransformedValue,
+            (member(TransformedValue, [a, b]) -> true ; fail),
+            TransformedAnswers),
+    assertion(OriginalAnswers == [a]),
+    assertion(TransformedAnswers == OriginalAnswers).
+
+test(keeps_cut_nested_in_terminal_guard) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(choose/1, ['?'], [any],
+                           [mnn_clause(1, choose(Value),
+                                       conj(conj(Value = a, !), !),
+                                       source(sample, 1))],
+                           original)],
                   proof([]), trace([])),
     mnn_detlog_transform:transform_program(
         Program, Transformed, detlog_transform_report([])),

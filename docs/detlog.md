@@ -145,13 +145,19 @@ exactly one clause whose complete body is `true, !` or a single unification
 followed by `!`. The clause has no earlier choicepoint and the guard is
 deterministic, so this cut cannot change the answers. The report records
 `removed_green_cut(Predicate, ClauseId)`. Cuts after potentially nondeterministic
-goals, cuts in multi-clause predicates, and all other cut placements are left
-unchanged. This syntactic check is not an independently checked proof.
+goals can also be lowered when a predicate has exactly one clause whose complete
+body is `Guard, !`. If `Guard` is nonvar and contains neither a cut nor an
+explicit `call/N`, the result is `ite(Guard, true, fail)`, which commits to the
+first success just as the terminal cut does. The report records
+`compiled_cut(Predicate, ClauseId, Guard)`. This lets supported nondeterministic
+guards such as `member/2` preserve their first answer while removing the
+operational cut. Nested cuts, explicit meta-calls, cuts in multi-clause
+predicates, and all other cut placements remain unchanged. These syntactic
+transformations are not independently proof-checked.
 
 General mode inference, choicepoint splicing, choice-packet generation, general
-cut conversion, red-cut safety proofs, and broader source/output answer-sequence
-checking remain future work. In particular, this slice does not yet lower
-operational cuts to `if_commit/3`.
+cut conversion, red-cut safety proofs, lowering to the `if_commit/3` runtime
+construct, and broader source/output answer-sequence checking remain future work.
 
 Run the focused tests from the repository root:
 
@@ -166,8 +172,12 @@ The transformation tests include first-answer behavior for built-in `member/2`,
 preservation for `length/2`, `nth0/3`, `nth1/3`, `append/3`, and `select/3`, and
 checks that program-defined versions of these built-ins are not treated as
 built-ins. They also cover removal of a redundant cut after a deterministic
-unification in a singleton clause, and preservation of cuts after a
-nondeterministic goal or in a multi-clause predicate.
+unification in a singleton clause, lowering a terminal cut after a
+nondeterministic guard, and preservation of nested or multi-clause cuts.
+
+The transformation tests also compare first-answer behavior for a terminal cut
+after a nondeterministic guard and confirm that nested and multi-clause cuts are
+preserved.
 
 The focused suite covers ground-fact predicate calls with exact and
 partially-instantiated patterns, including nested patterns, duplicate matches,

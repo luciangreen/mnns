@@ -34,6 +34,16 @@ transform_clauses(
                    TransformedGuard, GuardEvents),
     append(GuardEvents, [removed_green_cut(Key, Id)], Events).
 transform_clauses(
+    [mnn_clause(Id, Head, conj(Guard, !), Location)], Key,
+    SourcePredicates,
+    [mnn_clause(Id, Head, ite(TransformedGuard, true, fail), Location)],
+    Events) :-
+    supported_cut_guard(Guard),
+    !,
+    transform_goal(Guard, Key, Id, SourcePredicates,
+                   TransformedGuard, GuardEvents),
+    append(GuardEvents, [compiled_cut(Key, Id, Guard)], Events).
+transform_clauses(
     [mnn_clause(Id, Head, Body, Location)|Clauses], Key,
     SourcePredicates,
     [mnn_clause(Id, Head, TransformedBody, Location)|Transformed],
@@ -81,6 +91,36 @@ deterministic_unification_guard(true).
 deterministic_unification_guard(Goal) :-
     nonvar(Goal),
     Goal =.. ['=', _, _].
+
+supported_cut_guard(Guard) :-
+    nonvar(Guard),
+    \+ goal_contains_cut(Guard),
+    \+ explicit_call_in(Guard).
+
+goal_contains_cut(!).
+goal_contains_cut(conj(Left, Right)) :-
+    (   goal_contains_cut(Left)
+    ;   goal_contains_cut(Right)
+    ).
+goal_contains_cut(disj(Left, Right)) :-
+    (   goal_contains_cut(Left)
+    ;   goal_contains_cut(Right)
+    ).
+goal_contains_cut(ite(If, Then, Else)) :-
+    (   goal_contains_cut(If)
+    ;   goal_contains_cut(Then)
+    ;   goal_contains_cut(Else)
+    ).
+goal_contains_cut(not(Goal)) :-
+    goal_contains_cut(Goal).
+goal_contains_cut(once(Goal)) :-
+    goal_contains_cut(Goal).
+
+explicit_call_in(Goal) :-
+    sub_term(Subgoal, Goal),
+    nonvar(Subgoal),
+    functor(Subgoal, call, Arity),
+    Arity > 0.
 
 pure_goal(true, _) :-
     !.
