@@ -140,10 +140,18 @@ Goal)` and `kept_once(Predicate, ClauseId, unsupported_goal(Goal))` entries.
 Other program fields, clause order, and source locations are preserved. This is
 a bounded transformation report, not an independently checked proof.
 
-This does not yet implement general mode inference, choicepoint splicing,
-choice-packet generation, cut conversion, or fallback diagnostics. Red-cut
-safety proofs and broader source/output answer-sequence checking remain future
-work.
+The transform also removes a narrowly redundant green cut when a predicate has
+exactly one clause whose complete body is `true, !` or a single unification
+followed by `!`. The clause has no earlier choicepoint and the guard is
+deterministic, so this cut cannot change the answers. The report records
+`removed_green_cut(Predicate, ClauseId)`. Cuts after potentially nondeterministic
+goals, cuts in multi-clause predicates, and all other cut placements are left
+unchanged. This syntactic check is not an independently checked proof.
+
+General mode inference, choicepoint splicing, choice-packet generation, general
+cut conversion, red-cut safety proofs, and broader source/output answer-sequence
+checking remain future work. In particular, this slice does not yet lower
+operational cuts to `if_commit/3`.
 
 Run the focused tests from the repository root:
 
@@ -157,7 +165,9 @@ The transformation tests include first-answer behavior for built-in `member/2`,
 `between/3`, `length/2`, `nth0/3`, `nth1/3`, `append/3`, and `select/3`, failure
 preservation for `length/2`, `nth0/3`, `nth1/3`, `append/3`, and `select/3`, and
 checks that program-defined versions of these built-ins are not treated as
-built-ins.
+built-ins. They also cover removal of a redundant cut after a deterministic
+unification in a singleton clause, and preservation of cuts after a
+nondeterministic goal or in a multi-clause predicate.
 
 The focused suite covers ground-fact predicate calls with exact and
 partially-instantiated patterns, including nested patterns, duplicate matches,

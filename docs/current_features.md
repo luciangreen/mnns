@@ -226,14 +226,22 @@ retained occurrence as `compiled_once/3` or `kept_once/3`. Program metadata,
 clause order, and source locations are retained. The resulting control
 construct commits to the first success, matching `once/1` for this side-effect-
 free subset. This report is not an independently checked proof, and the
-transform does not implement general mode inference, choicepoint splicing,
-choice packets, or cut conversion.
+transform also removes a redundant cut only when a predicate has one clause and
+the complete body is `true, !` or one unification followed by `!`. The report
+records `removed_green_cut/2`. Cuts after potentially nondeterministic goals,
+inside multi-clause predicates, and in other positions are preserved. This
+syntactic cut check is not independently proof-checked; general cut conversion,
+red-cut safety proofs, mode inference, choicepoint splicing, and choice packets
+remain unimplemented.
 
 Run this focused suite from the repository root:
 
 ```sh
 swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
 ```
+
+The transformation tests include safe redundant-cut removal and regression
+checks that nondeterministic and multi-clause cuts are preserved.
 
 ## S2A synthesis
 
