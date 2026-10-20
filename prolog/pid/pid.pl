@@ -81,6 +81,9 @@ goal_tail_calls(ite(If, Then, Else), Component, TailPosition, Calls) :-
 goal_tail_calls(not(Goal), Component, _, Calls) :-
     !,
     goal_tail_calls(Goal, Component, false, Calls).
+goal_tail_calls(once(Goal), Component, _, Calls) :-
+    !,
+    goal_tail_calls(Goal, Component, false, Calls).
 goal_tail_calls(Goal, Component, TailPosition,
                 [tail_call(Goal, TailPosition)]) :-
     callable(Goal),
@@ -204,6 +207,9 @@ goal_recursive_calls(ite(If, Then, Else), Keys, Calls) :-
     goal_recursive_calls(Else, Keys, ElseCalls),
     append([IfCalls, ThenCalls, ElseCalls], Calls).
 goal_recursive_calls(not(Goal), Keys, Calls) :-
+    !,
+    goal_recursive_calls(Goal, Keys, Calls).
+goal_recursive_calls(once(Goal), Keys, Calls) :-
     !,
     goal_recursive_calls(Goal, Keys, Calls).
 goal_recursive_calls(Goal, Keys, [Goal]) :-
@@ -344,6 +350,9 @@ goal_call_edges(ite(If, Then, Else), Key, Keys, Edges) :-
     goal_call_edges(Else, Key, Keys, ElseEdges),
     append([IfEdges, ThenEdges, ElseEdges], Edges).
 goal_call_edges(not(Goal), Key, Keys, Edges) :-
+    !,
+    goal_call_edges(Goal, Key, Keys, Edges).
+goal_call_edges(once(Goal), Key, Keys, Edges) :-
     !,
     goal_call_edges(Goal, Key, Keys, Edges).
 goal_call_edges(Goal, Key, Keys, [edge(Key, CalledKey)]) :-

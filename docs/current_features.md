@@ -138,8 +138,10 @@ by one, or `N >= K` for subtraction by positive integer `K`. The guard must
 precede the subtraction and recursive call so the measure remains nonnegative.
 Mutual recursion is checked against one shared measure. Unsupported cases are
 reported as unavailable. An induction report is not a termination proof or a
-proof of a user specification. `analyze_tail_recursion/2` also classifies
-recursive calls by their syntactic tail position. See [`pid.md`](pid.md).
+proof of a user specification. Recursive calls inside normalized `once/1` goals
+are included in call-graph, measure, and induction analysis; tail-recursion
+analysis conservatively marks them non-tail. `analyze_tail_recursion/2` also
+classifies recursive calls by their syntactic tail position. See [`pid.md`](pid.md).
 
 ## Detlog analysis
 
