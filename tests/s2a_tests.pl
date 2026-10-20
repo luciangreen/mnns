@@ -147,6 +147,57 @@ test(rejects_nonintegral_or_inconsistent_quadratic_examples) :-
     mnn_s2a:s2a(quadratic_lookup_probe, InconsistentSpec, [],
                 no_algorithm(no_generalization_candidate)).
 
+test(infers_integer_cubic_relation_and_generalizes_held_out_inputs) :-
+    Spec = [
+        [[input, [['A', 0]]], [output, [['B', 5]]]],
+        [[input, [['A', 1]]], [output, [['B', 8]]]],
+        [[input, [['A', 2]]], [output, [['B', 17]]]],
+        [[input, [['A', 4]]], [output, [['B', 101]]]]
+    ],
+    mnn_s2a:s2a(cubic_lookup_probe, Spec, [], Program),
+    Program = mnn_program(
+                  mnn_s2a_cubic_lookup_probe,
+                  meta(s2a_cubic(cubic_lookup_probe, 2, -3, 4, 5),
+                       [directive(1, module(_, [cubic_lookup_probe/2])),
+                        clause(2)]),
+                  [mnn_pred(cubic_lookup_probe/2, _, _, [Clause], original)],
+                  proof([]),
+                  trace([s2a_cubic(cubic_lookup_probe, 2, -3, 4, 5,
+                                   examples_reproduced(4))])),
+    Clause = mnn_clause(2, cubic_lookup_probe(_, _), _,
+                        generated(s2a_cubic, 2)),
+    setup_call_cleanup(
+        temporary_source(File),
+        ( mnn_ir:emit_program(Program, File),
+          load_files(File, [silent(true)]),
+          assertion(mnn_s2a_cubic_lookup_probe:
+                        cubic_lookup_probe(10, 1745)),
+          assertion(\+ mnn_s2a_cubic_lookup_probe:
+                          cubic_lookup_probe(10, 1746))
+        ),
+        ( unload_file(File),
+          delete_file(File)
+        )).
+
+test(rejects_fractional_or_inconsistent_cubic_examples) :-
+    FractionalSpec = [
+        [[input, [['A', 0]]], [output, [['B', 0]]]],
+        [[input, [['A', 1]]], [output, [['B', 0]]]],
+        [[input, [['A', 2]]], [output, [['B', 0]]]],
+        [[input, [['A', 3]]], [output, [['B', 3]]]],
+        [[input, [['A', 4]]], [output, [['B', 12]]]]
+    ],
+    InconsistentSpec = [
+        [[input, [['A', 0]]], [output, [['B', 5]]]],
+        [[input, [['A', 1]]], [output, [['B', 8]]]],
+        [[input, [['A', 2]]], [output, [['B', 17]]]],
+        [[input, [['A', 4]]], [output, [['B', 102]]]]
+    ],
+    mnn_s2a:s2a(cubic_lookup_probe, FractionalSpec, [],
+                no_algorithm(no_generalization_candidate)),
+    mnn_s2a:s2a(cubic_lookup_probe, InconsistentSpec, [],
+                no_algorithm(no_generalization_candidate)).
+
 test(infers_constant_integer_output_from_distinct_inputs) :-
     Spec = [
         [[input, [['A', 2]]], [output, [['B', 9]]]],

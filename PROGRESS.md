@@ -192,7 +192,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed
   formulas remain unimplemented.
 - **Stage 8 — S2A and Starlog: in progress (input-address projection, integer
-  affine and quadratic inference, and table mode).** For at least two distinct
+  affine, quadratic and cubic inference, and table mode).** For at least two distinct
   ground examples,
   `mnn_s2a:s2a/4` finds a unique input subterm address shared with every output
   and emits one generalized projection clause, preserving the constructors
@@ -200,7 +200,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   two distinct inputs can infer and validate an exact integer-affine relation
   across all examples; when no affine relation fits, at least three distinct
   integer inputs may infer an exact integer-quadratic relation with integer
-  coefficients, validated against every example. Ambiguous addresses are
+  coefficients, and when no quadratic fits, at least four distinct integer
+  inputs may infer an exact integer-cubic relation with integer coefficients;
+  each candidate is validated against every example. Ambiguous addresses are
   reported unless `allow_table(true)` explicitly permits a table fallback;
   unsupported cases can also use that opt-in table mode. Conflicting
   input/output examples and unsupported spec shapes are rejected. These
@@ -228,7 +230,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes ground-list `select/3` with partially instantiated value/remainder patterns, `member/2` over an unbound list for independent element patterns, `select/3` with three distinct unbound arguments, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths or distinct unbound list/length variables, ground-list `nth0/3` and `nth1/3` with arbitrary element patterns including index/element sharing, selected `append/3` modes, and counts capped at two for exact or partially instantiated calls to ground-fact-only predicates when variables are not shared across arguments; restricted pure `once/1` compilation includes built-in `member/2`, `between/3`, `length/2`, `nth0/3`, and `nth1/3` when not shadowed by source definitions; a redundant cut is removed only after one deterministic unification or `true` in a singleton clause; general mode inference, other bound/repeated-argument calls, choicepoint splicing, choice packets, operational `if_commit/3` conversion, red-cut proofs, and proof-checked cut rewriting remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
-| 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine inference from examples, plus explicit opt-in table fallback; no formal proof; recursive/list generalization, broader arithmetic templates, and Starlog remain unimplemented) |
+| 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; no formal proof; recursive/list generalization, broader arithmetic templates, and Starlog remain unimplemented) |
 | 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric and proof-checked bundle writer/verifier; incorporation, semantic simplification, candidate assessment, library, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |

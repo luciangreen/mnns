@@ -10,9 +10,10 @@ This repository implements only a subset of the full vision in
 [`PROGRAM_REQUIREMENTS.md`](PROGRAM_REQUIREMENTS.md). It includes initial Detlog
 analysis and a restricted pure `once/1` compilation slice, but not general
 Detlog transformations. S2A supports a conservative unique input-address
-projection and explicitly opted-in example tables; recursive generalization,
-Starlog, the end-user MNN compiler, general PLOp optimization, AIOC,
-neural-network, chatbot, and agent features remain incomplete. A proof-gated
+projection, integer polynomial relations through degree three, and explicitly
+opted-in example tables; recursive generalization, Starlog, the end-user MNN
+compiler, general PLOp optimization, AIOC, neural-network, chatbot, and agent
+features remain incomplete. A proof-gated
 PLOp pipeline currently exposes a limited set of independently checked
 finite-generator conversions. See [`PROGRESS.md`](PROGRESS.md) for the
 stage-by-stage implementation status and remaining work.
@@ -127,8 +128,8 @@ feature and its focused test suite.
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
 - **S2A (initial inference):** for two or more distinct ground examples, a
   unique input subterm address shared with every output generates a generalized
-  projection clause; otherwise integer examples may infer an exact integer-affine
-  or integer-quadratic relation. Ambiguous or unsupported cases are reported
+  projection clause; otherwise integer examples may infer an exact integer-affine,
+  integer-quadratic, or integer-cubic relation. Ambiguous or unsupported cases are reported
   unless `[allow_table(true)]` explicitly permits a lookup table. These
   candidates reproduce the examples but have no formal proof certificate;
   recursive generalization and broader arithmetic templates remain unsupported.
