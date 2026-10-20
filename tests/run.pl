@@ -28,5 +28,7 @@ main :-
     load_files(S2ATests, [silent(true)]),
     directory_file_path(Directory, 'aioc_size_tests.pl', AIOCSizeTests),
     load_files(AIOCSizeTests, [silent(true)]),
+    directory_file_path(Directory, 'bundle_tests.pl', BundleTests),
+    load_files(BundleTests, [silent(true)]),
     run_tests,
     halt.
