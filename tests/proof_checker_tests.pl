@@ -41,6 +41,26 @@ test(accept_reordering_nested_in_conjunction) :-
     reorder_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_reordering_of_ground_arithmetic_comparisons) :-
+    program_with_body(conj((3 + 1 > 2), (4 =< 5)), Original),
+    program_with_body(conj((4 =< 5), (3 + 1 > 2)), Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_reordering_with_variable_arithmetic_comparison) :-
+    program_with_body(conj((X > 2), integer(X)), Original),
+    program_with_body(conj(integer(X), (X > 2)), Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_reordering_with_raising_arithmetic_comparison) :-
+    program_with_body(conj((1 / 0 > 2), atom(ok)), Original),
+    program_with_body(conj(atom(ok), (1 / 0 > 2)), Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_unfold_of_ground_pure_definition) :-
     definition_rewrite_program(integer(3), positive(3), Original),
     definition_rewrite_program(integer(3), integer(3), Program),

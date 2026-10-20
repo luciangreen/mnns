@@ -33,10 +33,16 @@ one adjacent pair of conjunction goals in one clause body. Both goals must be
 ground calls to one of `atom/1`, `atomic/1`, `compound/1`, `ground/1`,
 `integer/1`, `is_list/1` or `number/1`, with a ground argument. These built-ins
 are pure and do not bind variables or raise instantiation errors in this
-restricted use, so their order does not affect answers. The checker rejects
-variable-bearing goals, other predicates, extra changes, and unsupported proof
-rules. Domain and mode annotations must be ground, but this restricted rule does
-not infer them.
+restricted use, so their order does not affect answers. It also permits two
+ground comparisons from `>`, `>=`, `<`, `=<`, `=:=`, and `=\=`, provided both
+expressions use only numeric constants and the supported arithmetic operators
+listed below. A comparison can be paired with another allowed ground test or
+comparison. The checker evaluates the expressions without executing the source
+program and rejects comparisons that raise arithmetic exceptions. These
+comparisons do not bind variables, so swapping them preserves success or failure.
+Variable-bearing goals, other predicates, extra changes, and unsupported proof
+rules are rejected. Domain and mode annotations must be ground, but this
+restricted rule does not infer them.
 
 The unfold and fold rules use the same proof-step shape, with `unfold` or `fold`
 as the rule name. They accept exactly one occurrence change in one clause body.
