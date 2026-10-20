@@ -488,8 +488,8 @@ The current work is an initial subset, not a completed version 1 suite:
   as described above; program-position extraction, splice-index loops,
   `r_spec` provenance, complexity ranking, and proof-backed formulas remain
   unimplemented.
-- **Stage 8 has initial S2A input-address, integer-affine, and integer-quadratic
-  inference, plus an opt-in example-table fallback.** Recursive list
+- **Stage 8 has initial S2A input-address, integer-affine, integer-quadratic,
+  and integer-cubic inference, plus an opt-in example-table fallback.** Recursive list
   generalization, broader arithmetic/list templates, formal example-reproduction
   proofs, and Starlog remain unimplemented.
 - **Stage 9 is in progress:** the structural-size metric and proof-checked bundle
