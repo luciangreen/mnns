@@ -79,7 +79,11 @@ independent proof checker validates conversions over predicates consisting
 entirely of ground facts, including supported arithmetic-comparison filters, and
 finite acyclic rule generators whose clauses use only ground facts, conjunction,
 disjunction, `true`, `fail`, supported arithmetic comparisons, and calls to other
-supported source predicates. It also checks ground-list `append/3`,
+supported source predicates, including nested `findall/3` over supported finite
+built-in generators. Nested generators require a ground proper list or literal
+integer bounds, must not be shadowed by a source predicate, and must produce
+ground templates; nested source-predicate generators are not certified. It also
+checks ground-list `append/3`,
 `member/2` and
 `select/3` with or without supported arithmetic-comparison filters,
 `nth0/3`/`nth1/3` indices with supported filters, `length/2`, and bounded
@@ -92,8 +96,6 @@ every successful template is ground. Arithmetic filters are limited to the
 comparisons and expressions above and must be ground when reached. Conversions
 involving unsupported built-in filters or other forms are not independently
 checked. Do not treat such output as proof-certified.
-Nested `findall/3` inside a rule body is currently converted by loop2 but is not
-independently certified by the proof checker.
 
 Run the full suite, including loop2 tests, with:
 

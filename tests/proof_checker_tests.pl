@@ -371,6 +371,82 @@ test(accept_finite_acyclic_rule_findall_to_fold) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_nested_findall_over_ground_member_with_duplicates) :-
+    nested_findall_to_fold_programs(Original, Program),
+    Program = mnn_program(_, _,
+                          [_, mnn_pred(all_items/1, _, _,
+                                       [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                   _)],
+                                       _)|_],
+                          _, _),
+    assertion(Values == [[a, b, a]]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_nested_findall_over_filtered_between) :-
+    nested_between_findall_to_fold_programs(Original, Program),
+    Program = mnn_program(_, _,
+                          [_, mnn_pred(all_items/1, _, _,
+                                       [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                   _)],
+                                       _)|_],
+                          _, _),
+    assertion(Values == [[3, 4]]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_nested_findall_over_source_predicate) :-
+    Original = mnn_program(
+                   sample,
+                   meta(source, [clause(1), clause(2), clause(3), clause(4)]),
+                   [mnn_pred(item/1, ['?'], [any],
+                             [mnn_clause(1, item(a), true, source(source, 1)),
+                              mnn_clause(2, item(b), true, source(source, 2))],
+                             original),
+                    mnn_pred(items/1, ['?'], [any],
+                             [mnn_clause(3, items(ItemResults),
+                                         findall(Value, item(Value), ItemResults),
+                                         source(source, 3))],
+                             original),
+                    mnn_pred(all_items/1, ['?'], [any],
+                             [mnn_clause(4, all_items(Results),
+                                         findall(ItemsTemplate,
+                                                 items(ItemsTemplate), Results),
+                                         source(source, 4))],
+                             original)],
+                   proof([]), trace([])),
+    Candidate = mnn_program(
+                    sample,
+                    meta(source, [clause(1), clause(2), clause(3), clause(4),
+                                  clause(5), clause(6)]),
+                    [mnn_pred(item/1, ['?'], [any],
+                              [mnn_clause(1, item(a), true, source(source, 1)),
+                               mnn_clause(2, item(b), true, source(source, 2))],
+                              original),
+                     mnn_pred(items/1, ['?'], [any],
+                              [mnn_clause(3, items(ItemResults),
+                                          findall(Value, item(Value), ItemResults),
+                                          source(source, 3))],
+                              original),
+                     mnn_pred(all_items/1, ['?'], [any],
+                              [mnn_clause(4, all_items(Results),
+                                          mnn_loop2_1([[a, b]], Results),
+                                          source(source, 4))],
+                              original),
+                     mnn_pred(mnn_loop2_1/2, ['?', '?'], [any, any],
+                              [mnn_clause(5, mnn_loop2_1([], []), true,
+                                          generated(loop2)),
+                               mnn_clause(
+                                   6, mnn_loop2_1([Value|Values],
+                                                  [Value|Results]),
+                                   mnn_loop2_1(Values, Results),
+                                   generated(loop2))],
+                              generated(loop2))],
+                    proof([]), trace([])),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Candidate, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_rule_findall_to_fold_with_changed_values) :-
     rule_findall_to_fold_programs(Original, Program0),
     Program0 = mnn_program(Name, Meta,
@@ -1458,6 +1534,45 @@ rule_findall_to_fold_programs(Original, Program) :-
                                             original)],
                                   proof([]), trace([])),
                    mnn_loop2:convert_program(Original, Program, _).
+
+nested_findall_to_fold_programs(Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1), clause(2)]),
+                   [mnn_pred(items/1, ['?'], [any],
+                            [mnn_clause(
+                                 1, items(ItemResults),
+                                 findall(Value, member(Value, [a, b, a]),
+                                         ItemResults),
+                                 source(source, 1))],
+                            original),
+                   mnn_pred(all_items/1, ['?'], [any],
+                            [mnn_clause(2, all_items(Results),
+                                        findall(ItemsTemplate,
+                                                items(ItemsTemplate), Results),
+                                        source(source, 2))],
+                            original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+nested_between_findall_to_fold_programs(Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1), clause(2)]),
+                   [mnn_pred(items/1, ['?'], [any],
+                             [mnn_clause(
+                                  1, items(ItemResults),
+                                  findall(Value,
+                                          conj(between(1, 4, Value), Value > 2),
+                                          ItemResults),
+                                  source(source, 1))],
+                             original),
+                    mnn_pred(all_items/1, ['?'], [any],
+                             [mnn_clause(2, all_items(Results),
+                                         findall(ItemsTemplate,
+                                                 items(ItemsTemplate), Results),
+                                         source(source, 2))],
+                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
 
 nth0_findall_to_fold_programs(
     List, Original, Program) :-
