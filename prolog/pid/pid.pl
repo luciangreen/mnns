@@ -276,17 +276,22 @@ decreases_naturally(
     var(Next),
     Measure \== Next,
     conjunction_goals(Body, Goals),
-    append(_, [integer(GuardedMeasure), PositiveGuard,
+    append(_, [integer(GuardedMeasure), MeasureGuard,
                is(AssignedNext, -(DecrementedMeasure, Step)),
                RecursiveCall|_], Goals),
     GuardedMeasure == Measure,
-    PositiveGuard = >(PositiveMeasure, 0),
-    PositiveMeasure == Measure,
     AssignedNext == Next,
     DecrementedMeasure == Measure,
     integer(Step),
     Step > 0,
+    natural_measure_guard(MeasureGuard, Measure, Step),
     RecursiveCall == Call.
+
+natural_measure_guard(>(GuardedMeasure, 0), Measure, 1) :-
+    GuardedMeasure == Measure.
+natural_measure_guard(>=(GuardedMeasure, Minimum), Measure, Step) :-
+    GuardedMeasure == Measure,
+    Minimum == Step.
 
 conjunction_goals(conj(Left, Right), Goals) :-
     !,

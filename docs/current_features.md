@@ -128,11 +128,13 @@ swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_che
 `mnn_pid:analyze_program/2`, `analyze_measures/2`, and `analyze_induction/2`
 provide call-graph classification, conservative measure checks, and schematic
 clause obligations, respectively. Supported measures are shared structural
-subterm decreases and a guarded natural-number subtraction pattern. Mutual
-recursion is checked against one shared measure. Unsupported cases are reported
-as unavailable. An induction report is not a termination proof or a proof of a
-user specification. `analyze_tail_recursion/2` also classifies recursive calls
-by their syntactic tail position. See [`pid.md`](pid.md).
+subterm decreases and guarded natural-number subtraction: `N > 0` for decrement
+by one, or `N >= K` for subtraction by positive integer `K`. The guard must
+precede the subtraction and recursive call so the measure remains nonnegative.
+Mutual recursion is checked against one shared measure. Unsupported cases are
+reported as unavailable. An induction report is not a termination proof or a
+proof of a user specification. `analyze_tail_recursion/2` also classifies
+recursive calls by their syntactic tail position. See [`pid.md`](pid.md).
 
 ## Detlog analysis
 
