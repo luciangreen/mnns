@@ -12,6 +12,11 @@ recursive clause and call for each checked decrease. The component is accepted
 only when every call between its predicates decreases; calls outside the
 component are not treated as recursive.
 
+Calls inside normalized `once/1` goals participate in call-graph, measure, and
+induction analysis. For tail-recursion analysis, a call inside `once/1` is
+conservatively classified as non-tail rather than assuming the meta-call wrapper
+preserves tail position.
+
 It also recognizes a narrow natural-number pattern: the clause must test
 `integer(N)`, guard that the selected decrement does not take the measure below
 zero, compute the decremented value, and recurse directly on it. The supported

@@ -55,6 +55,41 @@ test(finds_structural_measure_for_direct_list_recursion) :-
                       measure(structural(1),
                               [decrease(2, walk(_), structural(1))]))])).
 
+test(analyzes_recursion_inside_once) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(walk/1, ['?'], [any],
+                            [mnn_clause(1, walk([]), true, source(sample, 1)),
+                             mnn_clause(2, walk([_|Tail]), once(walk(Tail)),
+                                       source(sample, 2))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_program(
+        Program,
+        pid_report([predicate(walk/1, recursive)])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(walk/1,
+                       measure(structural(1),
+                              [decrease(2, walk(_), structural(1))]))])),
+    mnn_pid:analyze_induction(
+        Program,
+        pid_induction_report(
+            [predicate(walk/1,
+                       induction(structural(1),
+                                [clause_obligation(1, walk([]), true, []),
+                                 clause_obligation(
+                                     2, walk([_|_]), once(walk(_)),
+                                     [induction_hypothesis(
+                                          walk(_), structural(1))])]))])),
+    mnn_pid:analyze_tail_recursion(
+        Program,
+        pid_tail_recursion_report(
+            [predicate(walk/1,
+                       tail_recursion(non_tail_recursive(
+                           [recursive_call(2, walk(_))])))])).
+
 test(finds_measure_on_recursive_argument_two) :-
     Program = mnn_program(
                   sample, meta(sample, []),
