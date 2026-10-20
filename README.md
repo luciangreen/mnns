@@ -7,13 +7,14 @@ early implementations of an independent proof checker, termination analysis,
 and finite-generator loop conversion.
 
 This repository implements only a subset of the full vision in
-[`PROGRAM_REQUIREMENTS.md`](PROGRAM_REQUIREMENTS.md). It includes an initial
-Detlog analysis and a restricted pure `once/1` compilation slice, but not general
-Detlog transformations. It does not yet provide the end-user MNN compiler,
-S2A/Starlog, the general PLOp optimizer, AIOC,
-neural-network, chatbot, or agent features. A proof-gated PLOp pipeline currently
-exposes one independently checked finite-generator conversion. See
-[`PROGRESS.md`](PROGRESS.md) for the current implementation and remaining work.
+[`PROGRAM_REQUIREMENTS.md`](PROGRAM_REQUIREMENTS.md). It includes initial Detlog
+analysis and a restricted pure `once/1` compilation slice, but not general
+Detlog transformations. S2A currently supports only explicitly opted-in example
+tables; Starlog, the end-user MNN compiler, general PLOp optimization, AIOC,
+neural-network, chatbot, and agent features remain incomplete. A proof-gated
+PLOp pipeline currently exposes a limited set of independently checked
+finite-generator conversions. See [`PROGRESS.md`](PROGRESS.md) for the
+stage-by-stage implementation status and remaining work.
 
 ## Implemented features
 
@@ -141,4 +142,5 @@ swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 The full suite is also run on pushes and pull requests by
 [`.github/workflows/prolog-tests.yml`](.github/workflows/prolog-tests.yml).
 More detail on current capabilities and limitations is in
-[`docs/current_features.md`](docs/current_features.md).
+[`docs/current_features.md`](docs/current_features.md), including focused
+commands for every implemented test group.
