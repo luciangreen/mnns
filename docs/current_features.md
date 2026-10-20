@@ -22,7 +22,7 @@ sharing a change.
 | PID analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Tail recursion analysis | `prolog/pid/pid.pl` | `swipl -q -g "load_files('tests/pid_tests.pl'), run_tests(mnn_pid), halt"` | [PID analysis](pid.md) |
 | Detlog determinism analysis | `prolog/detlog/detlog.pl` | `swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"` | [Detlog analysis](detlog.md) |
-| Detlog `once/1` compilation | `prolog/detlog/detlog_transform.pl` | `swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"` | [Detlog transformation](detlog.md#restricted-once-compilation) |
+| Detlog transformations: `once/1` and restricted cut lowering | `prolog/detlog/detlog_transform.pl` | `swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"` | [Detlog transformation](detlog.md#restricted-once-compilation) |
 | loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
@@ -225,16 +225,17 @@ pure unification, arithmetic-comparison, or type-test built-ins listed in
 when the source does not define the predicate. It leaves unsupported `once/1`
 goals unchanged and reports each compiled or
 retained occurrence as `compiled_once/3` or `kept_once/3`. Program metadata,
-clause order, and source locations are retained. The resulting control
-construct commits to the first success, matching `once/1` for this side-effect-
-free subset. This report is not an independently checked proof, and the
-transform also removes a redundant cut only when a predicate has one clause and
-the complete body is `true, !` or one unification followed by `!`. The report
-records `removed_green_cut/2`. Cuts after potentially nondeterministic goals,
-inside multi-clause predicates, and in other positions are preserved. This
-syntactic cut check is not independently proof-checked; general cut conversion,
-red-cut safety proofs, mode inference, choicepoint splicing, and choice packets
-remain unimplemented.
+clause order, and source locations are retained. The resulting control construct commits to the first success, matching `once/1`
+for this side-effect-free subset. This report is not an independently checked
+proof. The transform removes a redundant cut only when a predicate has one clause
+and the complete body is `true, !` or one unification followed by `!`; it records
+`removed_green_cut/2`. It also lowers a terminal cut after a nonvar guard in a
+single-clause predicate to `ite(Guard, true, fail)`, recording
+`compiled_cut/3`. The guard must contain no cut or explicit `call/N`; nested
+cuts, multi-clause predicates, and other cut placements are preserved. Neither
+cut transformation is independently proof-checked. General cut conversion,
+`if_commit/3`, red-cut safety proofs, mode inference, choicepoint splicing, and
+choice packets remain unimplemented.
 
 Run this focused suite from the repository root:
 
@@ -242,8 +243,9 @@ Run this focused suite from the repository root:
 swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
 ```
 
-The transformation tests include safe redundant-cut removal and regression
-checks that nondeterministic and multi-clause cuts are preserved.
+The transformation tests include safe redundant-cut removal, first-answer
+preservation for a nondeterministic terminal-cut guard, and regression checks
+that nested and multi-clause cuts are preserved.
 
 ## S2A synthesis
 
@@ -478,8 +480,9 @@ The current work is an initial subset, not a completed version 1 suite:
   filter cases, `length/2` with or without supported arithmetic filters, and
   bounded `between/3` conversions with supported arithmetic filters. Stage 5
   adds only restricted compilation of pure `once/1` goals to the conservative
-  success-count analysis; general mode inference, choicepoint splicing, choice
-  packets, cut conversion, and fallback diagnostics are not implemented.
+  success-count analysis and terminal-cut lowering for supported singleton
+  clauses; general mode inference, choicepoint splicing, choice packets,
+  `if_commit/3`, red-cut proofs, and fallback diagnostics are not implemented.
 - **Stage 6 is in progress only for the proof-gated pipeline described above**;
   its full rewrite search and closed-form discovery remain unimplemented.
 - **Stage 7 has an initial exact constant/affine/quadratic, higher-degree
