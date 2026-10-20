@@ -14,7 +14,7 @@ sharing a change.
 
 | Feature | Implementation | Focused test command | Details |
 | --- | --- | --- | --- |
-| S2A input-address inference and example tables | `prolog/s2a/s2a.pl` | `swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"` | [S2A synthesis](#s2a-synthesis) |
+| S2A input-address and integer-affine inference, plus example tables | `prolog/s2a/s2a.pl` | `swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"` | [S2A synthesis](#s2a-synthesis) |
 | Program IR, parser and emitter | `prolog/ir/ir.pl` | `swipl -q -g "load_files('tests/ir_tests.pl'), run_tests(mnn_ir), halt"` | [IR section](#program-ir) |
 | Round-trip corpus | `tests/corpus/` | `swipl -q -g "load_files('tests/test_corpus.pl'), run_tests(mnn_ir_corpus), halt"` | [IR section](#program-ir) |
 | Sandboxed execution | `prolog/runner/sandbox_runner.pl` | `swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"` | [Sandboxed execution](#sandboxed-execution) |
@@ -233,19 +233,27 @@ projection at address `[2]`.
 If multiple addresses match, the default result is
 `no_algorithm(ambiguous(Candidates))`; if none match, or there are fewer than two
 distinct examples, the result is `no_algorithm(no_generalization_candidate)`.
-With the explicit option `[allow_table(true)]`, ambiguous or unsupported
-generalization cases may instead produce a standalone module containing one
-`Name/2` fact per distinct example. A unique input-address candidate takes
-precedence over table mode. Repeated identical examples are emitted once, while
-conflicting outputs for the same input, unsupported spec shapes, and invalid
-options return `no_algorithm/1`.
+When there is no matching input address and all examples have integer inputs and
+outputs, S2A next attempts an exact integer-affine relation
+`Output = Slope * Input + Intercept`. It requires at least two distinct input
+values, integer coefficients, and exact agreement with every example. The
+generated `Name/2` clause computes the output with `is/2`; examples such as
+`1 -> 5`, `2 -> 7`, and `4 -> 11` infer `2 * Input + 3`. Fractional slopes,
+non-integer examples, and inconsistent samples do not produce an affine
+candidate. A unique input-address candidate takes precedence over affine
+inference, which in turn takes precedence over table fallback. With the explicit
+option `[allow_table(true)]`, ambiguous or unsupported generalization cases may
+instead produce a standalone module containing one `Name/2` fact per distinct
+example. Repeated identical examples are emitted once, while conflicting outputs
+for the same input, unsupported spec shapes, and invalid options return
+`no_algorithm/1`.
 
-The trace identifies the inferred address or table and counts reproduced
-examples. Both modes currently use an empty formal proof: address inference
-reproduces the examples but is not a proof that the inferred relation is the
-intended function, and table mode does not generalize to held-out inputs. S2A
-does not yet infer recursive list algorithms such as reverse, arithmetic
-templates, or a formal example-reproduction proof.
+The trace identifies the inferred address, affine formula, or table and counts
+reproduced examples. All modes currently use an empty formal proof: address and
+integer-affine inference reproduce examples but do not prove that the inferred
+relation is the intended function, and table mode does not generalize to held-out
+inputs. S2A does not yet infer recursive list algorithms such as reverse,
+broader arithmetic templates, or a formal example-reproduction proof.
 
 Run its focused tests from the repository root:
 
@@ -428,14 +436,14 @@ The current work is an initial subset, not a completed version 1 suite:
   its full rewrite search and closed-form discovery remain unimplemented.
 - **Stage 7 has an initial exact constant/affine/quadratic, higher-degree
   polynomial, and integer-base geometric sequence-inference slice**, with exact
-  inverses for constant, affine, and integer-base geometric formulas as described
-  above; polynomial inverse discovery, program-position extraction, splice-index
-  loops, `r_spec` provenance, complexity ranking, and proof-backed formulas remain
+  inverses for constant, affine, polynomial, and integer-base geometric formulas
+  as described above; program-position extraction, splice-index loops,
+  `r_spec` provenance, complexity ranking, and proof-backed formulas remain
   unimplemented.
-- **Stage 8 has an initial opt-in S2A example-table mode.** Generalization,
-  input-address discovery, arithmetic/list templates, ambiguity reporting,
-  and formal example-reproduction proofs remain unimplemented; Starlog is not
-  started.
+- **Stage 8 has initial S2A input-address and integer-affine inference, plus an
+  opt-in example-table fallback.** Recursive list generalization, broader
+  arithmetic/list templates, formal example-reproduction proofs, and Starlog
+  remain unimplemented.
 - **Stages 9–14 are not started:** the AIOC pipeline and bundle interface,
   quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.

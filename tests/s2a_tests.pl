@@ -66,6 +66,60 @@ test(generalizes_a_unique_input_address_to_held_out_inputs) :-
           delete_file(File)
         )).
 
+test(infers_integer_affine_relation_and_generalizes_held_out_inputs) :-
+    Spec = [
+        [[input, [['A', 1]]], [output, [['B', 5]]]],
+        [[input, [['A', 2]]], [output, [['B', 7]]]],
+        [[input, [['A', 4]]], [output, [['B', 11]]]]
+    ],
+    mnn_s2a:s2a(affine_lookup_probe, Spec, [], Program),
+    Program = mnn_program(
+                  mnn_s2a_affine_lookup_probe,
+                  meta(s2a_affine(affine_lookup_probe, 2, 3),
+                       [directive(1, module(_, [affine_lookup_probe/2])),
+                        clause(2)]),
+                  [mnn_pred(affine_lookup_probe/2, _, _, [Clause], original)],
+                  proof([]),
+                  trace([s2a_affine(affine_lookup_probe, 2, 3,
+                                    examples_reproduced(3))])),
+    Clause = mnn_clause(2, affine_lookup_probe(Input, Output),
+                        (Output is 2 * Input + 3),
+                        generated(s2a_affine, 2)),
+    setup_call_cleanup(
+        temporary_source(File),
+        ( mnn_ir:emit_program(Program, File),
+          load_files(File, [silent(true)]),
+          assertion(mnn_s2a_affine_lookup_probe:affine_lookup_probe(10, 23)),
+          assertion(\+ mnn_s2a_affine_lookup_probe:affine_lookup_probe(10, 24))
+        ),
+        ( unload_file(File),
+          delete_file(File)
+        )).
+
+test(infers_constant_integer_output_from_distinct_inputs) :-
+    Spec = [
+        [[input, [['A', 2]]], [output, [['B', 9]]]],
+        [[input, [['A', 5]]], [output, [['B', 9]]]]
+    ],
+    mnn_s2a:s2a(affine_lookup_probe, Spec, [],
+                mnn_program(_, meta(s2a_affine(affine_lookup_probe, 0, 9), _),
+                            _, _, _)).
+
+test(rejects_nonintegral_or_inconsistent_affine_examples) :-
+    NonintegralSpec = [
+        [[input, [['A', 1]]], [output, [['B', 2]]]],
+        [[input, [['A', 3]]], [output, [['B', 3]]]]
+    ],
+    InconsistentSpec = [
+        [[input, [['A', 1]]], [output, [['B', 2]]]],
+        [[input, [['A', 2]]], [output, [['B', 4]]]],
+        [[input, [['A', 3]]], [output, [['B', 8]]]]
+    ],
+    mnn_s2a:s2a(affine_lookup_probe, NonintegralSpec, [],
+                no_algorithm(no_generalization_candidate)),
+    mnn_s2a:s2a(affine_lookup_probe, InconsistentSpec, [],
+                no_algorithm(no_generalization_candidate)).
+
 test(reports_ambiguous_input_addresses) :-
     Spec = [
         [[input, [['A', pair(red, red)]]], [output, [['B', red]]]],

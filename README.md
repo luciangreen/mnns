@@ -111,10 +111,11 @@ stage-by-stage implementation status and remaining work.
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
 - **S2A (initial inference):** for two or more distinct ground examples, a
   unique input subterm address shared with every output generates a generalized
-  projection clause. Ambiguous or unsupported cases are reported unless
-  `[allow_table(true)]` explicitly permits a lookup table. Neither mode has a
-  formal proof certificate; recursive and arithmetic generalization remain
-  unsupported. See
+  projection clause; when no address matches, integer examples may infer an
+  exact integer-affine relation. Ambiguous or unsupported cases are reported
+  unless `[allow_table(true)]` explicitly permits a lookup table. These
+  candidates reproduce the examples but have no formal proof certificate;
+  recursive generalization and broader arithmetic templates remain unsupported. See
   [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
 
 ## Requirements
