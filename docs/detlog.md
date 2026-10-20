@@ -59,13 +59,15 @@ so that mode is classified as multi; an aliased list and length variable remains
 unsupported. Other non-ground list patterns and negative lengths remain
 unavailable.
 The built-ins `nth0/3` and `nth1/3` are classified for ground proper lists when
-the index is an unbound variable or integer and the element is an unbound
-variable or ground term. An unbound index and element must be distinct variables.
-The analyzer counts matching positions up to two, so repeated elements can make
-a ground-element query multi; a fixed index has at most one success. `nth0/3`
-uses zero-based indices and `nth1/3` uses one-based indices. Improper or
-non-ground lists, partially instantiated elements, shared unbound index/element
-variables, and program-defined versions of these predicates remain unsupported.
+the index is an unbound variable or integer. The element may be any term pattern,
+including partially instantiated structures, repeated variables, or a variable
+shared with the index. For each list position, the analyzer copies the index and
+element together before matching them, preserving their sharing constraints
+without binding the analyzed program. Successes are counted up to two, so
+repeated matching elements can make a query multi; a fixed index has at most one
+success. `nth0/3` uses zero-based indices and `nth1/3` uses one-based indices.
+Improper or non-ground lists and program-defined versions of these predicates
+remain unsupported.
 The built-in `append/3` is classified as multi when all three arguments are
 distinct unbound variables: it has at least two successful list splits, so the
 reported count is capped at two. Repeated arguments and a program-defined
@@ -163,8 +165,9 @@ no matches, and unsupported shared variables across arguments. The supported
 `member/2` patterns include partially
 instantiated and repeated-variable patterns, duplicate matches, no matches,
 unbound lists, and unsupported aliases and list shapes. It also covers `nth0/3`
-and `nth1/3`, including duplicate values, out-of-range indices, and unsupported
-list or variable shapes. Run the complete suite with `swipl -q -s tests/run.pl`.
+and `nth1/3`, including partially instantiated and repeated-variable patterns,
+index/element sharing, duplicate values, out-of-range indices, and unsupported
+list shapes. Run the complete suite with `swipl -q -s tests/run.pl`.
 The append tests cover all distinct-unbound, ground, one-unbound, and two-unbound
 modes, including empty and nonempty ground lists and unsupported repeated or
 non-ground arguments.

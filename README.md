@@ -73,8 +73,9 @@ stage-by-stage implementation status and remaining work.
   nonnegative integer, while variable lists with fixed nonnegative lengths are
   classified as deterministic; distinct unbound list and length variables are
   classified as multi. Ground proper-list `nth0/3` and `nth1/3` calls are
-  classified for variable or integer indices and variable or ground elements,
-  preserving zero-/one-based indexing and duplicate-position counts. `append/3`
+  classified for variable or integer indices and arbitrary element patterns,
+  preserving pattern and index/element sharing, zero-/one-based indexing, and
+  duplicate-position counts. `append/3`
   is classified as multi when all three
   arguments are distinct unbound variables, and as deterministic or failing
   when all three arguments are ground proper lists or one argument is unbound

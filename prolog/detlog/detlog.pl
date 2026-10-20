@@ -178,13 +178,6 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     (   var(Index)
     ;   integer(Index)
     ),
-    (   var(Element)
-    ;   ground(Element)
-    ),
-    (   var(Index)
-    ->  Index \== Element
-    ;   true
-    ),
     \+ member(mnn_pred(nth0/3, _, _, _, _), Predicates),
     !,
     nth_list_outcomes(0, Index, List, Element, Outcomes).
@@ -195,13 +188,6 @@ goal_outcomes(Goal, Predicates, _, Outcomes) :-
     is_list(List),
     (   var(Index)
     ;   integer(Index)
-    ),
-    (   var(Element)
-    ;   ground(Element)
-    ),
-    (   var(Index)
-    ->  Index \== Element
-    ;   true
     ),
     \+ member(mnn_pred(nth1/3, _, _, _, _), Predicates),
     !,
@@ -450,8 +436,9 @@ nth_list_outcomes(Offset, Index, List, Element, Outcomes) :-
 nth_list_success_count([], _, _, _, Count, Count).
 nth_list_success_count([Candidate|Candidates], Position, Index, Element,
                        Count0, Count) :-
-    (   (var(Index) -> true ; Position =:= Index),
-        (var(Element) -> true ; Element == Candidate)
+    (   copy_term((Index, Element), (IndexCopy, ElementCopy)),
+        IndexCopy = Position,
+        ElementCopy = Candidate
     ->  Count1 is min(2, Count0 + 1)
     ;   Count1 = Count0
     ),
