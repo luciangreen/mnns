@@ -34,6 +34,55 @@ test(explicit_table_emits_standalone_module_and_runs_examples) :-
           delete_file(File)
         )).
 
+test(generalizes_a_unique_input_address_to_held_out_inputs) :-
+    Spec = [
+        [[input, [['A', box(red, [5, 6])]]],
+         [output, [['B', [5, 6]]]]],
+        [[input, [['A', box(blue, [7, 8])]]],
+         [output, [['B', [7, 8]]]]]
+    ],
+    mnn_s2a:s2a(address_lookup_probe, Spec, [], Program),
+    Program = mnn_program(
+                 mnn_s2a_address_lookup_probe,
+                 meta(s2a_input_address(address_lookup_probe, [2]),
+                      [directive(1, module(_, [address_lookup_probe/2])),
+                       clause(2)]),
+                 [mnn_pred(address_lookup_probe/2, _, _, [Clause], original)],
+                 proof([]),
+                 trace([s2a_input_address(address_lookup_probe, [2],
+                                          examples_reproduced(2))])),
+    Clause = mnn_clause(2, address_lookup_probe(box(_, Output), Output), true,
+                        generated(s2a_input_address, 2)),
+    setup_call_cleanup(
+        temporary_source(File),
+        ( mnn_ir:emit_program(Program, File),
+          load_files(File, [silent(true)]),
+          assertion(mnn_s2a_address_lookup_probe:address_lookup_probe(
+                        box(green, [9, 10]), [9, 10])),
+          assertion(\+ mnn_s2a_address_lookup_probe:address_lookup_probe(
+                           box(green, [9, 10]), wrong))
+        ),
+        ( unload_file(File),
+          delete_file(File)
+        )).
+
+test(reports_ambiguous_input_addresses) :-
+    Spec = [
+        [[input, [['A', pair(red, red)]]], [output, [['B', red]]]],
+        [[input, [['A', pair(blue, blue)]]], [output, [['B', blue]]]]
+    ],
+    mnn_s2a:s2a(address_lookup_probe, Spec, [],
+                no_algorithm(ambiguous([input_address([1]),
+                                        input_address([2])]))).
+
+test(requires_matching_structure_along_an_input_address) :-
+    Spec = [
+        [[input, [['A', first(red, one)]]], [output, [['B', red]]]],
+        [[input, [['A', second(blue, two)]]], [output, [['B', blue]]]]
+    ],
+    mnn_s2a:s2a(address_lookup_probe, Spec, [],
+                no_algorithm(no_generalization_candidate)).
+
 test(rejects_table_mode_without_explicit_opt_in) :-
     Spec = [[[input, [['A', one]]], [output, [['B', two]]]]],
     mnn_s2a:s2a(table_lookup_probe, Spec, [], no_algorithm(no_generalization_candidate)).

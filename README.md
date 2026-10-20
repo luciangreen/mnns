@@ -9,8 +9,9 @@ and finite-generator loop conversion.
 This repository implements only a subset of the full vision in
 [`PROGRAM_REQUIREMENTS.md`](PROGRAM_REQUIREMENTS.md). It includes initial Detlog
 analysis and a restricted pure `once/1` compilation slice, but not general
-Detlog transformations. S2A currently supports only explicitly opted-in example
-tables; Starlog, the end-user MNN compiler, general PLOp optimization, AIOC,
+Detlog transformations. S2A supports a conservative unique input-address
+projection and explicitly opted-in example tables; recursive generalization,
+Starlog, the end-user MNN compiler, general PLOp optimization, AIOC,
 neural-network, chatbot, and agent features remain incomplete. A proof-gated
 PLOp pipeline currently exposes a limited set of independently checked
 finite-generator conversions. See [`PROGRESS.md`](PROGRESS.md) for the
@@ -108,10 +109,13 @@ stage-by-stage implementation status and remaining work.
   evaluated at exact nonnegative positions; program positions and proof-backed
   formulas remain unsupported. See
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
-- **S2A (initial table mode):** explicitly opted-in example tables can be emitted
-  as a standalone IR module. This mode does not generalize beyond listed inputs
-  and has no formal proof certificate. See
-  [`docs/current_features.md`](docs/current_features.md#s2a-example-tables).
+- **S2A (initial inference):** for two or more distinct ground examples, a
+  unique input subterm address shared with every output generates a generalized
+  projection clause. Ambiguous or unsupported cases are reported unless
+  `[allow_table(true)]` explicitly permits a lookup table. Neither mode has a
+  formal proof certificate; recursive and arithmetic generalization remain
+  unsupported. See
+  [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
 
 ## Requirements
 

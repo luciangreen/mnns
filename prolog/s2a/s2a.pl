@@ -9,13 +9,11 @@ s2a(Name, Spec, Options, Result) :-
     ->  Result = no_algorithm(empty_spec)
     ;   \+ valid_options(Options)
     ->  Result = no_algorithm(invalid_options)
-    ;   \+ memberchk(allow_table(true), Options)
-    ->  Result = no_algorithm(no_generalization_candidate)
     ;   maplist(example_pair, Spec, Pairs)
     ->  (   conflicting_input(Pairs, Input)
         ->  Result = no_algorithm(conflicting_examples(Input))
         ;   unique_pairs(Pairs, UniquePairs),
-            build_program(Name, UniquePairs, Result)
+            infer_result(Name, UniquePairs, Options, Result)
         )
     ;   Result = no_algorithm(unsupported_spec_shape)
     ),
@@ -31,6 +29,116 @@ valid_options(Options) :-
 
 valid_option(allow_table(true)).
 valid_option(allow_table(false)).
+
+infer_result(Name, Pairs, Options, Result) :-
+    input_address_candidates(Pairs, Candidates),
+    (   Candidates = [Path]
+    ->  build_address_program(Name, Pairs, Path, Result)
+    ;   Candidates = []
+    ->  table_or_failure(Name, Pairs, Options, Result)
+    ;   memberchk(allow_table(true), Options)
+    ->  build_table_program(Name, Pairs, Result)
+    ;   maplist(input_address_candidate, Candidates, NamedCandidates),
+        Result = no_algorithm(ambiguous(NamedCandidates))
+    ).
+
+input_address_candidates([pair(FirstInput, FirstOutput)|Pairs], Candidates) :-
+    length(Pairs, RestCount),
+    (   RestCount > 0
+    ->  term_addresses(FirstInput, [], Addresses),
+        include(valid_input_address([pair(FirstInput, FirstOutput)|Pairs]),
+                Addresses, Candidates)
+    ;   Candidates = []
+    ).
+
+valid_input_address(Pairs, Address) :-
+    Pairs = [pair(ReferenceInput, _)|_],
+    forall(member(pair(Input, Output), Pairs),
+           (   term_at_address(Input, Address, Value),
+               Value == Output,
+               same_address_shape(ReferenceInput, Input, Address)
+           )).
+
+same_address_shape(_, _, []).
+same_address_shape(Reference, Input, [Index|Address]) :-
+    compound(Reference),
+    compound(Input),
+    functor(Reference, Functor, Arity),
+    functor(Input, Functor, Arity),
+    arg(Index, Reference, ReferenceArgument),
+    arg(Index, Input, InputArgument),
+    same_address_shape(ReferenceArgument, InputArgument, Address).
+
+term_addresses(Term, Address, [Address|SubAddresses]) :-
+    (   compound(Term)
+    ->  functor(Term, _, Arity),
+        findall(SubAddress,
+                ( between(1, Arity, Index),
+                  arg(Index, Term, Argument),
+                  append(Address, [Index], ArgumentAddress),
+                  term_addresses(Argument, ArgumentAddress, Addresses),
+                  member(SubAddress, Addresses)
+                ),
+                SubAddresses)
+    ;   SubAddresses = []
+    ).
+
+term_at_address(Term, [], Term).
+term_at_address(Term, [Index|Address], Value) :-
+    compound(Term),
+    arg(Index, Term, Argument),
+    term_at_address(Argument, Address, Value).
+
+input_address_candidate(Address, input_address(Address)).
+
+table_or_failure(Name, Pairs, Options, Result) :-
+    (   memberchk(allow_table(true), Options)
+    ->  build_table_program(Name, Pairs, Result)
+    ;   Result = no_algorithm(no_generalization_candidate)
+    ).
+
+build_address_program(Name, Pairs, Address,
+                      mnn_program(Module,
+                                  meta(s2a_input_address(Name, Address), Events),
+                                  Predicates, proof([]),
+                                  trace([s2a_input_address(
+                                             Name, Address,
+                                             examples_reproduced(Count))]))) :-
+    atom_concat(mnn_s2a_, Name, Module),
+    length(Pairs, Count),
+    Pairs = [pair(ExampleInput, _)|_],
+    pattern_at_address(ExampleInput, Address, InputPattern, Output),
+    Head =.. [Name, InputPattern, Output],
+    Events = [directive(1, module(Module, [Name/2])),
+              clause(2)],
+    Predicates = [mnn_pred(
+                      Name/2, ['?', '?'], [any, any],
+                      [mnn_clause(2, Head, true,
+                                  generated(s2a_input_address, 2))],
+                      original)].
+
+pattern_at_address(_, [], Variable, Variable).
+pattern_at_address(Term, [Index|Address], Pattern, Value) :-
+    compound(Term),
+    functor(Term, Functor, Arity),
+    Index >= 1,
+    Index =< Arity,
+    pattern_arguments(1, Arity, Index, Address, Term, Arguments, Value),
+    Pattern =.. [Functor|Arguments].
+
+pattern_arguments(Index, Arity, _, _, _, [], _) :-
+    Index > Arity,
+    !.
+pattern_arguments(Index, Arity, SelectedIndex, Address, Term,
+                  [Pattern|Patterns], Value) :-
+    (   Index =:= SelectedIndex
+    ->  arg(Index, Term, Selected),
+        pattern_at_address(Selected, Address, Pattern, Value)
+    ;   true
+    ),
+    NextIndex is Index + 1,
+    pattern_arguments(NextIndex, Arity, SelectedIndex, Address, Term,
+                      Patterns, Value).
 
 example_pair([[input, [[InputKey, Input]]],
               [output, [[OutputKey, Output]]]],
@@ -60,9 +168,10 @@ unique_pairs([pair(Input, Output)|Pairs], Seen, UniquePairs) :-
         unique_pairs(Pairs, [pair(Input, Output)|Seen], Rest)
     ).
 
-build_program(Name, Pairs,
-              mnn_program(Module, meta(s2a_table(Name), Events), Predicates,
-                          proof([]), trace([s2a_table(Name,
+build_table_program(Name, Pairs,
+                    mnn_program(Module, meta(s2a_table(Name), Events), Predicates,
+                                proof([]), trace([s2a_table(
+                                                     Name,
                                                      examples_reproduced(Count))]))) :-
     atom_concat(mnn_s2a_, Name, Module),
     length(Pairs, Count),

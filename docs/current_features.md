@@ -14,7 +14,7 @@ sharing a change.
 
 | Feature | Implementation | Focused test command | Details |
 | --- | --- | --- | --- |
-| S2A example-table generation (initial) | `prolog/s2a/s2a.pl` | `swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"` | [S2A example tables](#s2a-example-tables) |
+| S2A input-address inference and example tables | `prolog/s2a/s2a.pl` | `swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"` | [S2A synthesis](#s2a-synthesis) |
 | Program IR, parser and emitter | `prolog/ir/ir.pl` | `swipl -q -g "load_files('tests/ir_tests.pl'), run_tests(mnn_ir), halt"` | [IR section](#program-ir) |
 | Round-trip corpus | `tests/corpus/` | `swipl -q -g "load_files('tests/test_corpus.pl'), run_tests(mnn_ir_corpus), halt"` | [IR section](#program-ir) |
 | Sandboxed execution | `prolog/runner/sandbox_runner.pl` | `swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"` | [Sandboxed execution](#sandboxed-execution) |
@@ -216,18 +216,36 @@ Run this focused suite from the repository root:
 swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
 ```
 
-## S2A example tables
+## S2A synthesis
 
-`mnn_s2a:s2a/4` has an explicit table-only mode for a nonempty list of ground
-examples shaped as `[[input, [['A', Input]]], [output, [['B', Output]]]]`.
-Call it with `[allow_table(true)]` to generate a standalone module containing
-one `Name/2` fact per distinct input/output pair. Repeated identical examples
-are emitted once; conflicting outputs for the same input, unsupported spec
-shapes, invalid options, and missing table opt-in return `no_algorithm/1`.
-The trace records the number of unique examples. Inputs absent from the table
-simply fail; this mode does not infer a transformation or generalize to held-out
-inputs. The generated IR has an empty formal proof, so this feature does not
-claim proof certification or satisfy the broader S2A proof requirement.
+`mnn_s2a:s2a/4` accepts a nonempty list of ground examples shaped as
+`[[input, [['A', Input]]], [output, [['B', Output]]]]`. It first searches for a
+unique input address whose subterm is identical to the output in every distinct
+example. Addresses are lists of one-based compound-argument positions; `[]`
+denotes the whole input. When it finds exactly one address across at least two
+distinct examples, it emits one `Name/2` clause that preserves the constructors
+along that address and shares the selected subterm with the output. Other
+unselected input positions are variables, so the clause can handle held-out
+values with the same structural path. For example, examples mapping
+`box(red, [5,6])` to `[5,6]` and `box(blue, [7,8])` to `[7,8]` infer the
+projection at address `[2]`.
+
+If multiple addresses match, the default result is
+`no_algorithm(ambiguous(Candidates))`; if none match, or there are fewer than two
+distinct examples, the result is `no_algorithm(no_generalization_candidate)`.
+With the explicit option `[allow_table(true)]`, ambiguous or unsupported
+generalization cases may instead produce a standalone module containing one
+`Name/2` fact per distinct example. A unique input-address candidate takes
+precedence over table mode. Repeated identical examples are emitted once, while
+conflicting outputs for the same input, unsupported spec shapes, and invalid
+options return `no_algorithm/1`.
+
+The trace identifies the inferred address or table and counts reproduced
+examples. Both modes currently use an empty formal proof: address inference
+reproduces the examples but is not a proof that the inferred relation is the
+intended function, and table mode does not generalize to held-out inputs. S2A
+does not yet infer recursive list algorithms such as reverse, arithmetic
+templates, or a formal example-reproduction proof.
 
 Run its focused tests from the repository root:
 
