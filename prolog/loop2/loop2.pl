@@ -12,31 +12,80 @@ convert_program(
     loop2_report(Conversions)) :-
     max_clause_id(Predicates, MaxClauseId),
     NextClauseId is MaxClauseId + 1,
-    convert_predicates(Predicates, Predicates, NextClauseId, 1,
+    findall_generator_dependencies(Predicates, ProtectedPredicates),
+    convert_predicates(Predicates, Predicates, ProtectedPredicates,
+                       NextClauseId, 1,
                        [], ConvertedPredicates, [], GeneratedPredicates,
                        [], Conversions),
     append(ConvertedPredicates, GeneratedPredicates, UpdatedPredicates),
     generated_clause_events(GeneratedPredicates, GeneratedEvents),
     append(Events, GeneratedEvents, UpdatedEvents).
 
-convert_predicates([], _, _, _, Converted, Converted,
+convert_predicates([], _, _, _, _, Converted, Converted,
                    Generated, Generated, Conversions, Conversions).
 convert_predicates(
     [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
-    SourcePredicates, NextClauseId, NextName,
+    SourcePredicates, ProtectedPredicates, NextClauseId, NextName,
     Converted0, Converted,
     Generated0, Generated,
     Conversions0, Conversions) :-
-    convert_clauses(Clauses, SourcePredicates, NextClauseId, NextName,
-                    NextClauseId1, NextName1, [], UpdatedClauses,
-                    Generated0, Generated1, Conversions0, Conversions1),
+    (   memberchk(Key, ProtectedPredicates)
+    ->  NextClauseId1 = NextClauseId,
+        NextName1 = NextName,
+        UpdatedClauses = Clauses,
+        Generated1 = Generated0,
+        Conversions1 = Conversions0
+    ;   convert_clauses(Clauses, SourcePredicates, NextClauseId, NextName,
+                        NextClauseId1, NextName1, [], UpdatedClauses,
+                        Generated0, Generated1, Conversions0, Conversions1)
+    ),
     append(Converted0,
            [mnn_pred(Key, Modes, Domains, UpdatedClauses, Status)],
            Converted1),
-    convert_predicates(Predicates, SourcePredicates, NextClauseId1, NextName1,
-                       Converted1, Converted,
+    convert_predicates(Predicates, SourcePredicates, ProtectedPredicates,
+                       NextClauseId1, NextName1, Converted1, Converted,
                        Generated1, Generated,
                        Conversions1, Conversions).
+
+findall_generator_dependencies(Predicates, Dependencies) :-
+    findall(Key,
+            ( member(mnn_pred(_, _, _, Clauses, _), Predicates),
+              member(mnn_clause(_, _, Body, _), Clauses),
+              sub_term(Findall, Body),
+              nonvar(Findall),
+              Findall = findall(_, Generator, _),
+              generator_parts(Generator, Goal, _),
+              source_predicate_key(Predicates, Goal, Key)
+            ),
+            Seeds),
+    dependency_closure(Predicates, Seeds, [], Dependencies).
+
+dependency_closure(_, [], Dependencies, Dependencies).
+dependency_closure(Predicates, [Key|Pending], Seen, Dependencies) :-
+    (   memberchk(Key, Seen)
+    ->  dependency_closure(Predicates, Pending, Seen, Dependencies)
+    ;   predicate_source_dependencies(Predicates, Key, More),
+        append(Pending, More, Next),
+        dependency_closure(Predicates, Next, [Key|Seen], Dependencies)
+    ).
+
+predicate_source_dependencies(Predicates, Key, Dependencies) :-
+    member(mnn_pred(FoundKey, _, _, Clauses, _), Predicates),
+    FoundKey == Key,
+    findall(Dependency,
+            ( member(mnn_clause(_, _, Body, _), Clauses),
+              sub_term(Goal, Body),
+              source_predicate_key(Predicates, Goal, Dependency)
+            ),
+            Dependencies).
+
+source_predicate_key(Predicates, Goal, Key) :-
+    nonvar(Goal),
+    callable(Goal),
+    functor(Goal, Name, Arity),
+    Key = Name/Arity,
+    member(mnn_pred(FoundKey, _, _, _, _), Predicates),
+    FoundKey == Key.
 
 convert_clauses([], _, NextClauseId, NextName,
                 NextClauseId, NextName, Clauses, Clauses,
