@@ -209,11 +209,8 @@ findall_to_fold_program(
                 Proof, Trace)) :-
     is_list(Events),
     is_list(Predicates),
-    findall(PredicateIndex-ClauseIndex,
-            findall_candidate(Predicates, PredicateIndex, ClauseIndex, _, _),
-            [PredicateIndex-ClauseIndex|_]),
-            findall_candidate(Predicates, PredicateIndex, ClauseIndex,
-                              Values, Results),
+    findall_candidate(Predicates, PredicateIndex, ClauseIndex,
+                      Values, Results),
     fresh_loop_name(Predicates, Loop),
     max_clause_id(Predicates, MaxClauseId),
     FirstGeneratedId is MaxClauseId + 1,
