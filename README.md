@@ -27,7 +27,8 @@ stage-by-stage implementation status and remaining work.
   SWI-Prolog's sandbox, and limits execution time and answer count. See
   [`prolog/runner/sandbox_runner.pl`](prolog/runner/sandbox_runner.pl).
 - **Proof checker and renderer:** independently checks identity, one adjacent
-  reordering of restricted ground type tests, restricted definition
+  reordering of restricted ground type tests or safe ground arithmetic
+  comparisons, restricted definition
   introduction, narrow single-occurrence unfold/fold steps, and `findall/3`
   conversions over ground facts, `member/2`, `select/3`, `nth0/3`, and `nth1/3`,
   with supported arithmetic-comparison filters. Ground-list `member/2` checks

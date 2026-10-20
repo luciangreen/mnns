@@ -128,6 +128,10 @@ safe_ground_test(Goal) :-
     Goal =.. [Name, Argument],
     ground(Argument),
     memberchk(Name, [atom, atomic, compound, ground, integer, is_list, number]).
+safe_ground_test(Goal) :-
+    ground(Goal),
+    supported_arithmetic_filter(Goal),
+    checked_filter_result(Goal, _).
 
 valid_definition_rewrite_proof(Program, Original, Proof) :-
     ground(Proof),

@@ -69,6 +69,11 @@ member generator, and one
 `findall(Index, nth0(Index, GroundList, _), Results)` or
 `findall(Index, nth1(Index, GroundList, _), Results)` conversion, independently
 reconstructing the generated values, helper, and complete output IR. The
+`reorder_goals` rule additionally permits exactly one adjacent swap of two ground
+whitelisted arithmetic comparisons when both comparisons can be evaluated without
+arithmetic exceptions. Variable comparisons and unsupported goals remain
+unavailable. The proof-checker focused command below runs these cases alongside
+the other proof and renderer tests. The
 `nth0/3` and `nth1/3` index forms also accept whitelisted arithmetic-comparison
 filters when the index and element are distinct unbound variables; comparisons
 must be ground after each list item is matched. It also checks
