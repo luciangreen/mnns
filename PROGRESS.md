@@ -141,9 +141,10 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   failed calls and duplicate matching facts; rule calls, non-ground fact heads,
   recursive calls, and other bound/repeated-argument calls remain unavailable.
   A restricted compiler lowers `once/1` over a whitelist of pure built-ins and
-  normalized control goals (including built-in `member/2` and `between/3` when
-  the source does not define them) to if-then-else; unsupported goals remain
-  unchanged. General mode inference, choicepoint splicing, choice-packet
+  normalized control goals (including built-in `member/2`, `between/3`,
+  `append/3`, and `select/3` when the source does not define them) to
+  if-then-else; unsupported goals remain unchanged. General mode inference,
+  choicepoint splicing, choice-packet
   generation, and cut conversion remain unimplemented.
 - **Stage 6 — PLOp: in progress (initial pipeline only).** Whole-program and
   single-predicate entry points share a proof-gated pipeline that can apply

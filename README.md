@@ -77,8 +77,8 @@ exposes one independently checked finite-generator conversion. See
   also multi. See
   [`docs/detlog.md`](docs/detlog.md).
 - **Detlog `once/1` compilation (restricted):** lowers `once/1` over a
-  documented pure built-in/control-flow subset, including built-in `member/2`
-  and `between/3`, to IR if-then-else, preserving unsupported and locally defined
+  documented pure built-in/control-flow subset, including built-in `member/2`,
+  `between/3`, `append/3`, and `select/3`, to IR if-then-else, preserving unsupported and locally defined
   predicates unchanged. It does not yet implement choicepoint splicing, choice
   packets, or cut conversion. See [`docs/detlog.md`](docs/detlog.md).
 - **loop2 conversion:** converts `findall/3` over ground facts, `member/2`,
