@@ -26,5 +26,7 @@ main :-
     load_files(AlgebraPLOpTests, [silent(true)]),
     directory_file_path(Directory, 's2a_tests.pl', S2ATests),
     load_files(S2ATests, [silent(true)]),
+    directory_file_path(Directory, 'aioc_size_tests.pl', AIOCSizeTests),
+    load_files(AIOCSizeTests, [silent(true)]),
     run_tests,
     halt.

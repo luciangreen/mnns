@@ -192,6 +192,11 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   unsupported spec shapes are rejected. These candidates reproduce examples but
   carry no formal proof; recursive list generalization, broader arithmetic/list
   templates, formal example proofs, and Starlog remain unimplemented.
+- **Stage 9 — AIOC: initial structural-size metric.** The new metric reports
+  clause, normalized-goal, predicate-record, and term-node counts with a
+  documented equal-weight total. It does not estimate inference count or memory,
+  certify equivalence, simplify candidates, or implement the rest of the AIOC
+  controller.
 
 ## Remaining stages
 
@@ -205,7 +210,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine inference from examples, plus explicit opt-in table fallback; no formal proof; recursive/list generalization, broader arithmetic templates, and Starlog remain unimplemented) |
-| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | Not started |
+| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric; incorporation, semantic simplification, candidate assessment, bundles, library, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |

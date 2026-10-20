@@ -26,6 +26,7 @@ sharing a change.
 | loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
+| AIOC structural size metric (initial) | `prolog/aioc/size.pl` | `swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"` | [AIOC size metric](aioc.md) |
 
 Run the complete suite, including every group above, with:
 

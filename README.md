@@ -121,6 +121,10 @@ stage-by-stage implementation status and remaining work.
   candidates reproduce the examples but have no formal proof certificate;
   recursive generalization and broader arithmetic templates remain unsupported. See
   [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
+- **AIOC structural size metric (initial):** reports clause, goal, predicate, and
+  term-node counts for an IR program, plus an equal-weight total. This measures
+  representation size only; it does not estimate runtime or memory cost. See
+  [`docs/aioc.md`](docs/aioc.md).
 
 ## Requirements
 
@@ -139,7 +143,8 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-loop2, Detlog, PLOp, AlgebraPLOp, and S2A tests. Focused commands for every PlUnit group are listed in
+loop2, Detlog, PLOp, AlgebraPLOp, S2A, and AIOC size-metric tests. Focused
+commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 
 ```sh
