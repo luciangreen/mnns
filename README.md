@@ -127,12 +127,12 @@ feature and its focused test suite.
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
 - **S2A (initial inference):** for two or more distinct ground examples, a
   unique input subterm address shared with every output generates a generalized
-  projection clause; when no address matches, integer examples may infer an
-  exact integer-affine relation. Ambiguous or unsupported cases are reported
+  projection clause; otherwise integer examples may infer an exact integer-affine
+  or integer-quadratic relation. Ambiguous or unsupported cases are reported
   unless `[allow_table(true)]` explicitly permits a lookup table. These
   candidates reproduce the examples but have no formal proof certificate;
-  recursive generalization and broader arithmetic templates remain unsupported. See
-  [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
+  recursive generalization and broader arithmetic templates remain unsupported.
+  See [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
 - **AIOC structural size metric (initial):** reports clause, goal, predicate, and
   term-node counts for an IR program, plus an equal-weight total. This measures
   representation size only; it does not estimate runtime or memory cost. The
