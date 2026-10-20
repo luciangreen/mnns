@@ -30,5 +30,7 @@ main :-
     load_files(AIOCSizeTests, [silent(true)]),
     directory_file_path(Directory, 'bundle_tests.pl', BundleTests),
     load_files(BundleTests, [silent(true)]),
+    directory_file_path(Directory, 'prolog2ann_tests.pl', Prolog2ANNTests),
+    load_files(Prolog2ANNTests, [silent(true)]),
     run_tests,
     halt.
