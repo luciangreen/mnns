@@ -47,6 +47,39 @@ test(accept_reordering_of_ground_arithmetic_comparisons) :-
     reorder_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_reordering_of_ground_arithmetic_assignments) :-
+    program_with_body(conj(is(3, 1 + 2), is(8, 2 * 4)), Original),
+    program_with_body(conj(is(8, 2 * 4), is(3, 1 + 2)), Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_reordering_ground_arithmetic_assignment_with_failure) :-
+    program_with_body(conj(is(4, 1 + 2), atom(ok)), Original),
+    program_with_body(conj(atom(ok), is(4, 1 + 2)), Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_reordering_with_variable_arithmetic_assignment) :-
+    program_with_body(conj(is(Value, 1 + 2), integer(3)), Original),
+    program_with_body(conj(integer(3), is(Value, 1 + 2)), Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_reordering_with_raising_arithmetic_assignment) :-
+    program_with_body(conj(is(3, 1 / 0), atom(ok)), Original),
+    program_with_body(conj(atom(ok), is(3, 1 / 0)), Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
+test(reject_reordering_with_non_arithmetic_assignment) :-
+    program_with_body(conj(is(3, unsupported), atom(ok)), Original),
+    program_with_body(conj(atom(ok), is(3, unsupported)), Program),
+    reorder_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(reject_reordering_with_variable_arithmetic_comparison) :-
     program_with_body(conj((X > 2), integer(X)), Original),
     program_with_body(conj(integer(X), (X > 2)), Program),

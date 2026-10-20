@@ -72,11 +72,12 @@ these index generators, the index may be variable or integer, the element may
 use a constrained term pattern, and each passing template must be ground. The
 checker independently reconstructs the generated values, helper, and complete
 output IR. The `reorder_goals` rule additionally permits exactly one adjacent
-swap when each goal
-is either a supported ground unary type test or a ground whitelisted arithmetic
-comparison that can be evaluated without arithmetic exceptions. Variable
-comparisons and unsupported goals remain unavailable. The proof-checker focused
-command below runs these cases alongside the other proof and renderer tests.
+swap when each goal is either a supported ground unary type test, a ground
+whitelisted arithmetic comparison, or a ground `is/2` assignment whose
+right-hand expression can be evaluated without arithmetic exceptions. Variable
+comparisons or assignments and unsupported goals remain unavailable. The
+proof-checker focused command below runs these cases alongside the other proof
+and renderer tests.
 `nth0/3` and `nth1/3` also accept whitelisted arithmetic-comparison filters that
 are ground after matching each index and element against the list. Indices remain
 zero-based or one-based, respectively, and an empty ground list produces no
