@@ -144,8 +144,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   normalized control goals (including built-in `member/2`, `between/3`,
   `append/3`, and `select/3` when the source does not define them) to
   if-then-else; unsupported goals remain unchanged. General mode inference,
-  choicepoint splicing, choice-packet
-  generation, and cut conversion remain unimplemented.
+  choicepoint splicing, choice-packet generation, and cut conversion remain
+  unimplemented.
 - **Stage 6 — PLOp: in progress (initial pipeline only).** Whole-program and
   single-predicate entry points share a proof-gated pipeline that can apply
   multiple supported `findall/3`-to-loop conversions as sequentially checked proof
