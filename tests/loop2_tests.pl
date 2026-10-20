@@ -168,6 +168,31 @@ test(converts_rule_generator_with_bound_arguments, [nondet]) :-
                                         deterministic_loop))])),
     run_converted(Converted, values(Values), [[[1, 3]]]).
 
+test(converts_nested_findall_over_builtin_generator_in_finite_rule, [nondet]) :-
+    with_converted_program(
+        [(items(Values) :-
+              findall(Item, member(Item, [a, b]), Values)),
+         (all_items(Values) :-
+              findall(Items, items(Items), Values))],
+        Converted,
+        loop2_report(
+            [conversion(findall_to_fold, helper(mnn_loop2_1/2),
+                        side_conditions(finite_acyclic_rules(1),
+                                        safe_arithmetic_filters(0),
+                                        deterministic_loop))])),
+    run_converted(Converted, all_items(Values), [[[[a, b]]]]).
+
+test(leaves_nested_findall_over_source_predicate_unchanged, [nondet]) :-
+    with_converted_program(
+        [item(a),
+         item(b),
+         (items(Values) :-
+              findall(Item, item(Item), Values)),
+         (all_items(Values) :-
+              findall(Items, items(Items), Values))],
+        Converted, loop2_report([])),
+    run_converted(Converted, all_items(Values), [[[[a, b]]]]).
+
 test(leaves_recursive_and_unbound_rule_generators_unchanged, [nondet]) :-
     with_converted_program(
         [(recursive(X) :- recursive(X)),
