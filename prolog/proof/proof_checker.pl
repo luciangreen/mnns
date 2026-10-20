@@ -415,6 +415,11 @@ rule_goal_supported(Predicates, disj(Left, Right), Visited) :-
     !,
     rule_goal_supported(Predicates, Left, Visited),
     rule_goal_supported(Predicates, Right, Visited).
+rule_goal_supported(Predicates, Goal, _) :-
+    nonvar(Goal),
+    Goal = findall(_, _, _),
+    !,
+    nested_findall_supported(Predicates, Goal).
 rule_goal_supported(_, Goal, _) :-
     supported_arithmetic_filter(Goal),
     !.
@@ -453,6 +458,11 @@ rule_goal(_, Filter, _) :-
     supported_arithmetic_filter(Filter),
     !,
     checked_rule_filter(Filter, true).
+rule_goal(Predicates, Goal, _) :-
+    nonvar(Goal),
+    Goal = findall(_, _, _),
+    !,
+    nested_findall_values(Predicates, Goal).
 rule_goal(Predicates, Goal, Visited) :-
     functor(Goal, Name, Arity),
     Key = Name/Arity,
@@ -463,6 +473,56 @@ rule_goal(Predicates, Goal, Visited) :-
     copy_term((Head, Body), (HeadCopy, BodyCopy)),
     Goal = HeadCopy,
     rule_goal(Predicates, BodyCopy, [Key|Visited]).
+
+nested_findall_supported(Predicates, Goal) :-
+    copy_term(Goal, GoalCopy),
+    nested_findall_values(Predicates, GoalCopy).
+
+nested_findall_values(
+    Predicates, findall(Template, Generator, Results)) :-
+    nested_builtin_generator(Predicates, Generator),
+    copy_term((Template, Generator),
+              (TemplateCopy, GeneratorCopy)),
+    findall_candidate_values(Predicates, TemplateCopy, GeneratorCopy, Values),
+    Results = Values.
+
+nested_builtin_generator(Predicates, Generator) :-
+    generator_parts(Generator, Goal, Filters),
+    nonvar(Goal),
+    callable(Goal),
+    functor(Goal, Name, Arity),
+    memberchk(Name/Arity,
+              [member/2, select/3, append/3, length/2,
+               nth0/3, nth1/3, between/3]),
+    Key = Name/Arity,
+    \+ member(mnn_pred(Key, _, _, _, _), Predicates),
+    nested_builtin_domain(Goal),
+    maplist(supported_arithmetic_filter, Filters).
+
+nested_builtin_domain(member(_, List)) :-
+    ground(List),
+    is_list(List).
+nested_builtin_domain(select(_, List, _)) :-
+    ground(List),
+    is_list(List).
+nested_builtin_domain(append(_, _, List)) :-
+    ground(List),
+    is_list(List).
+nested_builtin_domain(length(List, _)) :-
+    ground(List),
+    is_list(List).
+nested_builtin_domain(nth0(_, List, _)) :-
+    ground(List),
+    is_list(List).
+nested_builtin_domain(nth1(_, List, _)) :-
+    ground(List),
+    is_list(List).
+nested_builtin_domain(between(Low, High, Value)) :-
+    integer(Low),
+    integer(High),
+    (   var(Value)
+    ;   integer(Value)
+    ).
 
 rule_candidate_values([], []).
 rule_candidate_values([candidate(Template, Filters)|Candidates], Values) :-

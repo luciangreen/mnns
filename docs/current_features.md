@@ -101,11 +101,14 @@ exceptions are not certified. These proof subsets exclude filters on built-in ge
 `member/2`, `select/3`, `nth0/3`, `nth1/3`, `length/2`, and bounded `between/3`.
 It also independently checks finite acyclic rule generators whose clauses are
 ground facts or use only conjunction, disjunction, `true`, `fail`, supported
-arithmetic comparisons, and other supported source-predicate calls. Unsupported
-goals, recursive dependencies, non-ground passing templates, and arithmetic
-exceptions are rejected. Nested findall, oversized ranges, and other list
-generators remain unsupported. The renderer creates Markdown explanations but
-does not certify proofs. General
+arithmetic comparisons, other supported source-predicate calls, and nested
+`findall/3` over supported finite built-in generators. Nested built-ins must not
+be shadowed; list generators require ground proper lists, and `between/3`
+requires integer literal bounds. Nested templates must be ground for every
+result. Unsupported goals, nested findall over source predicates, recursive
+dependencies, non-ground passing templates, and arithmetic exceptions are
+rejected. Oversized ranges and other list generators remain unsupported. The
+renderer creates Markdown explanations but does not certify proofs. General
 purity analysis, general clause/goal reordering, and most proof rules in the
 requirements remain unsupported.
 
@@ -305,13 +308,13 @@ Each conversion creates a uniquely named recursive list-copy predicate and
 preserves the existing predicates and their clause order. The report records
 finiteness and filter side conditions for the findall-to-fold lemma. The
 independent proof checker validates ground-fact conversions, finite acyclic rule
-generators with restricted pure bodies, and the documented direct ground-list
+generators with restricted pure bodies, including nested `findall/3` over supported
+finite built-in generators, and the documented direct ground-list
 `append/3`, `member/2`, `select/3`, `nth0/3`/`nth1/3` index, `length/2`, and bounded
 `between/3` subsets. It supports whitelisted arithmetic filters on these rule
 generators and on the built-in subsets documented in [`proof_rules.md`](proof_rules.md).
-Nested `findall/3` inside a rule body is converted but is not yet independently
-checked. Other filters and conversions remain unchecked; do not treat them as
-proof-certified. See [`loop2.md`](loop2.md).
+Nested findall over source predicates, unsupported filters, and other conversions
+remain unchecked; do not treat them as proof-certified. See [`loop2.md`](loop2.md).
 
 ## PLOp pipeline
 

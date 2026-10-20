@@ -155,7 +155,14 @@ generator conversion:
   exceptions. The checker interprets clause and goal order independently,
   preserves duplicate derivations, and requires a ground template for every
   passing derivation. Recursive dependencies and unsupported body goals are
-  rejected; the source program is never executed.
+  rejected; the source program is never executed. A rule body may also contain a
+  nested `findall/3` over `member/2`, `select/3`, `append/3`, `length/2`,
+  `nth0/3`, `nth1/3`, or bounded `between/3`. List generators require a ground
+  proper list, and `between/3` requires integer literal bounds and a variable or
+  integer value; the generator may use supported arithmetic-comparison filters.
+  These built-ins must not be shadowed by a source predicate, every nested
+  template must be ground for every result, and nested source-predicate
+  generators remain unsupported.
 
 For each case, it reconstructs the complete expected output IR: the source call
 must be replaced by a call to a fresh helper containing the independently
@@ -185,9 +192,11 @@ the stated distinct-variable `nth0/3` and `nth1/3` index forms with or without
 supported arithmetic filters, the stated `length/2` form with or without
 supported arithmetic filters, and bounded
 `between/3`, plus finite acyclic rule generators with the restricted bodies
-described above. Filters on built-in generators other than `member/2`, `select/3`,
-`nth0/3`, `nth1/3`, `length/2`, and `between/3`, nested findall, other list
-generators, and arbitrary `findall/3` rewrites are not certified. Ground domain
+described above, including nested findall over supported finite built-in
+generators. Filters on built-in generators other than `member/2`, `select/3`,
+`nth0/3`, `nth1/3`, `length/2`, and `between/3`, nested findall over source
+predicates, other list generators, and arbitrary `findall/3` rewrites are not
+certified. Ground domain
 and mode annotations are required but are not inferred.
 The checker does not import or invoke the loop2 converter.
 
@@ -205,7 +214,8 @@ Accepted identity proofs are explained as alpha-equivalence of the complete IR
 terms. Accepted findall-to-fold steps are summarized for ground-fact predicates,
 finite acyclic source-rule chains with restricted pure bodies, ground proper-list
 `member/2`, `select/3`, `append/3`, `nth0/3`, `nth1/3`, and `length/2`, and bounded
-integer-literal `between/3`. The summary includes the supported arithmetic-filter
+integer-literal `between/3`, including nested finite built-in generators in
+acyclic rule bodies. The summary includes the supported arithmetic-filter
 and ground-template conditions; the exact accepted subset is defined above.
 Rejected or unsupported proofs are shown as quoted Prolog terms and clearly marked
 as rejected. Rendering is explanatory; the independent checker result is the
