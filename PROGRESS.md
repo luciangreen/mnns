@@ -63,7 +63,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   the expected output and deterministic copy helper. Ordered sequences of
   these checked steps can be independently verified and rendered as Markdown
   reports. Filters on ground-fact generators are checked only for whitelisted
-  arithmetic comparisons with ground operands.   The checker also validates
+  arithmetic comparisons with ground operands. The checker also validates
   supported arithmetic-comparison filters on ground-list `append/3`, `member/2`,
   `select/3`, `nth0/3`, and `nth1/3` conversions, plus supported arithmetic
   filters on bounded integer-literal `between/3`.

@@ -166,9 +166,10 @@ generator conversion:
 For each case, it reconstructs the complete expected output IR: the source call
 must be replaced by a call to a fresh helper containing the independently
 derived values, and that helper must be the two-clause deterministic list-copy
-loop. The `nth0/3` case derives zero-based indices and the `nth1/3` case derives
-one-based indices, both in list order; an empty list produces an empty values
-list. For filtered `member/2`, it independently matches each list element, evaluates
+loop. For `nth0/3` and `nth1/3`, it enumerates list positions in order, matching
+zero-based or one-based index patterns respectively against the element patterns;
+an empty list produces no values. For filtered `member/2`, it independently
+matches each list element, evaluates
 the supported comparisons on the resulting ground terms, and collects passing
 templates in list order, preserving duplicates. For `select/3`, the checker
 independently enumerates each selected position,
@@ -180,12 +181,6 @@ any bound length before constructing the expected values. Existing clauses and
 predicates must be preserved; the generated
 helper's clause IDs and metadata events must also match. Thus a claimed conversion,
 altered values, missing helper, or unrelated program change is rejected.
-For `nth0/3` and `nth1/3`, the checker independently matches the index and value
-patterns against each ground list position, evaluates any supported comparisons,
-and collects passing templates in list order. This preserves duplicates and
-supports constrained indices or values as long as each passing template is
-ground.
-
 These checks cover ground-fact calls with or without whitelisted arithmetic filters,
 ground-list `member/2` and `select/3` with or without supported
 arithmetic-comparison filters,

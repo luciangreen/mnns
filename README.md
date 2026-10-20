@@ -37,10 +37,10 @@ stage-by-stage implementation status and remaining work.
   no-filter conversions over `length/2`, plus bounded `between/3` conversions with or
   without supported arithmetic-comparison filters, and finite acyclic rule
   generators with restricted pure bodies, including nested `findall/3` over
-  supported finite built-in generators.   For `nth0/3` and `nth1/3`, the index may be variable or integer and the element
-  may be constrained by a term pattern; each passing template must be ground.
-  Selection
-  order, fact order, and duplicate answers are preserved; indices are checked
+  supported finite built-in generators. For `nth0/3` and `nth1/3`, the index may
+  be variable or integer and the element may be constrained by a term pattern;
+  each passing template must be ground. Selection order, fact order, and duplicate
+  answers are preserved; indices are checked
   as zero-based for `nth0/3` and one-based for `nth1/3`. Unsupported proof rules and
   broader findall conversions are rejected.
   See [`docs/proof_rules.md`](docs/proof_rules.md).
