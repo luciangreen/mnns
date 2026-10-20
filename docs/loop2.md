@@ -18,6 +18,12 @@ The current supported subset is deliberately narrow:
   are preserved, including answers from multi-clause rules. Bound or partially
   instantiated arguments on the generator call are matched against rule heads
   and act as filters.
+- Such a finite acyclic rule body may contain a nested `findall/3` whose inner
+  generator is one of the supported built-in finite list generators or a bounded
+  `between/3` call. The nested generator must use a ground proper list or literal
+  integer bounds, must not be shadowed by a source predicate, and may use only
+  supported arithmetic-comparison filters. Nested calls to source predicates,
+  unsupported inner generators, and recursive dependencies remain unchanged.
 - `member/2` over a ground proper list, optionally followed by arithmetic
   comparisons. List order and duplicate elements are preserved.
 - `select/3` over a ground proper list, optionally followed by arithmetic
@@ -86,6 +92,8 @@ every successful template is ground. Arithmetic filters are limited to the
 comparisons and expressions above and must be ground when reached. Conversions
 involving unsupported built-in filters or other forms are not independently
 checked. Do not treat such output as proof-certified.
+Nested `findall/3` inside a rule body is currently converted by loop2 but is not
+independently certified by the proof checker.
 
 Run the full suite, including loop2 tests, with:
 
