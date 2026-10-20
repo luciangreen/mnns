@@ -14,6 +14,7 @@ sharing a change.
 
 | Feature | Implementation | Focused test command | Details |
 | --- | --- | --- | --- |
+| S2A example-table generation (initial) | `prolog/s2a/s2a.pl` | `swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"` | [S2A example tables](#s2a-example-tables) |
 | Program IR, parser and emitter | `prolog/ir/ir.pl` | `swipl -q -g "load_files('tests/ir_tests.pl'), run_tests(mnn_ir), halt"` | [IR section](#program-ir) |
 | Round-trip corpus | `tests/corpus/` | `swipl -q -g "load_files('tests/test_corpus.pl'), run_tests(mnn_ir_corpus), halt"` | [IR section](#program-ir) |
 | Sandboxed execution | `prolog/runner/sandbox_runner.pl` | `swipl -q -g "load_files('tests/runner_tests.pl'), run_tests(mnn_sandbox_runner), halt"` | [Sandboxed execution](#sandboxed-execution) |
@@ -212,6 +213,25 @@ Run this focused suite from the repository root:
 swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
 ```
 
+## S2A example tables
+
+`mnn_s2a:s2a/4` has an explicit table-only mode for a nonempty list of ground
+examples shaped as `[[input, [['A', Input]]], [output, [['B', Output]]]]`.
+Call it with `[allow_table(true)]` to generate a standalone module containing
+one `Name/2` fact per distinct input/output pair. Repeated identical examples
+are emitted once; conflicting outputs for the same input, unsupported spec
+shapes, invalid options, and missing table opt-in return `no_algorithm/1`.
+The trace records the number of unique examples. Inputs absent from the table
+simply fail; this mode does not infer a transformation or generalize to held-out
+inputs. The generated IR has an empty formal proof, so this feature does not
+claim proof certification or satisfy the broader S2A proof requirement.
+
+Run its focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
+```
+
 ## loop2 conversion
 
 `mnn_loop2:convert_program/3` currently handles a `findall/3` whose generator is
@@ -360,6 +380,7 @@ swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
 swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"
+swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
 ```
 
 The single canonical full-suite command is also used in CI. Individual test
@@ -387,9 +408,13 @@ The current work is an initial subset, not a completed version 1 suite:
   inverses for constant, affine, and integer-base geometric formulas as described
   above; polynomial inverse discovery, program-position extraction, splice-index
   loops, `r_spec` provenance, complexity ranking, and proof-backed formulas remain
-  unimplemented. **Stages
-  8–14 are not started:** S2A/Starlog,
-  the AIOC pipeline and bundle interface, quantum-inspired search/export, AMNN/ANN/manual
+  unimplemented.
+- **Stage 8 has an initial opt-in S2A example-table mode.** Generalization,
+  input-address discovery, arithmetic/list templates, ambiguity reporting,
+  and formal example-reproduction proofs remain unimplemented; Starlog is not
+  started.
+- **Stages 9–14 are not started:** the AIOC pipeline and bundle interface,
+  quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 
 See [`PROGRESS.md`](../PROGRESS.md) for the complete stage table and the

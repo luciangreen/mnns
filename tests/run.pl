@@ -24,5 +24,7 @@ main :-
     load_files(PlopTests, [silent(true)]),
     directory_file_path(Directory, 'algebraplop_tests.pl', AlgebraPLOpTests),
     load_files(AlgebraPLOpTests, [silent(true)]),
+    directory_file_path(Directory, 's2a_tests.pl', S2ATests),
+    load_files(S2ATests, [silent(true)]),
     run_tests,
     halt.
