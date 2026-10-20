@@ -756,7 +756,7 @@ test(reject_nth1_index_findall_to_fold_with_changed_indices) :-
     mnn_proof_checker:check_proof(
         Program, Original, ProofTerm, rejected(invalid_or_unsupported_proof)).
 
-test(reject_nth0_index_findall_to_fold_with_shared_index_and_element) :-
+test(accept_nth0_findall_to_fold_with_shared_index_and_element) :-
     Original = mnn_program(
                    sample, meta(source, [clause(1)]),
                    [mnn_pred(numbers/1, ['?'], [any],
@@ -768,9 +768,14 @@ test(reject_nth0_index_findall_to_fold_with_shared_index_and_element) :-
                              original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [1]),
     findall_to_fold_proof(Proof),
-    mnn_proof_checker:check_proof(
-        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
 test(reject_findall_to_fold_with_changed_values) :-
     findall_to_fold_programs(Original, Program0),

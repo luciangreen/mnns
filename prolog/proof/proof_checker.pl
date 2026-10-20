@@ -796,13 +796,11 @@ selection([Value|Values], Value, Values).
 selection([Head|Values], Value, [Head|Rest]) :-
     selection(Values, Value, Rest).
 
-list_indices(List, Indices) :-
-    list_indices(List, 0, Indices).
-
-list_indices([], _, []).
-list_indices([_|Values], Index, [Index|Indices]) :-
-    NextIndex is Index + 1,
-    list_indices(Values, NextIndex, Indices).
+supported_nth_index(Index) :-
+    var(Index),
+    !.
+supported_nth_index(Index) :-
+    integer(Index).
 
 replace_findall_candidate(
     [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
