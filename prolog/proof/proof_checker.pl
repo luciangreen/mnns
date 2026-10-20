@@ -395,6 +395,10 @@ rule_goal_supported(Predicates, Goal, _) :-
     Goal = findall(_, _, _),
     !,
     nested_findall_supported(Predicates, Goal).
+rule_goal_supported(Predicates, Goal, _) :-
+    safe_rule_unification(Goal),
+    !,
+    \+ member(mnn_pred((=)/2, _, _, _, _), Predicates).
 rule_goal_supported(_, Goal, _) :-
     supported_arithmetic_filter(Goal),
     !.
@@ -420,6 +424,18 @@ rule_goal(_, true, _) :-
 rule_goal(_, fail, _) :-
     !,
     fail.
+rule_goal(Predicates, Goal, _) :-
+    safe_rule_unification(Goal),
+    !,
+    (   member(mnn_pred((=)/2, _, _, _, _), Predicates)
+    ->  throw(invalid_rule_generator)
+    ;   Goal = (Left = Right),
+        Left = Right,
+        (   acyclic_term((Left, Right))
+        ->  true
+        ;   throw(invalid_rule_generator)
+        )
+    ).
 rule_goal(Predicates, conj(Left, Right), Visited) :-
     !,
     rule_goal(Predicates, Left, Visited),
@@ -448,6 +464,11 @@ rule_goal(Predicates, Goal, Visited) :-
     copy_term((Head, Body), (HeadCopy, BodyCopy)),
     Goal = HeadCopy,
     rule_goal(Predicates, BodyCopy, [Key|Visited]).
+
+safe_rule_unification(Goal) :-
+    nonvar(Goal),
+    Goal = (Left = Right),
+    acyclic_term((Left, Right)).
 
 nested_findall_supported(Predicates, Goal) :-
     copy_term(Goal, GoalCopy),

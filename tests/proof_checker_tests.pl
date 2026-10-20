@@ -416,6 +416,18 @@ test(accept_finite_acyclic_rule_findall_to_fold) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_rule_findall_to_fold_with_pure_unification) :-
+    unification_rule_findall_to_fold_programs(Original, Program),
+    Program = mnn_program(_, _,
+                          [_, _, mnn_pred(_, _, _,
+                                          [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                      _)],
+                                          _)|_],
+                          _, _),
+    assertion(Values == [item(1), item(2)]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
 test(accept_nested_findall_over_ground_member_with_duplicates) :-
     nested_findall_to_fold_programs(Original, Program),
     Program = mnn_program(_, _,
@@ -1584,6 +1596,27 @@ rule_findall_to_fold_programs(Original, Program) :-
                                             original)],
                                   proof([]), trace([])),
                    mnn_loop2:convert_program(Original, Program, _).
+
+unification_rule_findall_to_fold_programs(Original, Program) :-
+    Original = mnn_program(
+                   sample,
+                   meta(source, [clause(1), clause(2), clause(3), clause(4)]),
+                   [mnn_pred(num/1, ['?'], [integer],
+                            [mnn_clause(1, num(1), true, source(source, 1)),
+                             mnn_clause(2, num(2), true, source(source, 2))],
+                            original),
+                   mnn_pred(tagged/2, ['?', '?'], [integer, any],
+                            [mnn_clause(3, tagged(Value, Tag),
+                                        conj(num(Value), Tag = item(Value)),
+                                        source(source, 3))],
+                            original),
+                   mnn_pred(values/1, ['?'], [list(any)],
+                            [mnn_clause(4, values(Results),
+                                        findall(Tag, tagged(_, Tag), Results),
+                                        source(source, 4))],
+                            original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
 
 nested_findall_to_fold_programs(Original, Program) :-
     Original = mnn_program(
