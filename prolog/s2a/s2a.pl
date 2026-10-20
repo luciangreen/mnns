@@ -35,7 +35,10 @@ infer_result(Name, Pairs, Options, Result) :-
     (   Candidates = [Path]
     ->  build_address_program(Name, Pairs, Path, Result)
     ;   Candidates = []
-    ->  table_or_failure(Name, Pairs, Options, Result)
+    ->  (   integer_affine(Pairs, Slope, Intercept)
+        ->  build_affine_program(Name, Pairs, Slope, Intercept, Result)
+        ;   table_or_failure(Name, Pairs, Options, Result)
+        )
     ;   memberchk(allow_table(true), Options)
     ->  build_table_program(Name, Pairs, Result)
     ;   maplist(input_address_candidate, Candidates, NamedCandidates),
@@ -90,6 +93,44 @@ term_at_address(Term, [Index|Address], Value) :-
     term_at_address(Argument, Address, Value).
 
 input_address_candidate(Address, input_address(Address)).
+
+integer_affine([pair(Input0, Output0)|Pairs], Slope, Intercept) :-
+    integer(Input0),
+    integer(Output0),
+    member(pair(Input1, Output1), Pairs),
+    integer(Input1),
+    integer(Output1),
+    Input0 =\= Input1,
+    InputDifference is Input1 - Input0,
+    OutputDifference is Output1 - Output0,
+    0 is OutputDifference mod InputDifference,
+    Slope is OutputDifference // InputDifference,
+    Intercept is Output0 - Slope * Input0,
+    forall(member(pair(Input, Output), Pairs),
+           ( integer(Input),
+             integer(Output),
+             Output =:= Slope * Input + Intercept
+           )),
+    !.
+
+build_affine_program(Name, Pairs, Slope, Intercept,
+                     mnn_program(
+                         Module,
+                         meta(s2a_affine(Name, Slope, Intercept), Events),
+                         Predicates, proof([]),
+                         trace([s2a_affine(
+                                    Name, Slope, Intercept,
+                                    examples_reproduced(Count))]))) :-
+    atom_concat(mnn_s2a_, Name, Module),
+    length(Pairs, Count),
+    Head =.. [Name, Input, Output],
+    Body = (Output is Slope * Input + Intercept),
+    Events = [directive(1, module(Module, [Name/2])), clause(2)],
+    Predicates = [mnn_pred(
+                      Name/2, ['?', '?'], [any, any],
+                      [mnn_clause(2, Head, Body,
+                                  generated(s2a_affine, 2))],
+                      original)].
 
 table_or_failure(Name, Pairs, Options, Result) :-
     (   memberchk(allow_table(true), Options)
