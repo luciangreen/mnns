@@ -107,6 +107,43 @@ test(finds_guarded_natural_number_decrease) :-
                        measure(natural(1),
                               [decrease(2, count(_), natural(1))]))])).
 
+test(finds_guarded_natural_decrease_by_multiple) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(count/1, ['?'], [any],
+                           [mnn_clause(1, count(N),
+                                      conj(integer(N),
+                                           conj(>=(N, 2),
+                                                conj(is(Next, -(N, 2)),
+                                                     count(Next)))),
+                                      source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(count/1,
+                       measure(natural(1),
+                              [decrease(1, count(_), natural(1))]))])).
+
+test(rejects_unsafe_multiple_decrease_with_positive_guard) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(count/1, ['?'], [any],
+                           [mnn_clause(1, count(N),
+                                      conj(integer(N),
+                                           conj(>(N, 0),
+                                                conj(is(Next, -(N, 2)),
+                                                     count(Next)))),
+                                      source(sample, 1))],
+                           original)],
+                  proof([]), trace([])),
+    mnn_pid:analyze_measures(
+        Program,
+        pid_measure_report(
+            [predicate(count/1,
+                       unavailable(no_decreasing_structural_measure))])).
+
 test(rejects_natural_decrease_without_integer_guard) :-
     Program = mnn_program(
                   sample, meta(sample, []),

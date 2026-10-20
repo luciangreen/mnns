@@ -13,12 +13,15 @@ only when every call between its predicates decreases; calls outside the
 component are not treated as recursive.
 
 It also recognizes a narrow natural-number pattern: the clause must test
-`integer(N)` and `N > 0`, then compute `N1 is N - K` for a positive integer
-constant `K`, and recurse directly on `N1`. These four goals must occur in that
-order in a conjunction; this restriction ensures the guards hold before the
-decrease and excludes unbound and non-integer inputs. The same argument position
-and decrease pattern are checked across every recursive call in a mutually
-recursive component before a shared natural measure is reported.
+`integer(N)`, guard that the selected decrement does not take the measure below
+zero, compute the decremented value, and recurse directly on it. The supported
+guard is `N > 0` when subtracting one, or `N >= K` when subtracting a positive
+integer constant `K`. These goals must occur in that order in a conjunction;
+this restriction ensures the recursive measure remains a natural number and
+excludes unbound and non-integer inputs. The same argument position and decrease
+pattern are checked across every recursive call in a mutually recursive
+component before a shared natural measure is reported. Other guards and arithmetic
+updates remain unsupported.
 
 The measure analysis does not claim full termination. Mutual recursion without
 a shared structural or guarded natural decrease, other arithmetic measures,
