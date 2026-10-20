@@ -177,6 +177,51 @@ test(accept_ground_nth1_index_findall_to_fold_on_empty_list) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_ground_nth0_element_findall_to_fold_with_duplicates) :-
+    finite_generator_findall_to_fold_programs(
+        Value, nth0(_, [a, b, a], Value), Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [a, b, a]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_ground_nth1_findall_to_fold_with_index_and_element_template) :-
+    finite_generator_findall_to_fold_programs(
+        selected(Index, Value), nth1(Index, [a, b, a], Value),
+        Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [selected(1, a), selected(2, b), selected(3, a)]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(accept_ground_nth0_findall_to_fold_with_bound_index_and_filter) :-
+    finite_generator_findall_to_fold_programs(
+        Value, conj(nth0(2, [1, 2, 3], Value), Value > 1),
+        Original, Program),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [3]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
+test(reject_ground_nth_findall_to_fold_with_non_ground_template) :-
+    finite_generator_findall_to_fold_programs(
+        _Unbound, nth0(_, [a], _), Original, Program),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(
+        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+
 test(accept_ground_length_findall_to_fold) :-
     length_findall_to_fold_programs(
         _, [a, b], Original, Program),
@@ -711,7 +756,7 @@ test(reject_nth1_index_findall_to_fold_with_changed_indices) :-
     mnn_proof_checker:check_proof(
         Program, Original, ProofTerm, rejected(invalid_or_unsupported_proof)).
 
-test(reject_nth0_index_findall_to_fold_with_shared_index_and_element) :-
+test(accept_nth0_findall_to_fold_with_shared_index_and_element) :-
     Original = mnn_program(
                    sample, meta(source, [clause(1)]),
                    [mnn_pred(numbers/1, ['?'], [any],
@@ -723,9 +768,14 @@ test(reject_nth0_index_findall_to_fold_with_shared_index_and_element) :-
                              original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _),
+    Program = mnn_program(_, _,
+                          [mnn_pred(_, _, _,
+                                    [mnn_clause(_, _, mnn_loop2_1(Values, _), _)],
+                                    _)|_],
+                          _, _),
+    assertion(Values == [1]),
     findall_to_fold_proof(Proof),
-    mnn_proof_checker:check_proof(
-        Program, Original, Proof, rejected(invalid_or_unsupported_proof)).
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
 test(reject_findall_to_fold_with_changed_values) :-
     findall_to_fold_programs(Original, Program0),
@@ -1599,6 +1649,18 @@ nth1_findall_to_fold_programs(
                                                  Results),
                                          source(source, 1))],
                              original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+finite_generator_findall_to_fold_programs(
+    Template, Generator, Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1)]),
+                   [mnn_pred(numbers/1, ['?'], [any],
+                            [mnn_clause(1, numbers(Results),
+                                        findall(Template, Generator, Results),
+                                        source(source, 1))],
+                            original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
 

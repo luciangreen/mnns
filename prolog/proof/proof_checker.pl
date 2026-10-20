@@ -235,40 +235,18 @@ findall_candidate_values(_, Template, member(Value, List), Values) :-
     ground(List),
     is_list(List),
     member_candidate_values(List, Value, Template, [], Values).
-findall_candidate_values(_, Template, nth0(Index, List, Value), Indices) :-
-    Template == Index,
-    var(Index),
-    var(Value),
-    Index \== Value,
-    ground(List),
-    is_list(List),
-    list_indices(List, Indices).
-findall_candidate_values(_, Template, nth1(Index, List, Value), Indices) :-
-    Template == Index,
-    var(Index),
-    var(Value),
-    Index \== Value,
-    ground(List),
-    is_list(List),
-    list_indices(List, 1, Indices).
 findall_candidate_values(_, Template, Generator, Values) :-
     generator_parts(Generator, nth0(Index, List, Value), Filters),
-    Filters \= [],
-    var(Index),
-    var(Value),
-    Index \== Value,
     ground(List),
     is_list(List),
+    supported_nth_index(Index),
     maplist(supported_arithmetic_filter, Filters),
     nth_candidate_values(List, 0, Index, Value, Template, Filters, Values).
 findall_candidate_values(_, Template, Generator, Values) :-
     generator_parts(Generator, nth1(Index, List, Value), Filters),
-    Filters \= [],
-    var(Index),
-    var(Value),
-    Index \== Value,
     ground(List),
     is_list(List),
+    supported_nth_index(Index),
     maplist(supported_arithmetic_filter, Filters),
     nth_candidate_values(List, 1, Index, Value, Template, Filters, Values).
 findall_candidate_values(_, Template, Generator, Values) :-
@@ -818,13 +796,11 @@ selection([Value|Values], Value, Values).
 selection([Head|Values], Value, [Head|Rest]) :-
     selection(Values, Value, Rest).
 
-list_indices(List, Indices) :-
-    list_indices(List, 0, Indices).
-
-list_indices([], _, []).
-list_indices([_|Values], Index, [Index|Indices]) :-
-    NextIndex is Index + 1,
-    list_indices(Values, NextIndex, Indices).
+supported_nth_index(Index) :-
+    var(Index),
+    !.
+supported_nth_index(Index) :-
+    integer(Index).
 
 replace_findall_candidate(
     [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
