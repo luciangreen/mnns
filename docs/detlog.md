@@ -123,7 +123,8 @@ only `true`, `fail`, normalized conjunction, disjunction, if-then-else,
 negation, and these pure built-ins: `=/2`, `\=/2`, `==/2`, `\==/2`, `is/2`,
 arithmetic comparisons, the type tests `var/1`, `nonvar/1`, `atom/1`,
 `atomic/1`, `compound/1`, `ground/1`, `integer/1`, `number/1`, and
-`is_list/1`, plus built-in `member/2`, `between/3`, `append/3`, and `select/3`.
+`is_list/1`, plus built-in `between/3`, `length/2`, `member/2`, `nth0/3`,
+`nth1/3`, `append/3`, and `select/3`.
 The compilation does not require these generators to be deterministic: the
 if-then-else commits to their first condition solution, matching `once/1`, and
 retains failure when the condition has no solution. A call is not compiled as a
@@ -151,9 +152,10 @@ swipl -q -s tests/run.pl
 ```
 
 The transformation tests include first-answer behavior for built-in `member/2`,
-`between/3`, `append/3`, and `select/3`, failure preservation for `append/3` and
-`select/3`, and checks that program-defined versions of these built-ins are not
-treated as built-ins.
+`between/3`, `length/2`, `nth0/3`, `nth1/3`, `append/3`, and `select/3`, failure
+preservation for `length/2`, `nth0/3`, `nth1/3`, `append/3`, and `select/3`, and
+checks that program-defined versions of these built-ins are not treated as
+built-ins.
 
 The focused suite covers ground-fact predicate calls with exact and
 partially-instantiated patterns, including nested patterns, duplicate matches,

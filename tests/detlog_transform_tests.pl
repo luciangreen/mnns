@@ -178,6 +178,87 @@ test(compiles_builtin_select_once_and_preserves_first_answer, [nondet]) :-
     assertion(OriginalAnswers == [a-[a, b]]),
     assertion(CompiledAnswers == OriginalAnswers).
 
+test(compiles_builtin_length_once_and_preserves_first_answer, [nondet]) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(first_length/2, ['?', '?'], [any, any],
+                            [mnn_clause(1, first_length(List, Length),
+                                        once(length(List, Length)),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(first_length/2, _, _,
+                                    [mnn_clause(_, _, Compiled, _)],
+                                    original)], _, _),
+        detlog_transform_report(
+            [compiled_once(first_length/2, 1, length(_, _))])),
+    assertion(Compiled = ite(length(CompiledList, CompiledLength),
+                             true, fail)),
+    findall(SourceList-SourceLength,
+            once(length(SourceList, SourceLength)),
+            OriginalAnswers),
+    findall(CompiledList-CompiledLength,
+            (length(CompiledList, CompiledLength) -> true ; fail),
+            CompiledAnswers),
+    assertion(OriginalAnswers == [[]-0]),
+    assertion(CompiledAnswers == OriginalAnswers).
+
+test(compiles_builtin_nth0_once_and_preserves_first_answer, [nondet]) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(first_nth0/2, ['?', '?'], [any, any],
+                            [mnn_clause(1, first_nth0(Index, Value),
+                                        once(nth0(Index, [a, b], Value)),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(first_nth0/2, _, _,
+                                    [mnn_clause(_, _, Compiled, _)],
+                                    original)], _, _),
+        detlog_transform_report(
+            [compiled_once(first_nth0/2, 1, nth0(_, [a, b], _))])),
+    assertion(Compiled = ite(nth0(CompiledIndex, [a, b], CompiledValue),
+                             true, fail)),
+    findall(SourceIndex-SourceValue,
+            once(nth0(SourceIndex, [a, b], SourceValue)),
+            OriginalAnswers),
+    findall(CompiledIndex-CompiledValue,
+            (nth0(CompiledIndex, [a, b], CompiledValue) -> true ; fail),
+            CompiledAnswers),
+    assertion(OriginalAnswers == [0-a]),
+    assertion(CompiledAnswers == OriginalAnswers).
+
+test(compiles_builtin_nth1_once_and_preserves_first_answer, [nondet]) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(first_nth1/2, ['?', '?'], [any, any],
+                            [mnn_clause(1, first_nth1(Index, Value),
+                                        once(nth1(Index, [a, b], Value)),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(first_nth1/2, _, _,
+                                    [mnn_clause(_, _, Compiled, _)],
+                                    original)], _, _),
+        detlog_transform_report(
+            [compiled_once(first_nth1/2, 1, nth1(_, [a, b], _))])),
+    assertion(Compiled = ite(nth1(CompiledIndex, [a, b], CompiledValue),
+                             true, fail)),
+    findall(SourceIndex-SourceValue,
+            once(nth1(SourceIndex, [a, b], SourceValue)),
+            OriginalAnswers),
+    findall(CompiledIndex-CompiledValue,
+            (nth1(CompiledIndex, [a, b], CompiledValue) -> true ; fail),
+            CompiledAnswers),
+    assertion(OriginalAnswers == [1-a]),
+    assertion(CompiledAnswers == OriginalAnswers).
+
 test(compiles_builtin_append_and_select_failures) :-
     Program = mnn_program(
                   sample, meta(sample, [clause(1), clause(2)]),
@@ -203,6 +284,39 @@ test(compiles_builtin_append_and_select_failures) :-
     assertion(Select = ite(select(z, [a, b], _), true, fail)),
     assertion(\+ call(append([a], [b], [c]))),
     assertion(\+ call(select(z, [a, b], _))).
+
+test(compiles_builtin_length_and_nth_failures) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1), clause(2), clause(3)]),
+                  [mnn_pred(fails/0, [], [],
+                            [mnn_clause(1, fails,
+                                        once(length([a, b], 1)),
+                                        source(sample, 1)),
+                             mnn_clause(2, fails,
+                                        once(nth0(2, [a, b], _)),
+                                        source(sample, 2)),
+                             mnn_clause(3, fails,
+                                        once(nth1(0, [a, b], _)),
+                                        source(sample, 3))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(fails/0, _, _,
+                                    [mnn_clause(_, _, Length, _),
+                                     mnn_clause(_, _, Nth0, _),
+                                     mnn_clause(_, _, Nth1, _)],
+                                    original)], _, _),
+        detlog_transform_report(
+            [compiled_once(fails/0, 1, length([a, b], 1)),
+             compiled_once(fails/0, 2, nth0(2, [a, b], _)),
+             compiled_once(fails/0, 3, nth1(0, [a, b], _))])),
+    assertion(Length = ite(length([a, b], 1), true, fail)),
+    assertion(Nth0 = ite(nth0(2, [a, b], _), true, fail)),
+    assertion(Nth1 = ite(nth1(0, [a, b], _), true, fail)),
+    assertion(\+ call(length([a, b], 1))),
+    assertion(\+ call(nth0(2, [a, b], _))),
+    assertion(\+ call(nth1(0, [a, b], _))).
 
 test(keeps_once_for_program_defined_append_and_select) :-
     Program = mnn_program(
@@ -230,6 +344,39 @@ test(keeps_once_for_program_defined_append_and_select) :-
         detlog_transform_report(
             [kept_once(caller/0, 1, unsupported_goal(append(a, b, c))),
              kept_once(caller/0, 2, unsupported_goal(select(a, b, c)))])),
+    assertion(Transformed = Program).
+
+test(keeps_once_for_program_defined_length_and_nth) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1), clause(2), clause(3),
+                                        clause(4), clause(5), clause(6)]),
+                  [mnn_pred(caller/0, [], [],
+                            [mnn_clause(1, caller, once(length(a, b)),
+                                        source(sample, 1)),
+                             mnn_clause(2, caller, once(nth0(a, b, c)),
+                                        source(sample, 2)),
+                             mnn_clause(3, caller, once(nth1(a, b, c)),
+                                        source(sample, 3))],
+                            original),
+                   mnn_pred(length/2, ['?', '?'], [any, any],
+                            [mnn_clause(4, length(_, _), true,
+                                        source(sample, 4))],
+                            original),
+                   mnn_pred(nth0/3, ['?', '?', '?'], [any, any, any],
+                            [mnn_clause(5, nth0(_, _, _), true,
+                                        source(sample, 5))],
+                            original),
+                   mnn_pred(nth1/3, ['?', '?', '?'], [any, any, any],
+                            [mnn_clause(6, nth1(_, _, _), true,
+                                        source(sample, 6))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program, Transformed,
+        detlog_transform_report(
+            [kept_once(caller/0, 1, unsupported_goal(length(a, b))),
+             kept_once(caller/0, 2, unsupported_goal(nth0(a, b, c))),
+             kept_once(caller/0, 3, unsupported_goal(nth1(a, b, c)))])),
     assertion(Transformed = Program).
 
 test(keeps_once_for_program_defined_member) :-
