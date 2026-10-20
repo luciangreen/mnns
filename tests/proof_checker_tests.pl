@@ -383,6 +383,18 @@ test(accept_nested_findall_over_ground_member_with_duplicates) :-
     findall_to_fold_proof(Proof),
     mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
 
+test(accept_nested_findall_over_filtered_between) :-
+    nested_between_findall_to_fold_programs(Original, Program),
+    Program = mnn_program(_, _,
+                          [_, _, mnn_pred(_, _, _,
+                                          [mnn_clause(_, _, mnn_loop2_1(Values, _),
+                                                      _)],
+                                          _)|_],
+                          _, _),
+    assertion(Values == [[3, 4]]),
+    findall_to_fold_proof(Proof),
+    mnn_proof_checker:check_proof(Program, Original, Proof, accepted).
+
 test(reject_nested_findall_over_source_predicate) :-
     Original = mnn_program(
                    sample,
@@ -1539,6 +1551,26 @@ nested_findall_to_fold_programs(Original, Program) :-
                                                 items(ItemsTemplate), Results),
                                         source(source, 2))],
                             original)],
+                   proof([]), trace([])),
+    mnn_loop2:convert_program(Original, Program, _).
+
+nested_between_findall_to_fold_programs(Original, Program) :-
+    Original = mnn_program(
+                   sample, meta(source, [clause(1), clause(2)]),
+                   [mnn_pred(items/1, ['?'], [any],
+                             [mnn_clause(
+                                  1, items(ItemResults),
+                                  findall(Value,
+                                          conj(between(1, 4, Value), Value > 2),
+                                          ItemResults),
+                                  source(source, 1))],
+                             original),
+                    mnn_pred(all_items/1, ['?'], [any],
+                             [mnn_clause(2, all_items(Results),
+                                         findall(ItemsTemplate,
+                                                 items(ItemsTemplate), Results),
+                                         source(source, 2))],
+                             original)],
                    proof([]), trace([])),
     mnn_loop2:convert_program(Original, Program, _).
 
