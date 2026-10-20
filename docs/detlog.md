@@ -86,14 +86,17 @@ Pairwise non-unifiable clause heads are treated as exclusive. Calls to acyclic
 user predicates in the same program are analyzed recursively when every call
 argument is a distinct unbound variable (zero-arity calls satisfy this condition).
 Their success counts are propagated to the caller; recursive calls are reported
-as unavailable. A separate ground-call case counts a call exactly when its
-predicate consists only of ground facts; unmatched calls fail and duplicate
-matching facts count as distinct successes, with the count capped at two.
-Ground calls to predicates with rules or non-ground fact heads remain
-unavailable. This does not extend analysis to general bound-argument or
-repeated-variable modes.
-Bound arguments and repeated variables in a call are unsupported. The reported
-classes are:
+as unavailable. A ground-fact case also handles calls with partially instantiated argument
+patterns, provided variables are not shared between distinct arguments. Each
+candidate fact is unified with a fresh copy of the call, so nested patterns and
+variable sharing within an argument are respected without binding the analyzed
+program. Matching fact clauses count separately, including duplicate facts, and
+the count is capped at two; unmatched calls fail. The predicate must consist
+only of ground facts with `true` bodies. Calls with rules or non-ground fact
+heads, and calls whose variables are shared between arguments, remain
+unavailable. This narrow case does not extend analysis to general
+bound-argument or repeated-variable modes, and the analyzer still does not track
+bindings between separate goals. The reported classes are:
 
 - `failure`: no successful derivations;
 - `det`: exactly one successful derivation;
@@ -152,7 +155,10 @@ The transformation tests include first-answer behavior for built-in `member/2`,
 `select/3`, and checks that program-defined versions of these built-ins are not
 treated as built-ins.
 
-The focused suite covers the supported `member/2` patterns, including partially
+The focused suite covers ground-fact predicate calls with exact and
+partially-instantiated patterns, including nested patterns, duplicate matches,
+no matches, and unsupported shared variables across arguments. The supported
+`member/2` patterns include partially
 instantiated and repeated-variable patterns, duplicate matches, no matches,
 unbound lists, and unsupported aliases and list shapes. It also covers `nth0/3`
 and `nth1/3`, including duplicate values, out-of-range indices, and unsupported

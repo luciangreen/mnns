@@ -147,10 +147,13 @@ recursive calls by their syntactic tail position. See [`pid.md`](pid.md).
 of normalized goals in the all-arguments-unbound mode. It reports unsupported
 goals rather than guessing; acyclic user-predicate calls within the program are
 analyzed recursively when their arguments are distinct unbound variables, while
-recursive, bound-argument, and repeated-argument calls remain unavailable. Ground
-calls to predicates defined exclusively by ground facts are counted up to two,
-including failure and duplicate matching facts; ground calls to rules or
-non-ground fact heads remain unsupported.
+recursive calls and general bound-argument calls remain unavailable. Calls to
+predicates defined exclusively by ground facts are counted up to two for exact
+and partially instantiated patterns, including failure and duplicate matching
+facts. Variables cannot be shared across distinct arguments in this pattern
+mode; nested patterns and sharing within one argument are matched on copies.
+Calls to rules, non-ground fact heads, or repeated variables across arguments
+remain unsupported.
 Ground goals from the whitelisted pure built-ins are evaluated exactly for
 success or failure, while exceptions are reported as unavailable. Bounded
 `between/3` calls with integer literal limits and a variable or integer value are
