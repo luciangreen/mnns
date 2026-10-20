@@ -87,7 +87,8 @@ exposes one independently checked finite-generator conversion. See
   optionally with supported arithmetic filters, into deterministic list-copy
   loops. Bound or partially instantiated arguments are matched against fact and
   rule heads or list-generator patterns. List order, selection remainders,
-  indices, and duplicates are preserved; unsupported generators remain
+  indices, duplicates, and supported nested `findall/3` values in finite acyclic
+  rules are preserved; unsupported generators remain
   unchanged, and the conversion report is an obligation—not an independently
   checked proof.
   See [`docs/loop2.md`](docs/loop2.md).

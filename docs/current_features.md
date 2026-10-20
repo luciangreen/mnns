@@ -238,10 +238,11 @@ swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
 A direct call to a predicate made entirely of ground facts (including calls
 with bound or partially instantiated arguments), a call through a finite acyclic
 chain of supported facts and rules (also matching bound call arguments against
-rule heads), or `member/2`, `select/3`, `append/3`, `nth0/3` or `nth1/3` over a ground proper
-list, or `between/3` with integer literal bounds and a variable
-or integer generator argument, or `length/2` over a ground proper list with a
-variable or nonnegative integer length. Rule bodies
+rule heads; these rules may contain a nested `findall/3` over a supported built-in
+finite generator), or `member/2`, `select/3`, `append/3`, `nth0/3` or `nth1/3`
+over a ground proper list, or `between/3` with integer literal bounds and a
+variable or integer generator argument, or `length/2` over a ground proper list
+with a variable or nonnegative integer length. Rule bodies
 are limited to conjunction, disjunction, `true`, `fail`, supported source
 predicate calls, and whitelisted arithmetic comparisons; recursive dependencies
 and other goals are left unchanged. These generators may be followed by
@@ -269,7 +270,8 @@ generators with restricted pure bodies, and the documented direct ground-list
 `append/3`, `member/2`, `select/3`, `nth0/3`/`nth1/3` index, `length/2`, and bounded
 `between/3` subsets. It supports whitelisted arithmetic filters on these rule
 generators and on the built-in subsets documented in [`proof_rules.md`](proof_rules.md).
-Other filters and conversions remain unchecked; do not treat them as
+Nested `findall/3` inside a rule body is converted but is not yet independently
+checked. Other filters and conversions remain unchecked; do not treat them as
 proof-certified. See [`loop2.md`](loop2.md).
 
 ## PLOp pipeline
@@ -392,8 +394,8 @@ The current work is an initial subset, not a completed version 1 suite:
 
 - **Stages 1–5 are in progress.** Their implemented slices and limits are
   documented above and in the subsystem guides. In particular, Stage 4 still
-  lacks nested `findall/3` conversion and independent checking of most conversion
-  proofs; the checker verifies ground-fact and finite acyclic rule generators
+  lacks independent checking of nested `findall/3` conversions and most other
+  conversion proofs; the checker verifies ground-fact and finite acyclic rule generators
   with supported arithmetic filters, ground-list `member/2` and `select/3` with
   or without supported arithmetic filters, `nth0/3`/`nth1/3` with supported
   filter cases, `length/2` with or without supported arithmetic filters, and
