@@ -237,8 +237,8 @@ goal_outcomes(Goal, _, _, unavailable(unsupported_goal(Goal))).
 ground_fact_goal(Goal, Predicates, Outcomes) :-
     nonvar(Goal),
     callable(Goal),
-    ground(Goal),
     Goal =.. [Name|Arguments],
+    independent_argument_variables(Arguments),
     length(Arguments, Arity),
     Key = Name/Arity,
     member(mnn_pred(Key, _, _, Clauses, _), Predicates),
@@ -259,7 +259,8 @@ ground_fact_clauses([mnn_clause(_, Head, true, _)|Clauses]) :-
 count_ground_fact_matches(_, [], Count, Count).
 count_ground_fact_matches(Goal, [mnn_clause(_, Head, true, _)|Clauses],
                           Count0, Count) :-
-    (   Head =@= Goal
+    copy_term(Goal, GoalCopy),
+    (   unify_with_occurs_check(GoalCopy, Head)
     ->  Count1 is min(2, Count0 + 1)
     ;   Count1 = Count0
     ),
@@ -267,6 +268,22 @@ count_ground_fact_matches(Goal, [mnn_clause(_, Head, true, _)|Clauses],
     ->  Count = 2
     ;   count_ground_fact_matches(Goal, Clauses, Count1, Count)
     ).
+
+independent_argument_variables(Arguments) :-
+    independent_argument_variables(Arguments, []).
+
+independent_argument_variables([], _).
+independent_argument_variables([Argument|Arguments], SeenVariables) :-
+    term_variables(Argument, Variables),
+    \+ shares_variable(Variables, SeenVariables),
+    append(SeenVariables, Variables, NextSeenVariables),
+    independent_argument_variables(Arguments, NextSeenVariables).
+
+shares_variable([Variable|_], Variables) :-
+    identical_member(Variable, Variables),
+    !.
+shares_variable([_|Rest], Variables) :-
+    shares_variable(Rest, Variables).
 
 user_predicate_goal(Goal, Predicates, Stack, Outcomes) :-
     nonvar(Goal),
