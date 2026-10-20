@@ -37,6 +37,9 @@ infer_result(Name, Pairs, Options, Result) :-
     ;   Candidates = []
     ->  (   integer_affine(Pairs, Slope, Intercept)
         ->  build_affine_program(Name, Pairs, Slope, Intercept, Result)
+        ;   integer_quadratic(Pairs, Quadratic, Linear, Constant)
+        ->  build_quadratic_program(Name, Pairs, Quadratic, Linear,
+                                    Constant, Result)
         ;   table_or_failure(Name, Pairs, Options, Result)
         )
     ;   memberchk(allow_table(true), Options)
@@ -113,6 +116,58 @@ integer_affine([pair(Input0, Output0)|Pairs], Slope, Intercept) :-
            )),
     !.
 
+integer_quadratic(Pairs, Quadratic, Linear, Constant) :-
+    Pairs = [pair(Input0, Output0)|Rest],
+    integer(Input0),
+    integer(Output0),
+    member(pair(Input1, Output1), Rest),
+    integer(Input1),
+    integer(Output1),
+    Input1 =\= Input0,
+    member(pair(Input2, Output2), Rest),
+    integer(Input2),
+    integer(Output2),
+    Input2 =\= Input0,
+    Input2 =\= Input1,
+    quadratic_determinants(Input0, Output0, Input1, Output1,
+                          Input2, Output2,
+                          Denominator, QuadraticNumerator,
+                          LinearNumerator, ConstantNumerator),
+    Denominator =\= 0,
+    0 is QuadraticNumerator mod Denominator,
+    0 is LinearNumerator mod Denominator,
+    0 is ConstantNumerator mod Denominator,
+    Quadratic is QuadraticNumerator // Denominator,
+    Linear is LinearNumerator // Denominator,
+    Constant is ConstantNumerator // Denominator,
+    forall(member(pair(Input, Output), Pairs),
+           ( integer(Input),
+             integer(Output),
+             Output =:= Quadratic * Input * Input + Linear * Input + Constant
+           )),
+    !.
+
+quadratic_determinants(Input0, Output0, Input1, Output1, Input2, Output2,
+                       Denominator, QuadraticNumerator,
+                       LinearNumerator, ConstantNumerator) :-
+    determinant3(Input0 * Input0, Input0, 1,
+                 Input1 * Input1, Input1, 1,
+                 Input2 * Input2, Input2, 1, Denominator),
+    determinant3(Output0, Input0, 1,
+                 Output1, Input1, 1,
+                 Output2, Input2, 1, QuadraticNumerator),
+    determinant3(Input0 * Input0, Output0, 1,
+                 Input1 * Input1, Output1, 1,
+                 Input2 * Input2, Output2, 1, LinearNumerator),
+    determinant3(Input0 * Input0, Input0, Output0,
+                 Input1 * Input1, Input1, Output1,
+                 Input2 * Input2, Input2, Output2, ConstantNumerator).
+
+determinant3(A, B, C, D, E, F, G, H, I, Determinant) :-
+    Determinant is A * (E * I - F * H) -
+                   B * (D * I - F * G) +
+                   C * (D * H - E * G).
+
 build_affine_program(Name, Pairs, Slope, Intercept,
                      mnn_program(
                          Module,
@@ -130,6 +185,26 @@ build_affine_program(Name, Pairs, Slope, Intercept,
                       Name/2, ['?', '?'], [any, any],
                       [mnn_clause(2, Head, Body,
                                   generated(s2a_affine, 2))],
+                      original)].
+
+build_quadratic_program(Name, Pairs, Quadratic, Linear, Constant,
+                       mnn_program(
+                           Module,
+                           meta(s2a_quadratic(Name, Quadratic, Linear,
+                                              Constant), Events),
+                           Predicates, proof([]),
+                           trace([s2a_quadratic(
+                                      Name, Quadratic, Linear, Constant,
+                                      examples_reproduced(Count))]))) :-
+    atom_concat(mnn_s2a_, Name, Module),
+    length(Pairs, Count),
+    Head =.. [Name, Input, Output],
+    Body = (Output is Quadratic * Input * Input + Linear * Input + Constant),
+    Events = [directive(1, module(Module, [Name/2])), clause(2)],
+    Predicates = [mnn_pred(
+                      Name/2, ['?', '?'], [any, any],
+                      [mnn_clause(2, Head, Body,
+                                 generated(s2a_quadratic, 2))],
                       original)].
 
 table_or_failure(Name, Pairs, Options, Result) :-

@@ -192,17 +192,21 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed
   formulas remain unimplemented.
 - **Stage 8 — S2A and Starlog: in progress (input-address projection, integer
-  affine inference, and table mode).** For at least two distinct ground examples,
+  affine and quadratic inference, and table mode).** For at least two distinct
+  ground examples,
   `mnn_s2a:s2a/4` finds a unique input subterm address shared with every output
   and emits one generalized projection clause, preserving the constructors
   along that path. If no address matches, integer-valued examples with at least
   two distinct inputs can infer and validate an exact integer-affine relation
-  across all examples. Ambiguous addresses are reported unless
-  `allow_table(true)` explicitly permits a table fallback; unsupported cases can
-  also use that opt-in table mode. Conflicting input/output examples and
-  unsupported spec shapes are rejected. These candidates reproduce examples but
-  carry no formal proof; recursive list generalization, broader arithmetic/list
-  templates, formal example proofs, and Starlog remain unimplemented.
+  across all examples; when no affine relation fits, at least three distinct
+  integer inputs may infer an exact integer-quadratic relation with integer
+  coefficients, validated against every example. Ambiguous addresses are
+  reported unless `allow_table(true)` explicitly permits a table fallback;
+  unsupported cases can also use that opt-in table mode. Conflicting
+  input/output examples and unsupported spec shapes are rejected. These
+  candidates reproduce examples but carry no formal proof; recursive list
+  generalization, broader arithmetic/list templates, formal example proofs, and
+  Starlog remain unimplemented.
 - **Stage 9 — AIOC: initial structural-size metric and proof-checked bundle
   writer/verifier.** The metric reports clause, normalized-goal, predicate-record,
   and term-node counts with a documented equal-weight total. The bundle writer

@@ -96,6 +96,57 @@ test(infers_integer_affine_relation_and_generalizes_held_out_inputs) :-
           delete_file(File)
         )).
 
+test(infers_integer_quadratic_relation_and_generalizes_held_out_inputs) :-
+    Spec = [
+        [[input, [['A', 0]]], [output, [['B', 4]]]],
+        [[input, [['A', 1]]], [output, [['B', 9]]]],
+        [[input, [['A', 2]]], [output, [['B', 18]]]],
+        [[input, [['A', 4]]], [output, [['B', 48]]]]
+    ],
+    mnn_s2a:s2a(quadratic_lookup_probe, Spec, [], Program),
+    Program = mnn_program(
+                  mnn_s2a_quadratic_lookup_probe,
+                  meta(s2a_quadratic(quadratic_lookup_probe, 2, 3, 4),
+                       [directive(1, module(_, [quadratic_lookup_probe/2])),
+                        clause(2)]),
+                  [mnn_pred(quadratic_lookup_probe/2, _, _, [Clause], original)],
+                  proof([]),
+                  trace([s2a_quadratic(quadratic_lookup_probe, 2, 3, 4,
+                                       examples_reproduced(4))])),
+    Clause = mnn_clause(
+                 2, quadratic_lookup_probe(Input, Output),
+                 (Output is 2 * Input * Input + 3 * Input + 4),
+                 generated(s2a_quadratic, 2)),
+    setup_call_cleanup(
+        temporary_source(File),
+        ( mnn_ir:emit_program(Program, File),
+          load_files(File, [silent(true)]),
+          assertion(mnn_s2a_quadratic_lookup_probe:
+                        quadratic_lookup_probe(10, 234)),
+          assertion(\+ mnn_s2a_quadratic_lookup_probe:
+                          quadratic_lookup_probe(10, 235))
+        ),
+        ( unload_file(File),
+          delete_file(File)
+        )).
+
+test(rejects_nonintegral_or_inconsistent_quadratic_examples) :-
+    NonintegralSpec = [
+        [[input, [['A', 0]]], [output, [['B', 0]]]],
+        [[input, [['A', 2]]], [output, [['B', 2]]]],
+        [[input, [['A', 4]]], [output, [['B', 8]]]]
+    ],
+    InconsistentSpec = [
+        [[input, [['A', 0]]], [output, [['B', 4]]]],
+        [[input, [['A', 1]]], [output, [['B', 9]]]],
+        [[input, [['A', 2]]], [output, [['B', 18]]]],
+        [[input, [['A', 4]]], [output, [['B', 49]]]]
+    ],
+    mnn_s2a:s2a(quadratic_lookup_probe, NonintegralSpec, [],
+                no_algorithm(no_generalization_candidate)),
+    mnn_s2a:s2a(quadratic_lookup_probe, InconsistentSpec, [],
+                no_algorithm(no_generalization_candidate)).
+
 test(infers_constant_integer_output_from_distinct_inputs) :-
     Spec = [
         [[input, [['A', 2]]], [output, [['B', 9]]]],
@@ -105,7 +156,7 @@ test(infers_constant_integer_output_from_distinct_inputs) :-
                 mnn_program(_, meta(s2a_affine(affine_lookup_probe, 0, 9), _),
                             _, _, _)).
 
-test(rejects_nonintegral_or_inconsistent_affine_examples) :-
+test(uses_quadratic_when_affine_examples_are_inconsistent) :-
     NonintegralSpec = [
         [[input, [['A', 1]]], [output, [['B', 2]]]],
         [[input, [['A', 3]]], [output, [['B', 3]]]]
@@ -118,7 +169,9 @@ test(rejects_nonintegral_or_inconsistent_affine_examples) :-
     mnn_s2a:s2a(affine_lookup_probe, NonintegralSpec, [],
                 no_algorithm(no_generalization_candidate)),
     mnn_s2a:s2a(affine_lookup_probe, InconsistentSpec, [],
-                no_algorithm(no_generalization_candidate)).
+                mnn_program(_, meta(s2a_quadratic(affine_lookup_probe, 1, -1, 2),
+                                    _),
+                            _, _, _)).
 
 test(reports_ambiguous_input_addresses) :-
     Spec = [
