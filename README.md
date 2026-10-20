@@ -17,6 +17,11 @@ PLOp pipeline currently exposes a limited set of independently checked
 finite-generator conversions. See [`PROGRESS.md`](PROGRESS.md) for the
 stage-by-stage implementation status and remaining work.
 
+New to the project? Start with the [quick-start guide](docs/quick_start.md) for
+installation, runnable parser and sandbox examples, and test commands. The
+[current feature guide](docs/current_features.md) documents every implemented
+feature and its focused test suite.
+
 ## Implemented features
 
 - **IR parser and emitter:** reads Prolog clauses and directives into
