@@ -192,11 +192,15 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   unsupported spec shapes are rejected. These candidates reproduce examples but
   carry no formal proof; recursive list generalization, broader arithmetic/list
   templates, formal example proofs, and Starlog remain unimplemented.
-- **Stage 9 — AIOC: initial structural-size metric.** The new metric reports
-  clause, normalized-goal, predicate-record, and term-node counts with a
-  documented equal-weight total. It does not estimate inference count or memory,
-  certify equivalence, simplify candidates, or implement the rest of the AIOC
-  controller.
+- **Stage 9 — AIOC: initial structural-size metric and proof-checked bundle
+  writer/verifier.** The metric reports clause, normalized-goal, predicate-record,
+  and term-node counts with a documented equal-weight total. The bundle writer
+  emits candidate and original Prolog, a machine proof with the exact IR snapshots,
+  a rendered proof, a supplied trace, and a supplied report, but only after the
+  independent checker accepts the proof. The verifier reads source and proof as
+  data, confirms emitted programs match the snapshots, and re-checks the proof.
+  Incorporation front ends, semantic simplification, candidate assessment,
+  library/REPL interfaces, and the rest of the AIOC controller remain.
 
 ## Remaining stages
 
@@ -210,7 +214,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine inference from examples, plus explicit opt-in table fallback; no formal proof; recursive/list generalization, broader arithmetic templates, and Starlog remain unimplemented) |
-| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric; incorporation, semantic simplification, candidate assessment, bundles, library, and REPL remain) |
+| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric and proof-checked bundle writer/verifier; incorporation, semantic simplification, candidate assessment, library, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |
@@ -226,3 +230,5 @@ full test runner and can also be run with
 See `docs/current_features.md` for the implemented feature descriptions,
 limitations, and focused test commands. Run the full current test suite with
 `swipl -q -s tests/run.pl`.
+The bundle writer/verifier tests can also be run with
+`swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"`.
