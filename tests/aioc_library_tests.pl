@@ -63,15 +63,20 @@ test(reports_entries_with_rejected_proofs_when_ranking) :-
     setup_call_cleanup(
         true,
         ( sample_entry(valid, ValidEntry, _),
-          sample_entry(invalid, InvalidEntry, _),
+          sample_entry(invalid, Entry, _),
+          Entry = mnn_library_entry(Name, _, _, _, Assessment, Cost, Cycle,
+                                    SourceForm, TestResults),
+          InvalidEntry = mnn_library_entry(
+                             Name, invalid, invalid, proof([]), Assessment,
+                             Cost, Cycle, SourceForm, TestResults),
           mnn_aioc_library:store_entry(Directory, ValidEntry),
-          mnn_aioc_library:store_entry(Directory, InvalidEntry),
+          mnn_aioc_library:store_entry(Directory, Entry),
           directory_file_path(Directory, 'invalid.entry.pl', File),
           setup_call_cleanup(
               open(File, write, Stream),
-              write(Stream, 'mnn_library_entry(invalid, invalid, invalid, '
-                            'proof([]), recorded, cost(1), cycle(1), prolog, '
-                            '[test_result(unit, passed)]).'),
+              ( write_term(Stream, InvalidEntry, [quoted(true)]),
+                write(Stream, '.\n')
+              ),
               close(Stream)),
           mnn_aioc_library:rank_library(
               Directory,
@@ -248,9 +253,15 @@ test(rechecks_proof_when_reading_entry) :-
           directory_file_path(Directory, 'sample.entry.pl', File),
           setup_call_cleanup(
               open(File, write, Stream),
-              write(Stream, 'mnn_library_entry(sample, invalid, invalid, '
-                            'proof([]), recorded, cost(1), cycle(1), prolog, '
-                            '[test_result(unit, passed)]).'),
+              ( Entry = mnn_library_entry(Name, _, _, _, Assessment, Cost,
+                                          Cycle, SourceForm, TestResults),
+                InvalidEntry = mnn_library_entry(
+                                   Name, invalid, invalid, proof([]),
+                                   Assessment, Cost, Cycle, SourceForm,
+                                   TestResults),
+                write_term(Stream, InvalidEntry, [quoted(true)]),
+                write(Stream, '.\n')
+              ),
               close(Stream)),
           mnn_aioc_library:get_entry(
               Directory, sample, rejected(proof_rejected(_)))

@@ -21,7 +21,10 @@ store_entry(Directory, Entry) :-
     Entry = mnn_library_entry(Name, _, _, _, _, _, _, _, _),
     make_directory_path(Directory),
     entry_file(Directory, Name, File),
-    write_entry_file(File, Entry).
+    (   exists_file(File)
+    ->  throw(error(permission_error(overwrite, file, File), _))
+    ;   write_entry_file(File, Entry)
+    ).
 
 update_entry(Directory, Entry, Result) :-
     must_be(atom, Directory),
