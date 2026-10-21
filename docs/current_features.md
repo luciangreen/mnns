@@ -28,6 +28,7 @@ sharing a change.
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 | AIOC structural size metric (initial) | `prolog/aioc/size.pl` | `swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"` | [AIOC size metric](aioc.md) |
 | AIOC proof-gated structural size comparison (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC assessment](aioc.md#proof-gated-structural-comparison) |
+| AIOC proof-gated structural candidate ranking (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate ranking](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-checked algorithm library (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
 
@@ -66,8 +67,9 @@ stored file, so a failed write does not truncate the existing entry.
 `remove_entry(Directory, Name, Result)` returns `removed` when it deletes an
 entry, `rejected(missing_entry)` when none exists, or
 `rejected(invalid_name(Name))` for an invalid name. Neither operation executes
-stored code or test suites. Richer search, ranking, and assessment workflows
-remain unimplemented.
+stored code or test suites. Richer search and assessment workflows remain
+unimplemented; the limited proof-gated structural candidate ranking is described
+in [`aioc.md`](aioc.md#proof-gated-structural-comparison).
 
 For example, after constructing a valid entry term:
 
@@ -509,6 +511,7 @@ swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"
 swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
 swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"
+swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"
 swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"
 swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"
 ```
@@ -545,11 +548,12 @@ The current work is an initial subset, not a completed version 1 suite:
   generalization, broader arithmetic/list templates, formal example-reproduction
   proofs, and Starlog remain unimplemented.
 - **Stage 9 is in progress:** the structural-size metric, proof-gated structural
-  candidate-size comparison, proof-checked bundle writer/verifier, and initial
+  candidate-size comparison and deterministic structural ranking of supplied,
+  proof-accepted candidates, proof-checked bundle writer/verifier, and initial
   proof-checked data-only library are implemented. The library records caller-
   supplied passed-test metadata but does not run or authenticate test suites.
   Incorporation front ends, semantic simplification, broader candidate
-  assessment, automated library testing/ranking/updates, and REPL commands remain.
+  assessment, automated library testing/ranking, and REPL commands remain.
 - **Stages 10–14 are not started:** quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 

@@ -213,11 +213,13 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   generalization, broader arithmetic/list templates, formal example proofs, and
   Starlog remain unimplemented.
 - **Stage 9 — AIOC: initial structural-size metric, proof-gated structural
-  candidate comparison, proof-checked bundles, and data-only library storage.** The metric
+  candidate comparison and ranking, proof-checked bundles, and data-only library storage.** The metric
   reports clause, normalized-goal, predicate-record, and term-node counts with a
   documented equal-weight total. `assess_candidate/4` compares original and
   candidate totals only after the independent checker accepts the supplied proof;
-  the result is a structural delta, not a runtime or quality estimate. The bundle
+  `rank_candidates/3` orders supplied accepted candidates by structural size and
+  name while retaining rejected proofs in its report. Neither result is a runtime
+  or quality estimate. The bundle
   writer emits candidate and original Prolog, a machine proof with the exact IR
   snapshots, a rendered proof, a supplied trace, and a supplied report, but only
   after the independent checker accepts the proof. The verifier reads source and
@@ -229,7 +231,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   entry only after rechecking its proof, and `remove_entry/3` deletes a named
   entry. `assess_library/2` rechecks each stored proof and reports sorted,
   proof-gated structural comparisons. The library treats programs as data and
-  does not run or authenticate test suites; ranking, automated test execution,
+  does not run or authenticate test suites. Automated library testing/ranking,
   incorporation front ends, semantic simplification, broader assessment, REPL
   interfaces, and the rest of the AIOC controller remain.
 
@@ -245,7 +247,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; no formal proof; recursive/list generalization, broader arithmetic templates, and Starlog remain unimplemented) |
-| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric, proof-gated comparison, proof-checked bundle writer/verifier, proof-checked data-only library storage with revalidated entry replacement and named removal, and proof-gated library-wide structural assessment; incorporation, semantic simplification, automated test execution/authentication, ranking, broader assessment, and REPL remain) |
+| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric, proof-gated comparison and ranking of supplied candidates, proof-checked bundle writer/verifier, proof-checked data-only library storage with revalidated entry replacement and named removal, and proof-gated library-wide structural assessment; incorporation, semantic simplification, automated test execution/authentication, library ranking, broader assessment, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |
