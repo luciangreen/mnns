@@ -528,9 +528,11 @@ The current work is an initial subset, not a completed version 1 suite:
   generalization, broader arithmetic/list templates, formal example-reproduction
   proofs, and Starlog remain unimplemented.
 - **Stage 9 is in progress:** the structural-size metric, proof-gated structural
-  candidate-size comparison, and proof-checked bundle writer/verifier are
-  implemented. Incorporation front ends, semantic simplification, broader
-  candidate assessment, the library, and REPL commands remain.
+  candidate-size comparison, proof-checked bundle writer/verifier, and initial
+  proof-checked data-only library are implemented. The library records caller-
+  supplied passed-test metadata but does not run or authenticate test suites.
+  Incorporation front ends, semantic simplification, broader candidate
+  assessment, automated library testing/ranking/updates, and REPL commands remain.
 - **Stages 10–14 are not started:** quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 
