@@ -26,10 +26,32 @@ AIOC capabilities remain future work; see [`PROGRESS.md`](../PROGRESS.md).
 The initial proof-checked bundle writer and verifier are described in
 [`bundle.md`](bundle.md).
 
+## Proof-gated structural comparison
+
+`mnn_aioc_assessment:assess_candidate/4` independently checks a supplied proof
+before comparing the original and candidate IR sizes:
+
+```prolog
+assess_candidate(Candidate, Original, Proof, Assessment).
+```
+
+For an accepted proof, `Assessment` is
+`assessment(accepted, size_comparison(OriginalSize, CandidateSize,
+weighted_delta(Delta), structural_effect(Effect)))`. `Delta` is the
+candidate's weighted total minus the original's, and `Effect` is `smaller`,
+`unchanged`, or `larger`. If the proof is rejected, the result is
+`assessment(ProofResult, not_assessed)` and sizes are not compared.
+
+This reports only a change in the documented structural metric. It does not
+estimate runtime or memory, establish that a candidate is faster or better, or
+apply or incorporate a candidate. A proof establishes only the equivalence
+covered by the proof checker's supported rules.
+
 Run its focused tests from the repository root:
 
 ```sh
 swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"
+swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"
 ```
 
 Run all test groups, including this one, with:

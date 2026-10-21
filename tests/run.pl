@@ -30,5 +30,8 @@ main :-
     load_files(AIOCSizeTests, [silent(true)]),
     directory_file_path(Directory, 'bundle_tests.pl', BundleTests),
     load_files(BundleTests, [silent(true)]),
+    directory_file_path(Directory, 'aioc_assessment_tests.pl',
+                        AIOCAssessmentTests),
+    load_files(AIOCAssessmentTests, [silent(true)]),
     run_tests,
     halt.

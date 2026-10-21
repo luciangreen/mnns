@@ -138,9 +138,11 @@ feature and its focused test suite.
   See [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
 - **AIOC structural size metric (initial):** reports clause, goal, predicate, and
   term-node counts for an IR program, plus an equal-weight total. This measures
-  representation size only; it does not estimate runtime or memory cost. The
-  initial bundle writer and verifier emit and re-check only proof-certified
-  bundles. See [`docs/aioc.md`](docs/aioc.md) and
+  representation size only; it does not estimate runtime or memory cost. An
+  initial proof-gated comparison reports candidate-versus-original structural
+  change only after the independent checker accepts the supplied proof. The
+  bundle writer and verifier emit and re-check only proof-certified bundles. See
+  [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).
 
 ## Requirements
