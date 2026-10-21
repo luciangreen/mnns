@@ -360,7 +360,7 @@ sample_entry(Name,
                                [test_result(full_suite, passed)]),
              Program) :-
     Program = mnn_program(
-                  library_test, meta(library_test, []),
+                  library_test, meta(library_test, [clause(1)]),
                   [mnn_pred(answer/2, ['?', '?'], [any, any],
                             [mnn_clause(1, answer(Value, Value), true,
                                         source(library_test, 1))],
