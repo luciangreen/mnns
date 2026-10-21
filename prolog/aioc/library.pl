@@ -82,12 +82,15 @@ entry_file(Directory, Name, File) :-
     directory_file_path(Directory, FileName, File).
 
 write_entry_file(File, Entry) :-
-    setup_call_cleanup(
-        open(File, write, Stream, [encoding(utf8), if_exists(error)]),
-        (   write_term(Stream, Entry, [quoted(true), numbervars(true)]),
-            write(Stream, '.\n')
-        ),
-        close(Stream)).
+    (   exists_file(File)
+    ->  throw(error(permission_error(open, source_sink, File), _))
+    ;   setup_call_cleanup(
+            open(File, write, Stream, [encoding(utf8), if_exists(error)]),
+            (   write_term(Stream, Entry, [quoted(true), numbervars(true)]),
+                write(Stream, '.\n')
+            ),
+            close(Stream))
+    ).
 
 read_entry_file(File, Name, Result) :-
     setup_call_cleanup(

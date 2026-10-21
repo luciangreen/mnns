@@ -88,9 +88,15 @@ test(rechecks_proof_when_reading_entry) :-
           directory_file_path(Directory, 'sample.entry.pl', File),
           setup_call_cleanup(
               open(File, write, Stream),
-              write(Stream, 'mnn_library_entry(sample, invalid, invalid, '
-                            'proof([]), recorded, cost(1), cycle(1), prolog, '
-                            '[test_result(unit, passed)]).'),
+              ( write_term(
+                    Stream,
+                    mnn_library_entry(
+                        sample, invalid, invalid, proof([]), recorded,
+                        cost(1), cycle(1), prolog,
+                        [test_result(unit, passed)]),
+                    [quoted(true)]),
+                write(Stream, '.')
+              ),
               close(Stream)),
           mnn_aioc_library:get_entry(
               Directory, sample, rejected(proof_rejected(_)))
