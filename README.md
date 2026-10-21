@@ -154,8 +154,9 @@ feature and its focused test suite.
   library-wide structural assessment; named entries can be removed, and
   `rank_library/2` ranks proof-checked entries by structural size. It does not
   execute or authenticate stored test suites, or assess runtime or qualitative
-  properties. A separate bounded sandboxed verifier compares candidate and
-  original answers on supplied examples; these checks are not proofs.
+  properties. Bounded sandboxed example checks compare candidate and original
+  answers, and `run_entry_tests/5` runs them for a proof-rechecked library entry;
+  these checks are not proofs and do not authenticate stored test metadata.
   The bundle writer and verifier emit and re-check only proof-certified bundles. See
   [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).

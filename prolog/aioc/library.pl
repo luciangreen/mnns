@@ -3,6 +3,7 @@
             update_entry/3,
             remove_entry/3,
             get_entry/3,
+            run_entry_tests/5,
             list_entries/2,
             assess_library/2,
             rank_library/2
@@ -13,6 +14,7 @@
 :- use_module(library(pairs)).
 :- use_module('../proof/proof_checker').
 :- use_module('assessment').
+:- use_module('test_runner').
 :- use_module('size').
 
 store_entry(Directory, Entry) :-
@@ -59,6 +61,17 @@ get_entry(Directory, Name, Result) :-
         )
     ;   Result = rejected(invalid_name(Name))
     ).
+
+run_entry_tests(Directory, Name, TestCases, Options, Result) :-
+    get_entry(Directory, Name, EntryResult),
+    run_entry_tests_result(EntryResult, Name, TestCases, Options, Result).
+
+run_entry_tests_result(
+        accepted(mnn_library_entry(Name, Candidate, Original, _, _, _, _, _, _)),
+        Name, TestCases, Options, entry_test_report(Name, Results)) :-
+    mnn_aioc_test_runner:compare_programs(
+        Candidate, Original, TestCases, Options, Results).
+run_entry_tests_result(rejected(Reason), _, _, _, rejected(Reason)).
 
 validate_entry(Entry) :-
     (   valid_entry(Entry)

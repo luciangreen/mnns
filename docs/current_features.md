@@ -32,7 +32,7 @@ sharing a change.
 | AIOC proof-gated structural candidate ranking (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate ranking](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-checked algorithm library and structural ranking (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
-| Bounded sandboxed candidate-vs-original example verification | `prolog/aioc/test_runner.pl` | `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"` | [AIOC example verification](aioc.md#bounded-example-verification) |
+| Bounded sandboxed candidate-vs-original example verification and verified library-entry tests | `prolog/aioc/test_runner.pl`, `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`; `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC example verification](aioc.md#bounded-example-verification); [proof-checked library](aioc.md#proof-checked-library) |
 
 Run the complete suite, including every group above, with:
 
@@ -56,10 +56,19 @@ entries are never overwritten by `store_entry/2`.
 `get_entry/3` reads a named entry as data and independently checks its proof
 again, returning `accepted(Entry)` or a `rejected(Reason)` result.
 `list_entries/2` returns the sorted names of files with the library entry
-suffix; callers can use `get_entry/3` to verify each listed item. The library
-does not execute stored programs or test suites, nor does it verify caller-
-supplied test results; these are recorded metadata rather than proof of test
-execution.
+suffix; callers can use `get_entry/3` to verify each listed item. Retrieval and
+library assessment do not execute stored programs or test suites, nor do they
+verify caller-supplied test results; these are recorded metadata rather than
+proof of test execution. The explicit `run_entry_tests/5` operation below runs
+verified entries through the sandbox.
+
+`run_entry_tests(Directory, Name, TestCases, Options, Result)` reads the entry
+as data, rechecks its proof, and runs the supplied named queries against its
+candidate and original using the bounded sandboxed verifier. It returns
+`entry_test_report(Name, Results)` for accepted entries, where each result is
+passed, failed, or inconclusive; missing or unproved entries return
+`rejected(Reason)` without execution. The call does not change the stored entry,
+and stored test-result claims remain caller-supplied metadata.
 
 `update_entry(Directory, Entry, Result)` replaces an existing entry only after
 validating its metadata and rechecking its proof. It returns `updated`, or
@@ -533,6 +542,7 @@ swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), h
 swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"
 swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"
 swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"
+swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"
 ```
 
 The single canonical full-suite command is also used in CI. Individual test
@@ -563,16 +573,18 @@ The current work is an initial subset, not a completed version 1 suite:
   `r_spec` provenance, complexity ranking, and proof-backed formulas remain
   unimplemented.
 - **Stage 8 has initial S2A input-address, integer-affine, integer-quadratic,
-  and integer-cubic inference, plus an opt-in example-table fallback.** Recursive list
-  generalization, broader arithmetic/list templates, formal example-reproduction
-  proofs, and Starlog remain unimplemented.
+  and integer-cubic inference, plus an opt-in example-table fallback.** Recursive
+  list generalization, broader arithmetic/list templates, formal example-
+  reproduction proofs, and broader Starlog syntax remain unimplemented.
 - **Stage 9 is in progress:** the structural-size metric, proof-gated structural
   candidate-size comparison and deterministic structural ranking of supplied,
   proof-accepted candidates, proof-checked bundle writer/verifier, and initial
   proof-checked data-only library are implemented. The library records caller-
-  supplied passed-test metadata but does not run or authenticate test suites.
-  Incorporation front ends, semantic simplification, broader candidate
-  assessment, automated library testing/ranking, and REPL commands remain.
+  supplied passed-test metadata; `run_entry_tests/5` runs bounded regression
+  checks only after rechecking a stored proof, without persisting or
+  authenticating the results. Incorporation front ends, semantic simplification,
+  persistent test suites/authenticated test records, broader candidate
+  assessment, and REPL commands remain.
 - **Stages 10–14 are not started:** quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 

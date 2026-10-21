@@ -244,6 +244,51 @@ test(missing_entry_is_reported) :-
         mnn_aioc_library:get_entry(Directory, absent, rejected(missing_entry)),
         delete_directory_and_contents(Directory)).
 
+test(runs_bounded_regression_cases_for_verified_entry) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          mnn_aioc_library:store_entry(Directory, Entry),
+          mnn_aioc_library:run_entry_tests(
+              Directory, sample,
+              [test_case(identity, answer(value, value))], [],
+              entry_test_report(sample, [test_result(identity, passed)]))
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(reports_missing_entry_when_running_tests) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        mnn_aioc_library:run_entry_tests(
+            Directory, absent, [], [], rejected(missing_entry)),
+        delete_directory_and_contents(Directory)).
+
+test(rechecks_stored_proof_before_running_tests) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          Entry = mnn_library_entry(Name, _, _, _, Assessment, Cost, Cycle,
+                                    SourceForm, TestResults),
+          InvalidEntry = mnn_library_entry(
+                             Name, invalid, invalid, proof([]), Assessment,
+                             Cost, Cycle, SourceForm, TestResults),
+          directory_file_path(Directory, 'sample.entry.pl', File),
+          setup_call_cleanup(
+              open(File, write, Stream),
+              ( write_term(Stream, InvalidEntry, [quoted(true)]),
+                write(Stream, '.\n')
+              ),
+              close(Stream)),
+          mnn_aioc_library:run_entry_tests(
+              Directory, sample,
+              [test_case(unsafe, throw(error(test_failure, _)))], [],
+              rejected(proof_rejected(_)))
+        ),
+        delete_directory_and_contents(Directory)).
+
 test(rechecks_proof_when_reading_entry) :-
     temporary_library_directory(Directory),
     setup_call_cleanup(
