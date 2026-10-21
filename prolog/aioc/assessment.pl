@@ -1,9 +1,45 @@
 :- module(mnn_aioc_assessment,
-          [ assess_candidate/4
+          [ assess_candidate/4,
+            rank_candidates/3
           ]).
 
+:- use_module(library(error)).
+:- use_module(library(lists)).
+:- use_module(library(pairs)).
 :- use_module('../proof/proof_checker').
 :- use_module('size').
+
+rank_candidates(Original, Candidates,
+               candidate_ranking(Ranked, Rejected)) :-
+    must_be(list, Candidates),
+    maplist(assess_rank_candidate(Original), Candidates, Results),
+    partition(accepted_rank_candidate, Results, Accepted, Rejected),
+    maplist(candidate_rank_key, Accepted, Keyed),
+    keysort(Keyed, Sorted),
+    pairs_values(Sorted, Ranked).
+
+assess_rank_candidate(Original, candidate(Name, Candidate, Proof), Result) :-
+    !,
+    must_be(atom, Name),
+    assess_candidate(Candidate, Original, Proof, Assessment),
+    rank_candidate_result(Name, Candidate, Assessment, Result).
+assess_rank_candidate(_, Candidate, _) :-
+    throw(error(domain_error(candidate, Candidate), _)).
+
+rank_candidate_result(Name, Candidate,
+                      assessment(accepted, Comparison),
+                      ranked_candidate(Name, Candidate, Comparison)) :-
+    !.
+rank_candidate_result(Name, _, assessment(ProofResult, not_assessed),
+                      rejected_candidate(Name, ProofResult)).
+
+accepted_rank_candidate(ranked_candidate(_, _, _)).
+
+candidate_rank_key(
+    ranked_candidate(Name, Candidate, Comparison),
+    key(WeightedTotal, Name)-ranked_candidate(Name, Candidate, Comparison)) :-
+    Comparison = size_comparison(_, CandidateSize, _, _),
+    CandidateSize = program_size(_, _, _, _, weighted_total(WeightedTotal)).
 
 assess_candidate(Candidate, Original, Proof, Assessment) :-
     mnn_proof_checker:check_proof(Candidate, Original, Proof, ProofResult),

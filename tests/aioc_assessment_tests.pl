@@ -45,6 +45,39 @@ test(compares_sizes_for_proof_accepted_rewrite) :-
     Delta is CandidateTotal - OriginalTotal,
     expected_structural_effect(Delta, Effect).
 
+test(ranks_only_checked_candidates_by_size_and_name) :-
+    findall_program(Original),
+    identity_proof(IdentityProof),
+    once(mnn_plop:optimize_program(
+        Original, Optimized, plop_report(_, OptimizedProof, accepted))),
+    mnn_aioc_assessment:rank_candidates(
+        Original,
+        [candidate(zeta, Original, IdentityProof),
+         candidate(alpha, Original, IdentityProof),
+         candidate(optimized, Optimized, OptimizedProof),
+         candidate(rejected, Optimized, proof([]))],
+        candidate_ranking(Ranked, Rejected)),
+    assertion(Ranked = [ranked_candidate(_, _, _),
+                        ranked_candidate(_, _, _),
+                        ranked_candidate(_, _, _)]),
+    assertion(Rejected = [rejected_candidate(
+                              rejected,
+                              rejected(invalid_or_unsupported_proof))]),
+    maplist(ranked_candidate_size, Ranked, Sizes),
+    msort(Sizes, SortedSizes),
+    assertion(Sizes == SortedSizes),
+    findall(Name,
+            member(ranked_candidate(Name, Original, _), Ranked),
+            OriginalCandidateNames),
+    assertion(OriginalCandidateNames == [alpha, zeta]).
+
+ranked_candidate_size(
+    ranked_candidate(_, _, size_comparison(
+                               _, program_size(_, _, _, _,
+                                               weighted_total(Size)),
+                               _, _)),
+    Size).
+
 findall_program(
     mnn_program(
         sample,

@@ -47,6 +47,25 @@ estimate runtime or memory, establish that a candidate is faster or better, or
 apply or incorporate a candidate. A proof establishes only the equivalence
 covered by the proof checker's supported rules.
 
+`rank_candidates/3` orders a supplied candidate set using that same
+proof-checked structural size:
+
+```prolog
+rank_candidates(Original, Candidates,
+                candidate_ranking(Ranked, Rejected)).
+```
+
+`Candidates` is a list of `candidate(Name, CandidateProgram, Proof)` terms.
+Every candidate is independently checked against `Original`. Accepted
+candidates are sorted by ascending weighted structural size, then by candidate
+name; equal names and sizes retain their input order. Each ranked entry contains
+`ranked_candidate(Name, Candidate, Assessment)`, where `Assessment` is the
+`size_comparison/4` result described above. Rejected proofs are retained in
+input order as `rejected_candidate(Name, ProofResult)` and are never ranked.
+Candidate names must be atoms. This is deterministic size ordering only: it
+does not estimate runtime, assess quality, generate candidates, or authenticate
+tests.
+
 Run its focused tests from the repository root:
 
 ```sh
@@ -85,7 +104,7 @@ verified and `rejected(Reason)` for missing, malformed-shape, or unproved
 entries. `list_entries(Directory, Names)` returns sorted names for files with
 the library suffix; each should be fetched with `get_entry/3` before use.
 Malformed Prolog data may raise a read error. Automatic test execution and
-ranking are not implemented.
+library-entry ranking are not implemented.
 
 `update_entry(Directory, Entry, Result)` accepts a replacement only after
 validating its shape and metadata and independently rechecking its proof. It

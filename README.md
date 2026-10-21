@@ -140,11 +140,13 @@ feature and its focused test suite.
   term-node counts for an IR program, plus an equal-weight total. This measures
   representation size only; it does not estimate runtime or memory cost. An
   initial proof-gated comparison reports candidate-versus-original structural
-  change only after the independent checker accepts the supplied proof. The
+  change and deterministic ranking of supplied candidates are available only
+  after the independent checker accepts each proof; ranking uses structural
+  size, not runtime or quality. The
   proof-checked library records candidate metadata and test-result claims, then
   rechecks proofs when entries are retrieved, updated, or included in a
   library-wide structural assessment; named entries can be removed. It does not
-  execute test suites or rank candidates.
+  execute test suites or rank library entries.
   The bundle writer and verifier emit and re-check only proof-certified bundles. See
   [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).
