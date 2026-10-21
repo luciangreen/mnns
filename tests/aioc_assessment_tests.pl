@@ -45,6 +45,66 @@ test(compares_sizes_for_proof_accepted_rewrite) :-
     Delta is CandidateTotal - OriginalTotal,
     expected_structural_effect(Delta, Effect).
 
+test(selects_cost_size_pareto_frontier_and_reports_dominated_candidates) :-
+    identity_proof(Proof),
+    small_program(Small),
+    medium_program(Medium),
+    large_program(Large),
+    Candidates = [
+        candidate(fast_large, Large, Large, Proof, 1),
+        candidate(middle, Medium, Medium, Proof, 5),
+        candidate(slow_small, Small, Small, Proof, 10),
+        candidate(worse_large, Large, Large, Proof, 6)
+    ],
+    mnn_aioc_assessment:assess_candidates(Candidates, Frontier, Results),
+    assertion(Frontier == [fast_large, middle, slow_small]),
+    assertion(memberchk(
+                  candidate_result(
+                      worse_large,
+                      accepted(cost(6), structural_size(_),
+                               structural_effect(unchanged),
+                               frontier(dominated))),
+                  Results)).
+
+test(keeps_candidates_with_equal_cost_and_size) :-
+    small_program(Program),
+    identity_proof(Proof),
+    Candidates = [
+        candidate(first, Program, Program, Proof, 2),
+        candidate(second, Program, Program, Proof, 2)
+    ],
+    mnn_aioc_assessment:assess_candidates(Candidates, Frontier, _),
+    assertion(Frontier == [first, second]).
+
+test(excludes_candidates_with_rejected_proofs) :-
+    small_program(Program),
+    identity_proof(Proof),
+    Candidates = [
+        candidate(accepted, Program, Program, Proof, 2),
+        candidate(rejected, Program, Program, proof([]), 1)
+    ],
+    mnn_aioc_assessment:assess_candidates(Candidates, Frontier, Results),
+    assertion(Frontier == [accepted]),
+    assertion(memberchk(
+                  candidate_result(
+                      rejected,
+                      rejected(rejected(invalid_or_unsupported_proof))),
+                  Results)).
+
+test(rejects_negative_candidate_cost, [throws(error(domain_error(nonnegative_cost, -1), _))]) :-
+    mnn_aioc_assessment:assess_candidates(
+        [candidate(invalid, not_a_program, not_a_program, proof([]), -1)],
+        _, _).
+
+test(rejects_duplicate_candidate_ids,
+     [throws(error(domain_error(unique_candidate_ids, [duplicate, duplicate]), _))]) :-
+    small_program(Program),
+    identity_proof(Proof),
+    mnn_aioc_assessment:assess_candidates(
+        [candidate(duplicate, Program, Program, Proof, 1),
+         candidate(duplicate, Program, Program, Proof, 2)],
+        _, _).
+
 findall_program(
     mnn_program(
         sample,
@@ -58,6 +118,26 @@ findall_program(
                               findall(X, num(X), Values), source(test, 3))],
                   original)],
         proof([]), trace([]))).
+
+small_program(mnn_program(small, meta(small, []), [], proof([]), trace([]))).
+
+medium_program(
+    mnn_program(medium, meta(medium, [clause(1)]),
+                [mnn_pred(answer/1, ['?'], [any],
+                [mnn_clause(1, answer(ok), true,
+                            source(medium, 1))],
+                original)],
+                proof([]), trace([]))).
+
+large_program(
+    mnn_program(large, meta(large, [clause(1), clause(2)]),
+                [mnn_pred(answer/1, ['?'], [any],
+                [mnn_clause(1, answer(ok), true,
+                            source(large, 1)),
+                 mnn_clause(2, answer(other), true,
+                            source(large, 2))],
+                original)],
+                proof([]), trace([]))).
 
 expected_structural_effect(Delta, smaller) :-
     Delta < 0,

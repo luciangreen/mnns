@@ -212,18 +212,23 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   candidates reproduce examples but carry no formal proof; recursive list
   generalization, broader arithmetic/list templates, formal example proofs, and
   Starlog remain unimplemented.
-- **Stage 9 — AIOC: initial structural-size metric, proof-gated structural
-  candidate comparison, and proof-checked bundle writer/verifier.** The metric
-  reports clause, normalized-goal, predicate-record, and term-node counts with a
-  documented equal-weight total. `assess_candidate/4` compares original and
-  candidate totals only after the independent checker accepts the supplied proof;
-  the result is a structural delta, not a runtime or quality estimate. The bundle
-  writer emits candidate and original Prolog, a machine proof with the exact IR
+- **Stage 9 — AIOC: initial structural-size metric, proof-gated candidate
+  comparison, cost/size Pareto frontier, and proof-checked bundle
+  writer/verifier.** The metric reports clause, normalized-goal, predicate-record,
+  and term-node counts with a documented equal-weight total.
+  `assess_candidate/4` compares original and candidate totals only after the
+  independent checker accepts the supplied proof; the result is a structural
+  delta, not a runtime or quality estimate. `assess_candidates/3` compares
+  independently proof-checked candidates by this structural size and caller-
+  supplied nonnegative finite cost, retaining tied or non-dominated candidates.
+  It does not estimate cost or compute qualitative scores. The bundle writer
+  emits candidate and original Prolog, a machine proof with the exact IR
   snapshots, a rendered proof, a supplied trace, and a supplied report, but only
   after the independent checker accepts the proof. The verifier reads source and
   proof as data, confirms emitted programs match the snapshots, and re-checks the
-  proof. Incorporation front ends, semantic simplification, broader candidate
-  assessment, library/REPL interfaces, and the rest of the AIOC controller remain.
+  proof. Incorporation front ends, semantic simplification, qualitative
+  assessment, a cost model, library/REPL interfaces, and the rest of the AIOC
+  controller remain.
 
 ## Remaining stages
 
@@ -237,7 +242,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; no formal proof; recursive/list generalization, broader arithmetic templates, and Starlog remain unimplemented) |
-| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric, proof-gated comparison of structural totals, and proof-checked bundle writer/verifier; incorporation, semantic simplification, broader candidate assessment, library, and REPL remain) |
+| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric, proof-gated comparison and caller-cost/structural-size Pareto frontier, and proof-checked bundle writer/verifier; incorporation, semantic simplification, qualitative assessment, a cost model, library, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |

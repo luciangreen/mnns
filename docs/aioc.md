@@ -47,6 +47,32 @@ estimate runtime or memory, establish that a candidate is faster or better, or
 apply or incorporate a candidate. A proof establishes only the equivalence
 covered by the proof checker's supported rules.
 
+## Proof-gated cost/size candidate frontier
+
+`mnn_aioc_assessment:assess_candidates/3` compares a set of candidate programs
+using caller-supplied costs and the documented structural-size metric:
+
+```prolog
+assess_candidates(Candidates, Frontier, Results).
+```
+
+Each input is `candidate(Id, Program, Original, Proof, Cost)`. IDs must be
+ground and unique. Costs must be nonnegative finite numbers supplied by the
+caller; this feature does not estimate cost. Every candidate is checked
+independently before its size can affect selection. Invalid proofs are reported
+as rejected and are never selected. `Frontier` contains the IDs of accepted
+candidates that are not dominated, in input order. Candidate A dominates B
+when A's cost and structural size are both no greater than B's and at least one
+is strictly lower. Candidates tied on both measures are all retained.
+
+Each result is `candidate_result(Id, accepted(cost(Cost), structural_size(Size),
+structural_effect(Effect), frontier(Status)))`, where `Status` is `selected` or
+`dominated`; a failed proof is reported as
+`candidate_result(Id, rejected(ProofResult))`. This implements only the
+proof-gated cost/size portion of candidate comparison. Qualitative assessment,
+the cost model, allocation, library incorporation, and full AIOC cycle logic
+remain future work.
+
 Run its focused tests from the repository root:
 
 ```sh

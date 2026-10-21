@@ -140,8 +140,11 @@ feature and its focused test suite.
   term-node counts for an IR program, plus an equal-weight total. This measures
   representation size only; it does not estimate runtime or memory cost. An
   initial proof-gated comparison reports candidate-versus-original structural
-  change only after the independent checker accepts the supplied proof. The
-  bundle writer and verifier emit and re-check only proof-certified bundles. See
+  change only after the independent checker accepts the supplied proof. Candidate
+  sets can also be filtered to a proof-gated Pareto frontier using structural
+  size and caller-supplied costs; this is not a cost estimate or qualitative
+  assessment. The bundle writer and verifier emit and re-check only
+  proof-certified bundles. See
   [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).
 
@@ -162,8 +165,8 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-loop2, Detlog, PLOp, AlgebraPLOp, S2A, AIOC size-metric, and bundle tests. Focused
-commands for every PlUnit group are listed in
+loop2, Detlog, PLOp, AlgebraPLOp, S2A, AIOC size-metric, candidate-assessment,
+and bundle tests. Focused commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 
 ```sh
