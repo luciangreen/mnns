@@ -3,12 +3,14 @@
             update_entry/3,
             remove_entry/3,
             get_entry/3,
-            list_entries/2
+            list_entries/2,
+            assess_library/2
           ]).
 
 :- use_module(library(error)).
 :- use_module(library(filesex)).
 :- use_module('../proof/proof_checker').
+:- use_module('assessment').
 
 store_entry(Directory, Entry) :-
     must_be(atom, Directory),
@@ -74,6 +76,22 @@ list_entries(Directory, Names) :-
             ),
             FoundNames),
     sort(FoundNames, Names).
+
+assess_library(Directory, Assessments) :-
+    must_be(atom, Directory),
+    list_entries(Directory, Names),
+    maplist(assess_library_entry(Directory), Names, Assessments).
+
+assess_library_entry(Directory, Name, entry_assessment(Name, Assessment)) :-
+    get_entry(Directory, Name, EntryResult),
+    assess_library_entry_result(EntryResult, Assessment).
+
+assess_library_entry_result(
+        accepted(mnn_library_entry(_, Candidate, Original, Proof, _, _, _, _, _)),
+        Assessment) :-
+    mnn_aioc_assessment:assess_candidate(
+        Candidate, Original, Proof, Assessment).
+assess_library_entry_result(rejected(Reason), rejected(Reason)).
 
 valid_entry(mnn_library_entry(Name, Program, Original, Proof, Assessment,
                               Cost, Cycle, SourceForm, TestResults)) :-

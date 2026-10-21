@@ -19,6 +19,46 @@ test(stores_and_rechecks_entry_with_metadata) :-
         ),
         delete_directory_and_contents(Directory)).
 
+test(assesses_stored_entries_in_sorted_order) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(zeta, ZetaEntry, _),
+          sample_entry(alpha, AlphaEntry, _),
+          mnn_aioc_library:store_entry(Directory, ZetaEntry),
+          mnn_aioc_library:store_entry(Directory, AlphaEntry),
+          mnn_aioc_library:assess_library(
+              Directory,
+              [entry_assessment(alpha, AlphaAssessment),
+               entry_assessment(zeta, ZetaAssessment)]),
+          assert_unchanged_assessment(AlphaAssessment),
+          assert_unchanged_assessment(ZetaAssessment)
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(reports_unproved_entries_in_library_assessment) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          Entry = mnn_library_entry(Name, Program, Original, _, Assessment,
+                                    Cost, Cycle, SourceForm, TestResults),
+          InvalidEntry = mnn_library_entry(
+                             Name, Program, Original, proof([]), Assessment,
+                             Cost, Cycle, SourceForm, TestResults),
+          directory_file_path(Directory, 'sample.entry.pl', File),
+          setup_call_cleanup(
+              open(File, write, Stream),
+              ( write_term(Stream, InvalidEntry, [quoted(true)]),
+                write(Stream, '.\n')
+              ),
+              close(Stream)),
+          mnn_aioc_library:assess_library(
+              Directory,
+              [entry_assessment(sample, rejected(proof_rejected(_)))])
+        ),
+        delete_directory_and_contents(Directory)).
+
 test(rejects_entry_without_passed_test_record) :-
     temporary_library_directory(Directory),
     setup_call_cleanup(
@@ -172,6 +212,11 @@ test(rechecks_proof_when_reading_entry) :-
               Directory, sample, rejected(proof_rejected(_)))
         ),
         delete_directory_and_contents(Directory)).
+
+assert_unchanged_assessment(
+    assessment(
+        accepted,
+        size_comparison(_, _, weighted_delta(0), structural_effect(unchanged)))).
 
 updated_sample_entry(
     mnn_library_entry(Name, Program, Original, Proof, _, _, _, _, _),
