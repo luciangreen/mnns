@@ -48,7 +48,7 @@ proof checker must accept the candidate and original before the library writes
 anything. Assessment, cost, cycle, source form, and test results must be ground;
 the test results must contain one or more `test_result(TestName, passed)` terms.
 Names are restricted to letters, digits, underscores, and hyphens, and existing
-entries are never overwritten.
+entries are never overwritten by `store_entry/2`.
 
 `get_entry/3` reads a named entry as data and independently checks its proof
 again, returning `accepted(Entry)` or a `rejected(Reason)` result.
@@ -56,8 +56,25 @@ again, returning `accepted(Entry)` or a `rejected(Reason)` result.
 suffix; callers can use `get_entry/3` to verify each listed item. The library
 does not execute stored programs or test suites, nor does it verify caller-
 supplied test results; these are recorded metadata rather than proof of test
-execution. This initial slice has no update/removal interface or richer search
-and assessment workflow.
+execution.
+
+`update_entry(Directory, Entry, Result)` replaces an existing entry only after
+validating its metadata and rechecking its proof. It returns `updated`, or
+`rejected(missing_entry)` if the name is not currently stored. The replacement
+is written to a temporary file in the library directory before it replaces the
+stored file, so a failed write does not truncate the existing entry.
+`remove_entry(Directory, Name, Result)` returns `removed` when it deletes an
+entry, `rejected(missing_entry)` when none exists, or
+`rejected(invalid_name(Name))` for an invalid name. Neither operation executes
+stored code or test suites. Richer search, ranking, and assessment workflows
+remain unimplemented.
+
+For example, after constructing a valid entry term:
+
+```prolog
+mnn_aioc_library:update_entry('/path/to/library', UpdatedEntry, updated).
+mnn_aioc_library:remove_entry('/path/to/library', old_name, removed).
+```
 
 Run its focused tests from the repository root:
 
