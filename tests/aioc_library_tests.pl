@@ -36,6 +36,50 @@ test(assesses_stored_entries_in_sorted_order) :-
         ),
         delete_directory_and_contents(Directory)).
 
+test(ranks_proof_checked_entries_by_size_then_name) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(zeta, ZetaEntry, _),
+          sample_entry(beta, BetaEntry, _),
+          larger_sample_entry(alpha, AlphaEntry),
+          mnn_aioc_library:store_entry(Directory, ZetaEntry),
+          mnn_aioc_library:store_entry(Directory, BetaEntry),
+          mnn_aioc_library:store_entry(Directory, AlphaEntry),
+          mnn_aioc_library:rank_library(
+              Directory,
+              library_ranking(Ranked, [])),
+          maplist(ranked_entry_name, Ranked, [beta, zeta, alpha]),
+          Ranked = [ranked_entry(beta, _, _),
+                    ranked_entry(zeta, _, _),
+                    ranked_entry(alpha, _, _)],
+          ranked_entry_size(Ranked, [Small, Small, Large]),
+          assertion(Small < Large)
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(reports_entries_with_rejected_proofs_when_ranking) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(valid, ValidEntry, _),
+          sample_entry(invalid, InvalidEntry, _),
+          mnn_aioc_library:store_entry(Directory, ValidEntry),
+          mnn_aioc_library:store_entry(Directory, InvalidEntry),
+          directory_file_path(Directory, 'invalid.entry.pl', File),
+          setup_call_cleanup(
+              open(File, write, Stream),
+              write(Stream, 'mnn_library_entry(invalid, invalid, invalid, '
+                            'proof([]), recorded, cost(1), cycle(1), prolog, '
+                            '[test_result(unit, passed)]).'),
+              close(Stream)),
+          mnn_aioc_library:rank_library(
+              Directory,
+              library_ranking([ranked_entry(valid, _, _)],
+                              [rejected_entry(invalid, proof_rejected(_))]))
+        ),
+        delete_directory_and_contents(Directory)).
+
 test(reports_unproved_entries_in_library_assessment) :-
     temporary_library_directory(Directory),
     setup_call_cleanup(
@@ -218,12 +262,36 @@ assert_unchanged_assessment(
         accepted,
         size_comparison(_, _, weighted_delta(0), structural_effect(unchanged)))).
 
+ranked_entry_name(ranked_entry(Name, _, _), Name).
+
+ranked_entry_size(Ranked, Sizes) :-
+    maplist(ranked_entry_weighted_size, Ranked, Sizes).
+
+ranked_entry_weighted_size(
+    ranked_entry(_, _, size_comparison(_, CandidateSize, _, _)),
+    WeightedTotal) :-
+    CandidateSize = program_size(_, _, _, _, weighted_total(WeightedTotal)).
+
 updated_sample_entry(
     mnn_library_entry(Name, Program, Original, Proof, _, _, _, _, _),
     mnn_library_entry(Name, Program, Original, Proof,
                       assessment(updated, recorded),
                       cost(steps(2)), cycle(2), prolog,
                       [test_result(focused_suite, passed)])).
+
+larger_sample_entry(Name, Entry) :-
+    sample_entry(Name, Entry0, Program0),
+    Program0 = mnn_program(ProgramName, Meta, Predicates, Proof, Trace),
+    append(Predicates,
+           [mnn_pred(extra/0, [], [],
+                     [mnn_clause(2, extra, true, source(ProgramName, 2))],
+                     original)],
+           LargerPredicates),
+    Program = mnn_program(ProgramName, Meta, LargerPredicates, Proof, Trace),
+    Entry0 = mnn_library_entry(Name, _, _, EntryProof, Assessment, Cost, Cycle,
+                              SourceForm, TestResults),
+    Entry = mnn_library_entry(Name, Program, Program, EntryProof, Assessment,
+                             Cost, Cycle, SourceForm, TestResults).
 
 temporary_library_directory(Directory) :-
     tmp_file(mnn_aioc_library, Directory),
