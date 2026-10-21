@@ -4,13 +4,16 @@
             remove_entry/3,
             get_entry/3,
             list_entries/2,
-            assess_library/2
+            assess_library/2,
+            rank_library/2
           ]).
 
 :- use_module(library(error)).
 :- use_module(library(filesex)).
+:- use_module(library(pairs)).
 :- use_module('../proof/proof_checker').
 :- use_module('assessment').
+:- use_module('size').
 
 store_entry(Directory, Entry) :-
     must_be(atom, Directory),
@@ -92,6 +95,51 @@ assess_library_entry_result(
     mnn_aioc_assessment:assess_candidate(
         Candidate, Original, Proof, Assessment).
 assess_library_entry_result(rejected(Reason), rejected(Reason)).
+
+rank_library(Directory, library_ranking(Ranked, Rejected)) :-
+    must_be(atom, Directory),
+    list_entries(Directory, Names),
+    maplist(rank_library_entry(Directory), Names, Results),
+    partition_ranked_entries(Results, Accepted, Rejected),
+    maplist(library_entry_rank_key, Accepted, Keyed),
+    keysort(Keyed, Sorted),
+    pairs_values(Sorted, Ranked).
+
+rank_library_entry(Directory, Name, Result) :-
+    get_entry(Directory, Name, EntryResult),
+    rank_library_entry_result(EntryResult, Name, Result).
+
+rank_library_entry_result(
+        accepted(mnn_library_entry(_, Candidate, Original, Proof, _, _, _, _, _)),
+        Name,
+        Result) :-
+    mnn_aioc_assessment:assess_candidate(
+        Candidate, Original, Proof, Assessment),
+    rank_library_assessment(Name, Candidate, Assessment, Result).
+rank_library_entry_result(rejected(Reason), Name, rejected_entry(Name, Reason)).
+
+rank_library_assessment(
+        Name, Candidate, assessment(accepted, Comparison),
+        ranked_entry(Name, Candidate, Comparison)) :-
+    !.
+rank_library_assessment(Name, _, assessment(ProofResult, not_assessed),
+                        rejected_entry(Name, ProofResult)).
+
+partition_ranked_entries([], [], []).
+partition_ranked_entries([ranked_entry(Name, Candidate, Comparison)|Results],
+                         [ranked_entry(Name, Candidate, Comparison)|Accepted],
+                         Rejected) :-
+    !,
+    partition_ranked_entries(Results, Accepted, Rejected).
+partition_ranked_entries([rejected_entry(Name, Reason)|Results], Accepted,
+                         [rejected_entry(Name, Reason)|Rejected]) :-
+    partition_ranked_entries(Results, Accepted, Rejected).
+
+library_entry_rank_key(
+        ranked_entry(Name, Candidate, Comparison),
+        key(WeightedTotal, Name)-ranked_entry(Name, Candidate, Comparison)) :-
+    Comparison = size_comparison(_, CandidateSize, _, _),
+    CandidateSize = program_size(_, _, _, _, weighted_total(WeightedTotal)).
 
 valid_entry(mnn_library_entry(Name, Program, Original, Proof, Assessment,
                               Cost, Cycle, SourceForm, TestResults)) :-
