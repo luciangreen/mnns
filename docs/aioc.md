@@ -84,9 +84,8 @@ consults it, and checks its proof again. It returns `accepted(Entry)` when
 verified and `rejected(Reason)` for missing, malformed-shape, or unproved
 entries. `list_entries(Directory, Names)` returns sorted names for files with
 the library suffix; each should be fetched with `get_entry/3` before use.
-Malformed Prolog data may raise a read error. Updating/removing entries,
-automatic test execution, ranking, and library-wide assessment are not
-implemented beyond the operations below.
+Malformed Prolog data may raise a read error. Automatic test execution,
+ranking, and library-wide assessment are not implemented.
 
 `update_entry(Directory, Entry, Result)` accepts a replacement only after
 validating its shape and metadata and independently rechecking its proof. It
