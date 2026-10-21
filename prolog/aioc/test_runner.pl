@@ -22,6 +22,7 @@ compare_programs(Candidate, Original, TestCases, Options, Results) :-
         delete_temporary_file(CandidateFile)).
 
 validate_test_case(test_case(Name, Goal)) :-
+    !,
     must_be(atom, Name),
     (   callable(Goal)
     ->  true
@@ -85,6 +86,7 @@ run_test_program(File, Goal, Options, Outcome) :-
 
 compare_test_outcomes(Name, MaxAnswers, completed(CandidateAnswers),
                       completed(OriginalAnswers), Result) :-
+    !,
     (   length(CandidateAnswers, CandidateCount),
         length(OriginalAnswers, OriginalCount),
         ( CandidateCount > MaxAnswers

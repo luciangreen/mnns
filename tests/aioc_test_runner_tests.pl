@@ -9,6 +9,13 @@ test(accepts_matching_ordered_answers_and_duplicates) :-
         Candidate, Original, [test_case(answer, answer(_Value))], [],
         [test_result(answer, passed)]).
 
+test(compares_answer_variable_sharing) :-
+    answer_program(candidate, [pair(Left, Left)], Candidate),
+    answer_program(original, [pair(Right, Right)], Original),
+    mnn_aioc_test_runner:compare_programs(
+        Candidate, Original, [test_case(answer, answer(_Pair))], [],
+        [test_result(answer, passed)]).
+
 test(reports_answer_order_mismatch) :-
     answer_program(candidate, [b, a], Candidate),
     answer_program(original, [a, b], Original),
