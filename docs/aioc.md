@@ -84,9 +84,28 @@ consults it, and checks its proof again. It returns `accepted(Entry)` when
 verified and `rejected(Reason)` for missing, malformed-shape, or unproved
 entries. `list_entries(Directory, Names)` returns sorted names for files with
 the library suffix; each should be fetched with `get_entry/3` before use.
-Malformed Prolog data may raise a read error. Updating/removing entries,
-automatic test execution, ranking, and library-wide assessment remain
-unimplemented.
+Malformed Prolog data may raise a read error. Automatic test execution,
+ranking, and library-wide assessment are not implemented.
+
+`update_entry(Directory, Entry, Result)` accepts a replacement only after
+validating its shape and metadata and independently rechecking its proof. It
+replaces an existing entry and returns `updated`; if the entry name is absent,
+it returns `rejected(missing_entry)` without creating a new entry. The new term
+is written to a temporary file in the same directory and renamed into place
+after the write succeeds. Invalid entries and unaccepted proofs raise the same
+domain errors as `store_entry/2`.
+
+`remove_entry(Directory, Name, Result)` deletes a named file and returns
+`removed`. It returns `rejected(missing_entry)` when the file is absent and
+`rejected(invalid_name(Name))` when the name fails the library's name rules.
+Removal does not read or execute the stored term.
+
+Example calls, assuming `UpdatedEntry` is a valid entry term:
+
+```prolog
+mnn_aioc_library:update_entry('/path/to/library', UpdatedEntry, updated).
+mnn_aioc_library:remove_entry('/path/to/library', old_name, removed).
+```
 
 Run the focused library tests from the repository root:
 

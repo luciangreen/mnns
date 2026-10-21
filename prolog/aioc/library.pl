@@ -1,5 +1,7 @@
 :- module(mnn_aioc_library,
           [ store_entry/2,
+            update_entry/3,
+            remove_entry/3,
             get_entry/3,
             list_entries/2
           ]).
@@ -10,19 +12,34 @@
 
 store_entry(Directory, Entry) :-
     must_be(atom, Directory),
-    (   valid_entry(Entry)
-    ->  true
-    ;   throw(error(domain_error(library_entry, Entry), _))
-    ),
-    Entry = mnn_library_entry(Name, Program, Original, Proof, _, _, _, _, _),
-    mnn_proof_checker:check_proof(Program, Original, Proof, ProofResult),
-    (   ProofResult == accepted
-    ->  true
-    ;   throw(error(domain_error(accepted_proof, ProofResult), _))
-    ),
+    validate_entry(Entry),
+    Entry = mnn_library_entry(Name, _, _, _, _, _, _, _, _),
     make_directory_path(Directory),
     entry_file(Directory, Name, File),
     write_entry_file(File, Entry).
+
+update_entry(Directory, Entry, Result) :-
+    must_be(atom, Directory),
+    validate_entry(Entry),
+    Entry = mnn_library_entry(Name, _, _, _, _, _, _, _, _),
+    entry_file(Directory, Name, File),
+    (   exists_file(File)
+    ->  replace_entry_file(Directory, File, Entry),
+        Result = updated
+    ;   Result = rejected(missing_entry)
+    ).
+
+remove_entry(Directory, Name, Result) :-
+    must_be(atom, Directory),
+    (   valid_name(Name)
+    ->  entry_file(Directory, Name, File),
+        (   exists_file(File)
+        ->  delete_file(File),
+            Result = removed
+        ;   Result = rejected(missing_entry)
+        )
+    ;   Result = rejected(invalid_name(Name))
+    ).
 
 get_entry(Directory, Name, Result) :-
     must_be(atom, Directory),
@@ -33,6 +50,18 @@ get_entry(Directory, Name, Result) :-
         ;   Result = rejected(missing_entry)
         )
     ;   Result = rejected(invalid_name(Name))
+    ).
+
+validate_entry(Entry) :-
+    (   valid_entry(Entry)
+    ->  true
+    ;   throw(error(domain_error(library_entry, Entry), _))
+    ),
+    Entry = mnn_library_entry(_, Program, Original, Proof, _, _, _, _, _),
+    mnn_proof_checker:check_proof(Program, Original, Proof, ProofResult),
+    (   ProofResult == accepted
+    ->  true
+    ;   throw(error(domain_error(accepted_proof, ProofResult), _))
     ).
 
 list_entries(Directory, Names) :-
@@ -84,10 +113,28 @@ entry_file(Directory, Name, File) :-
 write_entry_file(File, Entry) :-
     setup_call_cleanup(
         open(File, write, Stream, [encoding(utf8), if_exists(error)]),
-        (   write_term(Stream, Entry, [quoted(true), numbervars(true)]),
-            write(Stream, '.\n')
-        ),
+        write_entry(Stream, Entry),
         close(Stream)).
+
+write_entry(Stream, Entry) :-
+    write_term(Stream, Entry, [quoted(true), numbervars(true)]),
+    write(Stream, '.\n').
+
+replace_entry_file(Directory, File, Entry) :-
+    temporary_entry_file(Directory, TemporaryFile),
+    setup_call_cleanup(
+        true,
+        (   write_entry_file(TemporaryFile, Entry),
+            rename_file(TemporaryFile, File)
+        ),
+        catch(delete_file(TemporaryFile), _, true)).
+
+temporary_entry_file(Directory, File) :-
+    tmp_file(mnn_aioc_library, UniquePath),
+    file_base_name(UniquePath, UniqueName),
+    atom_concat('.', UniqueName, TemporaryName0),
+    atom_concat(TemporaryName0, '.tmp', TemporaryName),
+    directory_file_path(Directory, TemporaryName, File).
 
 read_entry_file(File, Name, Result) :-
     setup_call_cleanup(

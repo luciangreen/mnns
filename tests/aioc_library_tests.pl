@@ -67,6 +67,82 @@ test(rejects_duplicate_entry_name) :-
         ),
         delete_directory_and_contents(Directory)).
 
+test(updates_existing_entry_after_checking_its_proof) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          updated_sample_entry(Entry, UpdatedEntry),
+          mnn_aioc_library:store_entry(Directory, Entry),
+          mnn_aioc_library:update_entry(Directory, UpdatedEntry, updated),
+          mnn_aioc_library:get_entry(
+              Directory, sample, accepted(StoredEntry)),
+          assertion(StoredEntry =@= UpdatedEntry)
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(rejects_update_when_entry_is_missing) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(absent, Entry, _),
+          mnn_aioc_library:update_entry(
+              Directory, Entry, rejected(missing_entry)),
+          mnn_aioc_library:list_entries(Directory, [])
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(rejects_update_with_unaccepted_proof_without_changing_entry) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          Entry = mnn_library_entry(Name, Program, Original, _, Assessment,
+                                    Cost, Cycle, SourceForm, TestResults),
+          InvalidEntry = mnn_library_entry(
+                             Name, Program, Original, proof([]), Assessment,
+                             Cost, Cycle, SourceForm, TestResults),
+          mnn_aioc_library:store_entry(Directory, Entry),
+          catch(mnn_aioc_library:update_entry(
+                    Directory, InvalidEntry, _),
+                Error,
+                true),
+          assertion(Error = error(domain_error(accepted_proof, _), _)),
+          mnn_aioc_library:get_entry(
+              Directory, sample, accepted(StoredEntry)),
+          assertion(StoredEntry =@= Entry)
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(removes_existing_entry) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          mnn_aioc_library:store_entry(Directory, Entry),
+          mnn_aioc_library:remove_entry(Directory, sample, removed),
+          mnn_aioc_library:get_entry(
+              Directory, sample, rejected(missing_entry)),
+          mnn_aioc_library:list_entries(Directory, [])
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(reports_missing_entry_when_removing) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        mnn_aioc_library:remove_entry(
+            Directory, absent, rejected(missing_entry)),
+        delete_directory_and_contents(Directory)).
+
+test(rejects_invalid_name_when_removing) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        mnn_aioc_library:remove_entry(
+            Directory, '../outside', rejected(invalid_name('../outside'))),
+        delete_directory_and_contents(Directory)).
+
 test(rejects_path_traversal_name) :-
     sample_entry('../outside', Entry, _),
     catch(mnn_aioc_library:store_entry('/tmp', Entry), Error, true),
@@ -96,6 +172,13 @@ test(rechecks_proof_when_reading_entry) :-
               Directory, sample, rejected(proof_rejected(_)))
         ),
         delete_directory_and_contents(Directory)).
+
+updated_sample_entry(
+    mnn_library_entry(Name, Program, Original, Proof, _, _, _, _, _),
+    mnn_library_entry(Name, Program, Original, Proof,
+                      assessment(updated, recorded),
+                      cost(steps(2)), cycle(2), prolog,
+                      [test_result(focused_suite, passed)])).
 
 temporary_library_directory(Directory) :-
     tmp_file(mnn_aioc_library, Directory),
