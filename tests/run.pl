@@ -35,5 +35,8 @@ main :-
     load_files(AIOCAssessmentTests, [silent(true)]),
     directory_file_path(Directory, 'aioc_library_tests.pl', AIOCLibraryTests),
     load_files(AIOCLibraryTests, [silent(true)]),
+    directory_file_path(Directory, 'aioc_test_runner_tests.pl',
+                        AIOCTestRunnerTests),
+    load_files(AIOCTestRunnerTests, [silent(true)]),
     run_tests,
     halt.

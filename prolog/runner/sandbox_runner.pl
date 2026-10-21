@@ -19,7 +19,8 @@ run_program(File, Goal, Options, answers(Answers)) :-
     clause_terms(Program, Terms, Clauses),
     maplist(validate_clause_head, Clauses),
     with_mutex(mnn_sandbox_runner,
-               run_isolated(Clauses, Goal, MaxAnswers, TimeLimit, Answers)).
+               once(run_isolated(Clauses, Goal, MaxAnswers, TimeLimit,
+                                 Answers))).
 
 validate_options(Options, MaxAnswers, TimeLimit) :-
     (   is_list(Options)
@@ -64,6 +65,7 @@ validate_clause_head(Head) :-
 
 run_isolated(Clauses, Goal, MaxAnswers, TimeLimit, Answers) :-
     term_variables(Goal, Variables),
+    unload_previous_program,
     setup_call_cleanup(
         tmp_file_stream(text, File, Stream),
         ( write_terms(Stream,
@@ -86,6 +88,13 @@ run_isolated(Clauses, Goal, MaxAnswers, TimeLimit, Answers) :-
           catch(delete_file(SourceFile), _, true),
           catch(delete_file(File), _, true)
         )).
+
+unload_previous_program :-
+    findall(ExistingFile,
+            source_file(mnn_sandbox_runner_program:_, ExistingFile),
+            ExistingFiles0),
+    sort(ExistingFiles0, ExistingFiles),
+    maplist(unload_file, ExistingFiles).
 
 write_terms(_, []) :-
     !.

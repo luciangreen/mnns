@@ -147,7 +147,9 @@ feature and its focused test suite.
   rechecks proofs when entries are retrieved, updated, or included in a
   library-wide structural assessment; named entries can be removed, and
   `rank_library/2` ranks proof-checked entries by structural size. It does not
-  execute test suites or assess runtime or qualitative properties.
+  execute or authenticate stored test suites, or assess runtime or qualitative
+  properties. A separate bounded sandboxed verifier compares candidate and
+  original answers on supplied examples; these checks are not proofs.
   The bundle writer and verifier emit and re-check only proof-certified bundles. See
   [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).

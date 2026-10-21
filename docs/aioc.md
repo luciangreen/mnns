@@ -26,6 +26,42 @@ and the [library documentation](#proof-checked-library).
 The initial proof-checked bundle writer and verifier are described in
 [`bundle.md`](bundle.md).
 
+## Bounded example verification
+
+`mnn_aioc_test_runner:compare_programs/5` runs the same named query cases against
+candidate and original IR using the sandboxed runner:
+
+```prolog
+compare_programs(Candidate, Original,
+                 [test_case(lookup, lookup(Input, Output))],
+                 [max_answers(100), time_limit(5)],
+                 Results).
+```
+
+Each result is `test_result(Name, passed)`,
+`test_result(Name, failed(Reason))`, or
+`test_result(Name, inconclusive(Reason))`. It compares ordered answer lists,
+including duplicate answers and variable-sharing structure. Execution errors are
+reported as failures. If either program returns more than the configured answer
+limit, the case is inconclusive rather than treating two truncated lists as
+equivalent. Queries are sandbox-checked; source directives are not executed.
+Defaults are 100 answers and 5 seconds per program run.
+
+These checks are finite examples, not a proof of equivalence. They do not
+authenticate test results recorded in the AIOC library.
+
+Run its focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"
+```
+
+The test group is included in the full suite:
+
+```sh
+swipl -q -s tests/run.pl
+```
+
 ## Proof-gated structural comparison
 
 `mnn_aioc_assessment:assess_candidate/4` independently checks a supplied proof
