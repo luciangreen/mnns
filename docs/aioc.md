@@ -21,8 +21,8 @@ the four reported counts with weight one for each.
 
 This is a deterministic representation-size metric, not an inference-count,
 runtime, or memory estimate. It does not establish equivalence, assess candidate
-quality, simplify programs, or incorporate them into a library. These broader
-AIOC capabilities remain future work; see [`PROGRESS.md`](../PROGRESS.md).
+quality, or simplify programs. See the initial proof-checked comparison below
+and the [library documentation](#proof-checked-library).
 The initial proof-checked bundle writer and verifier are described in
 [`bundle.md`](bundle.md).
 
@@ -58,4 +58,38 @@ Run all test groups, including this one, with:
 
 ```sh
 swipl -q -s tests/run.pl
+```
+
+## Proof-checked library
+
+`mnn_aioc_library:store_entry/2` stores entries as data files in a library
+directory:
+
+```prolog
+store_entry(Directory,
+            mnn_library_entry(Name, Program, Original, Proof, Assessment,
+                              Cost, Cycle, SourceForm,
+                              [test_result(full_suite, passed)])).
+```
+
+The supplied proof must be accepted by the independent checker before writing.
+Assessment, cost, cycle, source form, and test-result metadata must be ground,
+and every recorded test result must be marked `passed`. Names contain only
+letters, digits, underscores, and hyphens. Existing names cannot be overwritten.
+These test results are caller-supplied metadata: the library does not execute
+programs or test suites and cannot authenticate that the recorded tests ran.
+
+`get_entry(Directory, Name, Result)` reads the entry as a Prolog term, never
+consults it, and checks its proof again. It returns `accepted(Entry)` when
+verified and `rejected(Reason)` for missing, malformed-shape, or unproved
+entries. `list_entries(Directory, Names)` returns sorted names for files with
+the library suffix; each should be fetched with `get_entry/3` before use.
+Malformed Prolog data may raise a read error. Updating/removing entries,
+automatic test execution, ranking, and library-wide assessment remain
+unimplemented.
+
+Run the focused library tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"
 ```

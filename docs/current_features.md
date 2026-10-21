@@ -28,6 +28,7 @@ sharing a change.
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 | AIOC structural size metric (initial) | `prolog/aioc/size.pl` | `swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"` | [AIOC size metric](aioc.md) |
 | AIOC proof-gated structural size comparison (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC assessment](aioc.md#proof-gated-structural-comparison) |
+| AIOC proof-checked algorithm library (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
 
 Run the complete suite, including every group above, with:
@@ -37,6 +38,34 @@ swipl -q -s tests/run.pl
 ```
 
 This is also the command used by [CI](../.github/workflows/prolog-tests.yml).
+
+## AIOC proof-checked library
+
+`mnn_aioc_library:store_entry/2` stores an
+`mnn_library_entry(Name, Program, Original, Proof, Assessment, Cost, Cycle,
+SourceForm, TestResults)` in a directory as a Prolog data term. The independent
+proof checker must accept the candidate and original before the library writes
+anything. Assessment, cost, cycle, source form, and test results must be ground;
+the test results must contain one or more `test_result(TestName, passed)` terms.
+Names are restricted to letters, digits, underscores, and hyphens, and existing
+entries are never overwritten.
+
+`get_entry/3` reads a named entry as data and independently checks its proof
+again, returning `accepted(Entry)` or a `rejected(Reason)` result.
+`list_entries/2` returns the sorted names of files with the library entry
+suffix; callers can use `get_entry/3` to verify each listed item. The library
+does not execute stored programs or test suites, nor does it verify caller-
+supplied test results; these are recorded metadata rather than proof of test
+execution. This initial slice has no update/removal interface or richer search
+and assessment workflow.
+
+Run its focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"
+```
+
+The library suite is also part of the full test command above.
 
 ## Program IR
 
@@ -464,6 +493,7 @@ swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop
 swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
 swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"
 swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"
+swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"
 ```
 
 The single canonical full-suite command is also used in CI. Individual test
