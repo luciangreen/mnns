@@ -6,6 +6,9 @@
 
 :- use_module(library(lists)).
 
+:- op(500, yfx, &).
+:- op(500, yfx, •).
+
 parse_program(File, Program) :-
     setup_call_cleanup(
         open(File, read, Stream),

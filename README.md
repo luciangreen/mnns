@@ -11,9 +11,10 @@ This repository implements only a subset of the full vision in
 analysis and a restricted pure `once/1` compilation slice, but not general
 Detlog transformations. S2A supports a conservative unique input-address
 projection, integer polynomial relations through degree three, and explicitly
-opted-in example tables; recursive generalization, Starlog, the end-user MNN
-compiler, general PLOp optimization, AIOC, neural-network, chatbot, and agent
-features remain incomplete. A proof-gated
+opted-in example tables; Starlog currently has an initial function-expression
+view, while recursive generalization, the end-user MNN compiler, general PLOp
+optimization, AIOC, neural-network, chatbot, and agent features remain incomplete.
+A proof-gated
 PLOp pipeline currently exposes a limited set of independently checked
 finite-generator conversions. See [`PROGRESS.md`](PROGRESS.md) for the
 stage-by-stage implementation status and remaining work.
@@ -136,6 +137,11 @@ feature and its focused test suite.
   candidates reproduce the examples but have no formal proof certificate;
   recursive generalization and broader arithmetic templates remain unsupported.
   See [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
+- **Starlog (initial readable view):** translates declared or module-qualified
+  function expressions to predicate calls, and supports string (`:`), list (`&`),
+  and atom (`•`) concatenation. Type coercion is opt-in; broader Starlog syntax
+  and reverse conversion of ambiguous ordinary predicate calls remain limited.
+  See [`docs/starlog.md`](docs/starlog.md).
 - **AIOC structural size metric (initial):** reports clause, goal, predicate, and
   term-node counts for an IR program, plus an equal-weight total. This measures
   representation size only; it does not estimate runtime or memory cost. An
@@ -171,7 +177,7 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-loop2, Detlog, PLOp, AlgebraPLOp, S2A, AIOC size-metric, and bundle tests. Focused
+loop2, Detlog, PLOp, AlgebraPLOp, S2A, Starlog, AIOC size-metric, and bundle tests. Focused
 commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 

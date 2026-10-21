@@ -209,9 +209,13 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   reported unless `allow_table(true)` explicitly permits a table fallback;
   unsupported cases can also use that opt-in table mode. Conflicting
   input/output examples and unsupported spec shapes are rejected. These
-  candidates reproduce examples but carry no formal proof; recursive list
-  generalization, broader arithmetic/list templates, formal example proofs, and
-  Starlog remain unimplemented.
+  candidates reproduce examples but carry no formal proof. Starlog now has an
+  initial two-way function-expression view over the shared IR: declared or
+  module-qualified functions lower to predicate calls with output arguments,
+  and `:`, `&`, and `•` represent string, list, and atom concatenation. Ground
+  type mismatches are rejected unless coercion is explicitly enabled. Recursive
+  list generalization, broader arithmetic/list templates, formal example proofs,
+  and the broader Starlog language remain unimplemented.
 - **Stage 9 — AIOC: initial structural-size metric, proof-gated structural
   candidate comparison and ranking, proof-checked bundles, and data-only library storage.** The metric
   reports clause, normalized-goal, predicate-record, and term-node counts with a
@@ -252,7 +256,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 5 | Detlog determinism analysis and transformations | In progress (conservative success-count analysis for selected normalized goals; includes ground-list `select/3` with partially instantiated value/remainder patterns, `member/2` over an unbound list for independent element patterns, `select/3` with three distinct unbound arguments, `length/2` over ground proper lists and variable lists with fixed nonnegative integer lengths or distinct unbound list/length variables, ground-list `nth0/3` and `nth1/3` with arbitrary element patterns including index/element sharing, selected `append/3` modes, and counts capped at two for exact or partially instantiated calls to ground-fact-only predicates when variables are not shared across arguments; restricted pure `once/1` compilation includes built-in `member/2`, `between/3`, `length/2`, `nth0/3`, and `nth1/3` when not shadowed by source definitions; a redundant cut is removed after a deterministic guard and a terminal cut after a supported guard in a singleton clause is lowered to committed if-then-else IR; general mode inference, other bound/repeated-argument calls, choicepoint splicing, choice packets, operational `if_commit/3`, red-cut proofs, and proof-checked cut rewriting remain) |
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
-| 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; no formal proof; recursive/list generalization, broader arithmetic templates, and Starlog remain unimplemented) |
+| 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; initial declared/module-qualified function expressions and string/list/atom concatenation view; no formal proof; recursive/list generalization, broader arithmetic templates, and broader Starlog syntax remain unimplemented) |
 | 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric, proof-gated comparison and ranking of supplied candidates and stored library entries, proof-checked bundle writer/verifier, proof-checked data-only library storage with revalidated entry replacement and named removal, bounded sandboxed candidate-vs-original example verification, and proof-gated library-wide structural assessment; incorporation, semantic simplification, automated library test execution/authentication, broader assessment, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
@@ -277,3 +281,5 @@ The proof-checked AIOC library tests can be run with
 `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"`.
 The bounded AIOC example-verification tests can be run with
 `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`.
+The Starlog tests can be run with
+`swipl -q -g "load_files('tests/starlog_tests.pl'), run_tests(mnn_starlog), halt"`.
