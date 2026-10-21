@@ -51,11 +51,11 @@ covered by the proof checker's supported rules.
 proof-checked structural size:
 
 ```prolog
-rank_candidates(Original,
-                [candidate(Name, Candidate, Proof), ...],
+rank_candidates(Original, Candidates,
                 candidate_ranking(Ranked, Rejected)).
 ```
 
+`Candidates` is a list of `candidate(Name, CandidateProgram, Proof)` terms.
 Every candidate is independently checked against `Original`. Accepted
 candidates are sorted by ascending weighted structural size, then by candidate
 name; equal names and sizes retain their input order. Each ranked entry contains

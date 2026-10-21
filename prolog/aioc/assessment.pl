@@ -19,11 +19,10 @@ rank_candidates(Original, Candidates,
     pairs_values(Sorted, Ranked).
 
 assess_rank_candidate(Original, candidate(Name, Candidate, Proof), Result) :-
-    (   atom(Name)
-    ->  assess_candidate(Candidate, Original, Proof, Assessment),
-        rank_candidate_result(Name, Candidate, Assessment, Result)
-    ;   throw(error(domain_error(candidate_name, Name), _))
-    ).
+    !,
+    must_be(atom, Name),
+    assess_candidate(Candidate, Original, Proof, Assessment),
+    rank_candidate_result(Name, Candidate, Assessment, Result).
 assess_rank_candidate(_, Candidate, _) :-
     throw(error(domain_error(candidate, Candidate), _)).
 

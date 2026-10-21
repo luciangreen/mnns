@@ -48,8 +48,8 @@ test(compares_sizes_for_proof_accepted_rewrite) :-
 test(ranks_only_checked_candidates_by_size_and_name) :-
     findall_program(Original),
     identity_proof(IdentityProof),
-    mnn_plop:optimize_program(
-        Original, Optimized, plop_report(_, OptimizedProof, accepted)),
+    once(mnn_plop:optimize_program(
+        Original, Optimized, plop_report(_, OptimizedProof, accepted))),
     mnn_aioc_assessment:rank_candidates(
         Original,
         [candidate(zeta, Original, IdentityProof),
@@ -64,7 +64,7 @@ test(ranks_only_checked_candidates_by_size_and_name) :-
                               rejected,
                               rejected(invalid_or_unsupported_proof))]),
     maplist(ranked_candidate_size, Ranked, Sizes),
-    sort(Sizes, SortedSizes),
+    msort(Sizes, SortedSizes),
     assertion(Sizes == SortedSizes),
     findall(Name,
             member(ranked_candidate(Name, Original, _), Ranked),
