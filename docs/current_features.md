@@ -31,6 +31,7 @@ sharing a change.
 | AIOC proof-gated structural candidate ranking (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate ranking](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-checked algorithm library and structural ranking (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
+| Bounded sandboxed candidate-vs-original example verification | `prolog/aioc/test_runner.pl` | `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"` | [AIOC example verification](aioc.md#bounded-example-verification) |
 
 Run the complete suite, including every group above, with:
 
