@@ -236,12 +236,10 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   entry. `assess_library/2` rechecks each stored proof and reports sorted,
   proof-gated structural comparisons. `rank_library/2` rechecks stored proofs
   and ranks accepted entries by structural size and name, reporting rejected
-  entries separately. The library treats programs as data and does not run or
-  authenticate test suites. A separate bounded sandboxed example verifier now
-  runs the same query cases against candidate and original programs, compares
-  ordered answer sequences, and reports answer-limit cases as inconclusive; these
-  example checks are not proofs and are not stored as authenticated test claims.
-  Automated library test execution,
+  entries separately. `run_entry_tests/5` rechecks an entry's proof before
+  comparing candidate and original on caller-supplied queries in the bounded
+  sandbox; reports are returned but do not alter the entry or authenticate
+  stored test metadata. Persistent stored suites and authenticated test records,
   incorporation front ends, semantic simplification, broader assessment, REPL
   interfaces, and the rest of the AIOC controller remain.
 
@@ -257,7 +255,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; initial declared/module-qualified function expressions and string/list/atom concatenation view; no formal proof; recursive/list generalization, broader arithmetic templates, and broader Starlog syntax remain unimplemented) |
-| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric, proof-gated comparison and ranking of supplied candidates and stored library entries, proof-checked bundle writer/verifier, proof-checked data-only library storage with revalidated entry replacement and named removal, bounded sandboxed candidate-vs-original example verification, and proof-gated library-wide structural assessment; incorporation, semantic simplification, automated library test execution/authentication, broader assessment, and REPL remain) |
+| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric, proof-gated comparison and ranking of supplied candidates and stored library entries, proof-checked bundle writer/verifier, proof-checked data-only library storage with revalidated entry replacement and named removal, bounded sandboxed candidate-vs-original example verification and proof-rechecked library-entry tests; incorporation, semantic simplification, persistent suites/authenticated test records, broader assessment, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |

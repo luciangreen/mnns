@@ -131,15 +131,39 @@ The supplied proof must be accepted by the independent checker before writing.
 Assessment, cost, cycle, source form, and test-result metadata must be ground,
 and every recorded test result must be marked `passed`. Names contain only
 letters, digits, underscores, and hyphens. Existing names cannot be overwritten.
-These test results are caller-supplied metadata: the library does not execute
-programs or test suites and cannot authenticate that the recorded tests ran.
+These test results are caller-supplied metadata: storage and retrieval do not
+authenticate that the recorded tests ran.
+
+`run_entry_tests(Directory, Name, TestCases, Options, Result)` first reads the
+named entry as data and rechecks its proof. Only an accepted entry is passed to
+the bounded sandboxed example verifier, which runs each supplied query against
+the candidate and original and compares ordered answers. For example:
+
+```prolog
+mnn_aioc_library:run_entry_tests(
+    '/path/to/library', sort_numbers,
+    [test_case(small, sort([3,1], [1,3])),
+     test_case(empty, sort([], []))],
+    [max_answers(100), time_limit(5)],
+    Result).
+```
+
+The result is `entry_test_report(Name, Results)` with each case reported as
+`test_result(Name, passed)`, `test_result(Name, failed(Reason))`, or
+`test_result(Name, inconclusive(Reason))`. Missing, invalid, or unproved entries
+return `rejected(Reason)` without running queries. The default bounds are 100
+answers and 5 seconds per program run. This operation does not modify the entry
+or authenticate its stored test-result metadata; its finite example checks are
+not proofs of equivalence.
 
 `get_entry(Directory, Name, Result)` reads the entry as a Prolog term, never
 consults it, and checks its proof again. It returns `accepted(Entry)` when
 verified and `rejected(Reason)` for missing, malformed-shape, or unproved
 entries. `list_entries(Directory, Names)` returns sorted names for files with
 the library suffix; each should be fetched with `get_entry/3` before use.
-Malformed Prolog data may raise a read error. Automatic test execution is not
+Malformed Prolog data may raise a read error. `run_entry_tests/5` provides
+bounded sandboxed regression checks against the stored candidate and original,
+but stored test suites and authenticated persistent test records are not
 implemented.
 
 `update_entry(Directory, Entry, Result)` accepts a replacement only after
