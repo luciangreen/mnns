@@ -141,7 +141,9 @@ feature and its focused test suite.
   representation size only; it does not estimate runtime or memory cost. An
   initial proof-gated comparison reports candidate-versus-original structural
   change only after the independent checker accepts the supplied proof. The
-  bundle writer and verifier emit and re-check only proof-certified bundles. See
+  proof-checked library records candidate metadata and test-result claims, then
+  rechecks proofs when entries are retrieved; it does not execute test suites.
+  The bundle writer and verifier emit and re-check only proof-certified bundles. See
   [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).
 

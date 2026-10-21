@@ -33,5 +33,7 @@ main :-
     directory_file_path(Directory, 'aioc_assessment_tests.pl',
                         AIOCAssessmentTests),
     load_files(AIOCAssessmentTests, [silent(true)]),
+    directory_file_path(Directory, 'aioc_library_tests.pl', AIOCLibraryTests),
+    load_files(AIOCLibraryTests, [silent(true)]),
     run_tests,
     halt.
