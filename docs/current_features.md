@@ -27,6 +27,7 @@ sharing a change.
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 | AIOC structural size metric (initial) | `prolog/aioc/size.pl` | `swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"` | [AIOC size metric](aioc.md) |
+| Starlog readable function view (initial) | `prolog/starlog/starlog.pl` | `swipl -q -g "load_files('tests/starlog_tests.pl'), run_tests(mnn_starlog), halt"` | [Starlog](starlog.md) |
 | AIOC proof-gated structural size comparison (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC assessment](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-gated structural candidate ranking (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate ranking](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-checked algorithm library and structural ranking (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
@@ -358,6 +359,23 @@ Run its focused tests from the repository root:
 
 ```sh
 swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
+```
+
+## Starlog readable view
+
+`mnn_starlog:starlog_to_ir/2` and `ir_to_starlog/2` provide an initial two-way
+function-expression view over `mnn_program/5` IR. A declared
+`starlog_function(Name/Arity)` or module-qualified call is written as
+`Output is Function(Inputs)` and lowered to a predicate call with the output
+argument last. The supported `:`, `&`, and `•` operators represent string
+concatenation, list append, and atom concatenation. Known ground string/atom type
+mismatches are rejected unless `starlog_to_ir/3` is called with
+`[coerce(true)]`; see [`starlog.md`](starlog.md) for behavior and limitations.
+
+Run the focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/starlog_tests.pl'), run_tests(mnn_starlog), halt"
 ```
 
 ## loop2 conversion
