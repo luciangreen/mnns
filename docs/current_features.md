@@ -28,6 +28,7 @@ sharing a change.
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 | AIOC structural size metric (initial) | `prolog/aioc/size.pl` | `swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"` | [AIOC size metric](aioc.md) |
 | AIOC proof-gated structural size comparison (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC assessment](aioc.md#proof-gated-structural-comparison) |
+| Proof-gated cost/size candidate frontier (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate frontier](aioc.md#proof-gated-costsize-candidate-frontier) |
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
 
 Run the complete suite, including every group above, with:
@@ -463,6 +464,7 @@ swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"
 swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
 swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"
+swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"
 swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"
 ```
 
@@ -498,9 +500,11 @@ The current work is an initial subset, not a completed version 1 suite:
   generalization, broader arithmetic/list templates, formal example-reproduction
   proofs, and Starlog remain unimplemented.
 - **Stage 9 is in progress:** the structural-size metric, proof-gated structural
-  candidate-size comparison, and proof-checked bundle writer/verifier are
-  implemented. Incorporation front ends, semantic simplification, broader
-  candidate assessment, the library, and REPL commands remain.
+  candidate-size comparison and cost/size Pareto frontier, and proof-checked
+  bundle writer/verifier are implemented. The frontier uses caller-supplied
+  costs and does not include qualitative scores. Incorporation front ends,
+  semantic simplification, broader candidate assessment, the library, and REPL
+  commands remain.
 - **Stages 10–14 are not started:** quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 
