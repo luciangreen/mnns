@@ -65,22 +65,25 @@ validate_clause_head(Head) :-
 
 run_isolated(Clauses, Goal, MaxAnswers, TimeLimit, Answers) :-
     term_variables(Goal, Variables),
-    unload_previous_program,
     setup_call_cleanup(
         tmp_file_stream(text, File, Stream),
-        ( write_terms(Stream,
-                      [(:- module(mnn_sandbox_runner_program, []))|Clauses]),
+        ( file_name_extension(File, pl, SourceFile),
+          file_base_name(SourceFile, SourceFileName),
+          file_name_extension(SourceBase, pl, SourceFileName),
+          atom_concat(mnn_sandbox_runner_program_, SourceBase, ProgramModule),
+          write_terms(
+              Stream,
+              [(:- module(ProgramModule, []))|Clauses]),
           close(Stream),
-          file_name_extension(File, pl, SourceFile),
           rename_file(File, SourceFile),
           load_files(SourceFile,
-                     [module(mnn_sandbox_runner_program), silent(true)]),
+                     [module(ProgramModule), silent(true)]),
           setup_call_cleanup(
-              sandbox:safe_goal(mnn_sandbox_runner_program:Goal),
+              sandbox:safe_goal(ProgramModule:Goal),
               call_with_time_limit(
                   TimeLimit,
                   findnsols(MaxAnswers, Variables,
-                            mnn_sandbox_runner_program:Goal, Answers)),
+                            ProgramModule:Goal, Answers)),
               unload_file(SourceFile))
         ),
         ( catch(close(Stream), _, true),
@@ -88,13 +91,6 @@ run_isolated(Clauses, Goal, MaxAnswers, TimeLimit, Answers) :-
           catch(delete_file(SourceFile), _, true),
           catch(delete_file(File), _, true)
         )).
-
-unload_previous_program :-
-    findall(ExistingFile,
-            source_file(mnn_sandbox_runner_program:_, ExistingFile),
-            ExistingFiles0),
-    sort(ExistingFiles0, ExistingFiles),
-    maplist(unload_file, ExistingFiles).
 
 write_terms(_, []) :-
     !.
