@@ -34,29 +34,39 @@ clause_size(mnn_clause(_, Head, Body, _),
     term_node_count(Body, BodyTermNodes),
     TermNodeCount is HeadTermNodes + BodyTermNodes.
 
-goal_node_count(conj(Left, Right), Count) :-
+goal_node_count(Goal, Count) :-
+    nonvar(Goal),
+    Goal = conj(Left, Right),
     !,
     goal_node_count(Left, LeftCount),
     goal_node_count(Right, RightCount),
     Count is LeftCount + RightCount + 1.
-goal_node_count(disj(Left, Right), Count) :-
+goal_node_count(Goal, Count) :-
+    nonvar(Goal),
+    Goal = disj(Left, Right),
     !,
     goal_node_count(Left, LeftCount),
     goal_node_count(Right, RightCount),
     Count is LeftCount + RightCount + 1.
-goal_node_count(ite(Condition, Then, Else), Count) :-
+goal_node_count(Goal, Count) :-
+    nonvar(Goal),
+    Goal = ite(Condition, Then, Else),
     !,
     goal_node_count(Condition, ConditionCount),
     goal_node_count(Then, ThenCount),
     goal_node_count(Else, ElseCount),
     Count is ConditionCount + ThenCount + ElseCount + 1.
-goal_node_count(not(Goal), Count) :-
+goal_node_count(Goal, Count) :-
+    nonvar(Goal),
+    Goal = not(InnerGoal),
     !,
-    goal_node_count(Goal, InnerCount),
+    goal_node_count(InnerGoal, InnerCount),
     Count is InnerCount + 1.
-goal_node_count(once(Goal), Count) :-
+goal_node_count(Goal, Count) :-
+    nonvar(Goal),
+    Goal = once(InnerGoal),
     !,
-    goal_node_count(Goal, InnerCount),
+    goal_node_count(InnerGoal, InnerCount),
     Count is InnerCount + 1.
 goal_node_count(_, 1).
 

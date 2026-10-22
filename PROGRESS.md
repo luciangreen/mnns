@@ -255,7 +255,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; initial declared/module-qualified function expressions and string/list/atom concatenation view; no formal proof; recursive/list generalization, broader arithmetic templates, and broader Starlog syntax remain unimplemented) |
-| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric, proof-gated comparison and ranking of supplied candidates and stored library entries, proof-checked bundle writer/verifier, proof-checked data-only library storage with revalidated entry replacement and named removal, bounded sandboxed candidate-vs-original example verification and proof-rechecked library-entry tests; incorporation, semantic simplification, persistent suites/authenticated test records, broader assessment, and REPL remain) |
+| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (initial deterministic IR structural-size metric; proof-checked removal of explicit `true` conjuncts, including nested normalized control goals; proof-gated comparison and ranking of supplied candidates and stored library entries; proof-checked bundle writer/verifier; proof-checked data-only library storage with revalidated entry replacement and named removal; bounded sandboxed candidate-vs-original example verification and proof-rechecked library-entry tests. Decision-tree/CFG incorporation, general semantic simplification, persistent suites/authenticated test records, broader assessment, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |
@@ -279,5 +279,7 @@ The proof-checked AIOC library tests can be run with
 `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"`.
 The bounded AIOC example-verification tests can be run with
 `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`.
+The proof-checked AIOC simplification tests can be run with
+`swipl -q -g "load_files('tests/aioc_simplify_tests.pl'), run_tests(mnn_aioc_simplify), halt"`.
 The Starlog tests can be run with
 `swipl -q -g "load_files('tests/starlog_tests.pl'), run_tests(mnn_starlog), halt"`.

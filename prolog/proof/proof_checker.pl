@@ -21,6 +21,8 @@ check_supported_proof(Program, Original, Proof, Result) :-
         )
     ;   valid_goal_reordering_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_true_conjunct_proof(Program, Original, Proof)
+    ->  Result = accepted
     ;   valid_definition_introduction_proof(Program, Original, Proof)
     ->  Result = accepted
     ;   valid_definition_rewrite_proof(Program, Original, Proof)
@@ -57,6 +59,19 @@ valid_goal_reordering_proof(Program, Original, Proof) :-
     reorder_program(OriginalCopy, Reordered, Count),
     Count =:= 1,
     Program =@= Reordered.
+
+valid_true_conjunct_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, remove_true_conjunct, [],
+                              equivalent(domain(Domain), modes(Modes)))]),
+    integer(Id),
+    Id > 0,
+    ground(Domain),
+    ground(Modes),
+    valid_rewrite_program(Original),
+    copy_term(Original, OriginalCopy),
+    remove_true_conjunct_program(OriginalCopy, Rewritten),
+    Program =@= Rewritten.
 
 valid_definition_introduction_proof(Program, Original, Proof) :-
     ground(Proof),
@@ -194,6 +209,10 @@ apply_proof_rule(reorder_goals, Program, Rewritten) :-
     copy_term(Program, ProgramCopy),
     reorder_program(ProgramCopy, Rewritten, Count),
     Count =:= 1.
+apply_proof_rule(remove_true_conjunct, Program, Rewritten) :-
+    valid_rewrite_program(Program),
+    copy_term(Program, ProgramCopy),
+    remove_true_conjunct_program(ProgramCopy, Rewritten).
 apply_proof_rule(introduce_definition, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
@@ -207,6 +226,81 @@ apply_proof_rule(findall_to_fold, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
     findall_to_fold_program(ProgramCopy, Rewritten).
+
+remove_true_conjunct_program(
+    mnn_program(Name, Meta, Predicates, Proof, Trace),
+    mnn_program(Name, Meta, RewrittenPredicates, Proof, Trace)) :-
+    is_list(Predicates),
+    \+ defines_true_predicate(Predicates),
+    remove_true_conjunct_predicates(Predicates, RewrittenPredicates).
+
+defines_true_predicate(Predicates) :-
+    member(Predicate, Predicates),
+    nonvar(Predicate),
+    functor(Predicate, mnn_pred, 5),
+    arg(1, Predicate, Key),
+    Key == true/0.
+
+remove_true_conjunct_predicates(
+    [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
+    [mnn_pred(Key, Modes, Domains, RewrittenClauses, Status)|Predicates]) :-
+    remove_true_conjunct_clauses(Clauses, RewrittenClauses),
+    !.
+remove_true_conjunct_predicates([Predicate|Predicates],
+                                [Predicate|RewrittenPredicates]) :-
+    remove_true_conjunct_predicates(Predicates, RewrittenPredicates).
+
+remove_true_conjunct_clauses(
+    [mnn_clause(Id, Head, Body, Source)|Clauses],
+    [mnn_clause(Id, Head, RewrittenBody, Source)|Clauses]) :-
+    remove_true_conjunct_goal(Body, RewrittenBody),
+    !.
+remove_true_conjunct_clauses([Clause|Clauses], [Clause|RewrittenClauses]) :-
+    remove_true_conjunct_clauses(Clauses, RewrittenClauses).
+
+remove_true_conjunct_goal(Goal, Rewritten) :-
+    nonvar(Goal),
+    remove_true_conjunct_nonvar_goal(Goal, Rewritten).
+
+remove_true_conjunct_nonvar_goal(conj(Left, Right), Right) :-
+    Left == true,
+    !.
+remove_true_conjunct_nonvar_goal(conj(Left, Right), Left) :-
+    Right == true,
+    !.
+remove_true_conjunct_nonvar_goal(conj(Left, Right),
+                                 conj(RewrittenLeft, Right)) :-
+    remove_true_conjunct_goal(Left, RewrittenLeft),
+    !.
+remove_true_conjunct_nonvar_goal(conj(Left, Right),
+                                 conj(Left, RewrittenRight)) :-
+    remove_true_conjunct_goal(Right, RewrittenRight),
+    !.
+remove_true_conjunct_nonvar_goal(disj(Left, Right),
+                                 disj(RewrittenLeft, Right)) :-
+    remove_true_conjunct_goal(Left, RewrittenLeft),
+    !.
+remove_true_conjunct_nonvar_goal(disj(Left, Right),
+                                 disj(Left, RewrittenRight)) :-
+    remove_true_conjunct_goal(Right, RewrittenRight),
+    !.
+remove_true_conjunct_nonvar_goal(ite(Condition, Then, Else),
+                                 ite(RewrittenCondition, Then, Else)) :-
+    remove_true_conjunct_goal(Condition, RewrittenCondition),
+    !.
+remove_true_conjunct_nonvar_goal(ite(Condition, Then, Else),
+                                 ite(Condition, RewrittenThen, Else)) :-
+    remove_true_conjunct_goal(Then, RewrittenThen),
+    !.
+remove_true_conjunct_nonvar_goal(ite(Condition, Then, Else),
+                                 ite(Condition, Then, RewrittenElse)) :-
+    remove_true_conjunct_goal(Else, RewrittenElse),
+    !.
+remove_true_conjunct_nonvar_goal(not(Goal), not(RewrittenGoal)) :-
+    remove_true_conjunct_goal(Goal, RewrittenGoal),
+    !.
+remove_true_conjunct_nonvar_goal(once(Goal), once(RewrittenGoal)) :-
+    remove_true_conjunct_goal(Goal, RewrittenGoal).
 
 findall_to_fold_program(
     mnn_program(Name, meta(Source, Events), Predicates, Proof, Trace),
