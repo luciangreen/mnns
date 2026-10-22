@@ -373,6 +373,113 @@ test(rechecks_proof_when_reading_entry) :-
         ),
         delete_directory_and_contents(Directory)).
 
+test(stores_and_reads_named_test_suites_as_data) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( TestCases = [test_case(repeated_variable, answer(Value, Value))],
+          mnn_aioc_library:store_test_suite(Directory, zeta, TestCases),
+          mnn_aioc_library:store_test_suite(
+              Directory, alpha, [test_case(identity, answer(value, value))]),
+          mnn_aioc_library:get_test_suite(
+              Directory, zeta, accepted(test_suite(zeta, StoredCases))),
+          assertion(StoredCases =@= TestCases),
+          mnn_aioc_library:list_test_suites(Directory, [alpha, zeta])
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(rejects_invalid_or_empty_test_suites) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( catch(mnn_aioc_library:store_test_suite(Directory, '../outside', []),
+                Error,
+                true),
+          assertion(Error = error(domain_error(test_suite, _), _)),
+          catch(mnn_aioc_library:store_test_suite(
+                    Directory, invalid, [not_a_test_case]),
+                InvalidCaseError,
+                true),
+          assertion(InvalidCaseError = error(domain_error(test_suite, _), _)),
+          mnn_aioc_library:list_test_suites(Directory, [])
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(reports_missing_and_invalid_test_suites) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( mnn_aioc_library:get_test_suite(
+              Directory, absent, rejected(missing_suite)),
+          mnn_aioc_library:get_test_suite(
+              Directory, '../outside', rejected(invalid_name('../outside'))),
+          mnn_aioc_library:remove_test_suite(
+              Directory, absent, rejected(missing_suite)),
+          mnn_aioc_library:list_test_suites(Directory, [])
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(removes_a_named_test_suite) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( mnn_aioc_library:store_test_suite(
+              Directory, focused, [test_case(identity, answer(value, value))]),
+          mnn_aioc_library:remove_test_suite(Directory, focused, removed),
+          mnn_aioc_library:get_test_suite(
+              Directory, focused, rejected(missing_suite)),
+          mnn_aioc_library:list_test_suites(Directory, [])
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(rejects_overwriting_a_named_test_suite) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( TestCases = [test_case(original, answer(value, value))],
+          mnn_aioc_library:store_test_suite(Directory, focused, TestCases),
+          catch(mnn_aioc_library:store_test_suite(
+                    Directory, focused,
+                    [test_case(replacement, fail)]),
+                Error,
+                true),
+          assertion(nonvar(Error)),
+          mnn_aioc_library:get_test_suite(
+              Directory, focused, accepted(test_suite(focused, StoredCases))),
+          assertion(StoredCases =@= TestCases)
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(runs_and_records_a_persisted_test_suite) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          mnn_aioc_library:store_entry(Directory, Entry),
+          mnn_aioc_library:store_test_suite(
+              Directory, focused, [test_case(identity, answer(value, value))]),
+          once(mnn_aioc_library:run_entry_test_suite(
+              Directory, sample, focused, [],
+              entry_test_report(sample, [test_result(identity, passed)]))),
+          once(mnn_aioc_library:run_and_record_entry_test_suite(
+              Directory, sample, focused, [],
+              entry_test_report(sample, [test_result(identity, passed)], recorded))),
+          once(mnn_aioc_library:get_entry(
+              Directory, sample,
+              accepted(mnn_library_entry(
+                           sample, _, _, _, _, _, _, _,
+                           [test_result(identity, passed)]))))
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(rejects_running_a_missing_test_suite) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        mnn_aioc_library:run_entry_test_suite(
+            Directory, sample, absent, [], rejected(missing_suite)),
+        delete_directory_and_contents(Directory)).
+
 assert_unchanged_assessment(
     assessment(
         accepted,

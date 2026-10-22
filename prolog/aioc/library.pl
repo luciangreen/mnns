@@ -3,8 +3,14 @@
             update_entry/3,
             remove_entry/3,
             get_entry/3,
+            store_test_suite/3,
+            get_test_suite/3,
+            list_test_suites/2,
+            remove_test_suite/3,
             run_entry_tests/5,
             run_and_record_entry_tests/5,
+            run_entry_test_suite/5,
+            run_and_record_entry_test_suite/5,
             list_entries/2,
             assess_library/2,
             rank_library/2
@@ -63,14 +69,97 @@ get_entry(Directory, Name, Result) :-
     ;   Result = rejected(invalid_name(Name))
     ).
 
+store_test_suite(Directory, Name, TestCases) :-
+    must_be(atom, Directory),
+    (   valid_test_suite(Name, TestCases)
+    ->  true
+    ;   throw(error(domain_error(test_suite, test_suite(Name, TestCases)), _))
+    ),
+    make_directory_path(Directory),
+    test_suite_file(Directory, Name, File),
+    (   exists_file(File)
+    ->  throw(error(permission_error(overwrite, file, File), _))
+    ;   write_test_suite_file(File, test_suite(Name, TestCases))
+    ).
+
+get_test_suite(Directory, Name, Result) :-
+    must_be(atom, Directory),
+    (   valid_name(Name)
+    ->  test_suite_file(Directory, Name, File),
+        (   exists_file(File)
+        ->  read_test_suite_file(File, Name, Result)
+        ;   Result = rejected(missing_suite)
+        )
+    ;   Result = rejected(invalid_name(Name))
+    ).
+
+list_test_suites(Directory, Names) :-
+    must_be(atom, Directory),
+    (   exists_directory(Directory)
+    ->  directory_files(Directory, Files),
+        findall(Name,
+                ( member(File, Files),
+                  atom_concat(Name, '.suite.pl', File),
+                  valid_name(Name)
+                ),
+                FoundNames),
+        sort(FoundNames, Names)
+    ;   Names = []
+    ).
+
+remove_test_suite(Directory, Name, Result) :-
+    must_be(atom, Directory),
+    (   valid_name(Name)
+    ->  test_suite_file(Directory, Name, File),
+        (   exists_file(File)
+        ->  delete_file(File),
+            Result = removed
+        ;   Result = rejected(missing_suite)
+        )
+    ;   Result = rejected(invalid_name(Name))
+    ).
+
 run_entry_tests(Directory, Name, TestCases, Options, Result) :-
     get_entry(Directory, Name, EntryResult),
     run_entry_tests_result(EntryResult, Name, TestCases, Options, Result).
+
+run_entry_test_suite(Directory, EntryName, SuiteName, Options, Result) :-
+    get_test_suite(Directory, SuiteName, SuiteResult),
+    run_entry_test_suite_result(
+        SuiteResult, Directory, EntryName, Options, Result).
 
 run_and_record_entry_tests(Directory, Name, TestCases, Options, Result) :-
     get_entry(Directory, Name, EntryResult),
     run_and_record_entry_tests_result(
         EntryResult, Directory, Name, TestCases, Options, Result).
+
+run_and_record_entry_test_suite(
+        Directory, EntryName, SuiteName, Options, Result) :-
+    get_test_suite(Directory, SuiteName, SuiteResult),
+    run_and_record_entry_test_suite_result(
+        SuiteResult, Directory, EntryName, Options, Result).
+
+run_entry_test_suite_result(
+        accepted(test_suite(_, TestCases)), Directory, EntryName, Options,
+        Result) :-
+    run_entry_tests(Directory, EntryName, TestCases, Options, Result).
+run_entry_test_suite_result(
+        rejected(Reason), _, EntryName, _, rejected(Reason)) :-
+    valid_name(EntryName),
+    !.
+run_entry_test_suite_result(_, _, EntryName, _, rejected(invalid_name(EntryName))).
+
+run_and_record_entry_test_suite_result(
+        accepted(test_suite(_, TestCases)), Directory, EntryName, Options,
+        Result) :-
+    run_and_record_entry_tests(
+        Directory, EntryName, TestCases, Options, Result).
+run_and_record_entry_test_suite_result(
+        rejected(Reason), _, EntryName, _, rejected(Reason)) :-
+    valid_name(EntryName),
+    !.
+run_and_record_entry_test_suite_result(
+        _, _, EntryName, _, rejected(invalid_name(EntryName))).
 
 run_entry_tests_result(
         accepted(mnn_library_entry(Name, Candidate, Original, _, _, _, _, _, _)),
@@ -204,6 +293,16 @@ valid_test_results([test_result(Name, passed)|Results]) :-
 passed_test_result(test_result(Name, passed)) :-
     atom(Name).
 
+valid_test_suite(Name, TestCases) :-
+    valid_name(Name),
+    is_list(TestCases),
+    TestCases \= [],
+    maplist(valid_test_case, TestCases).
+
+valid_test_case(test_case(Name, Goal)) :-
+    atom(Name),
+    callable(Goal).
+
 valid_name(Name) :-
     atom(Name),
     atom_chars(Name, [First|Rest]),
@@ -219,6 +318,20 @@ name_character('-').
 entry_file(Directory, Name, File) :-
     atom_concat(Name, '.entry.pl', FileName),
     directory_file_path(Directory, FileName, File).
+
+test_suite_file(Directory, Name, File) :-
+    atom_concat(Name, '.suite.pl', FileName),
+    directory_file_path(Directory, FileName, File).
+
+write_test_suite_file(File, Suite) :-
+    setup_call_cleanup(
+        open(File, write, Stream, [encoding(utf8), if_exists(error)]),
+        write_test_suite(Stream, Suite),
+        close(Stream)).
+
+write_test_suite(Stream, Suite) :-
+    write_term(Stream, Suite, [quoted(true), numbervars(true)]),
+    write(Stream, '.\n').
 
 write_entry_file(File, Entry) :-
     setup_call_cleanup(
@@ -262,6 +375,21 @@ read_entry_file(File, Name, Result) :-
         )
     ;   Result = rejected(invalid_entry)
     ).
+
+read_test_suite_file(File, Name, Result) :-
+    setup_call_cleanup(
+        open(File, read, Stream, [encoding(utf8)]),
+        read_single_entry(Stream, StoredSuite),
+        close(Stream)),
+    (   valid_stored_test_suite(StoredSuite),
+        StoredSuite = test_suite(StoredName, TestCases),
+        StoredName == Name
+    ->  Result = accepted(test_suite(StoredName, TestCases))
+    ;   Result = rejected(invalid_suite)
+    ).
+
+valid_stored_test_suite(test_suite(Name, TestCases)) :-
+    valid_test_suite(Name, TestCases).
 
 read_single_entry(Stream, Entry) :-
     read_term(Stream, Entry, [syntax_errors(error), module(mnn_aioc_library)]),

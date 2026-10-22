@@ -32,6 +32,7 @@ sharing a change.
 | AIOC proof-gated structural candidate ranking (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate ranking](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-checked removal of explicit `true` conjuncts and `fail` disjuncts (initial) | `prolog/aioc/simplify.pl` | `swipl -q -g "load_files('tests/aioc_simplify_tests.pl'), run_tests(mnn_aioc_simplify), halt"` | [AIOC simplification](aioc.md#proof-checked-simplification) |
 | AIOC proof-checked algorithm library, structural ranking, and run-and-record regression checks (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
+| Persistent named AIOC test suites and proof-rechecked suite execution | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC test suites](aioc.md#persistent-test-suites) |
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
 | Bounded sandboxed candidate-vs-original example verification and verified library-entry tests | `prolog/aioc/test_runner.pl`, `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`; `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC example verification](aioc.md#bounded-example-verification); [proof-checked library](aioc.md#proof-checked-library) |
 
@@ -70,6 +71,23 @@ candidate and original using the bounded sandboxed verifier. It returns
 passed, failed, or inconclusive; missing or unproved entries return
 `rejected(Reason)` without execution. The call does not change the stored entry,
 and stored test-result claims remain caller-supplied metadata.
+
+## Persistent test suites
+
+`store_test_suite(Directory, SuiteName, TestCases)` saves a nonempty named
+`[test_case(Name, Goal), ...]` suite as a Prolog data term. Suite names use the
+library's letters, digits, underscore, and hyphen convention. `get_test_suite/3`
+reads and validates the data without consulting it, `list_test_suites/2` returns
+sorted names, and `remove_test_suite/3` deletes a named suite. Suite files share
+the library directory but use the `.suite.pl` suffix, separate from `.entry.pl`
+files.
+
+`run_entry_test_suite(Directory, EntryName, SuiteName, Options, Result)` and
+`run_and_record_entry_test_suite/5` load a stored suite and run it against a
+proof-rechecked library entry through the existing bounded sandbox. The latter
+records results only when every case passes. Stored suites and result terms are
+editable data, not authenticated records; execution checks are examples, not
+proofs of equivalence. Malformed Prolog data may raise a read error.
 
 `run_and_record_entry_tests/5` performs the same proof-rechecked, bounded
 comparison and replaces the entry's test-result terms only when the nonempty
@@ -593,9 +611,10 @@ The current work is an initial subset, not a completed version 1 suite:
   proof-accepted candidates, proof-checked bundle writer/verifier, and initial
   proof-checked data-only library are implemented. The library records caller-
   supplied passed-test metadata; `run_entry_tests/5` runs bounded regression
-  checks only after rechecking a stored proof, without persisting or
-  authenticating the results. Incorporation front ends, semantic simplification,
-  persistent test suites/authenticated test records, broader candidate
+  checks only after rechecking a stored proof; named test suites are now
+  persistable data and can run through these checks, but result records remain
+  unauthenticated. Incorporation front ends, semantic simplification,
+  authenticated test records, broader candidate
   assessment, and REPL commands remain.
 - **Stages 10–14 are not started:** quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.

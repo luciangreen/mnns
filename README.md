@@ -155,13 +155,12 @@ feature and its focused test suite.
   proof-checked library records candidate metadata and test-result claims, then
   rechecks proofs when entries are retrieved, updated, or included in a
   library-wide structural assessment; named entries can be removed, and
-  `rank_library/2` ranks proof-checked entries by structural size. It does not
-  execute or authenticate stored test suites, or assess runtime or qualitative
-  properties. Bounded sandboxed example checks compare candidate and original
-  answers, and `run_entry_tests/5` runs them for a proof-rechecked library entry.
-  `run_and_record_entry_tests/5` records results only when all supplied cases
-  pass; case definitions are not persisted, and result terms are not
-  cryptographically authenticated. These checks are not proofs.
+  `rank_library/2` ranks proof-checked entries by structural size. Named test
+  suites can be persisted as data and run against proof-rechecked entries through
+  the bounded sandbox; passing results can be recorded. Suite files and result
+  terms are editable and not cryptographically authenticated. These example
+  checks are not proofs, and the library does not assess runtime or qualitative
+  properties.
   The bundle writer and verifier emit and re-check only proof-certified bundles. See
   [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).
