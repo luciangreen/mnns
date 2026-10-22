@@ -197,6 +197,27 @@ answers and 5 seconds per program run. This operation does not modify the entry
 or authenticate its stored test-result metadata; its finite example checks are
 not proofs of equivalence.
 
+`run_and_record_entry_tests/5` runs the same proof-rechecked, bounded comparisons
+and replaces the entry's `TestResults` only when the supplied nonempty set of
+cases all passes:
+
+```prolog
+mnn_aioc_library:run_and_record_entry_tests(
+    '/path/to/library', sort_numbers,
+    [test_case(small, sort([3,1], [1,3])),
+     test_case(empty, sort([], []))],
+    [max_answers(100), time_limit(5)],
+    entry_test_report(sort_numbers, Results, recorded)).
+```
+
+The report status is `recorded` after an atomic entry update,
+`not_recorded` when the case list is empty or any case fails or is inconclusive,
+or `not_recorded(Reason)` if the entry could not be updated. A missing or
+unproved entry returns `rejected(Reason)` without execution. The case
+definitions are supplied to each call and are not persisted; only successful
+result terms are recorded. Those terms remain editable file data and are not
+cryptographically authenticated. Example execution is not a proof of equivalence.
+
 `get_entry(Directory, Name, Result)` reads the entry as a Prolog term, never
 consults it, and checks its proof again. It returns `accepted(Entry)` when
 verified and `rejected(Reason)` for missing, malformed-shape, or unproved
@@ -204,8 +225,8 @@ entries. `list_entries(Directory, Names)` returns sorted names for files with
 the library suffix; each should be fetched with `get_entry/3` before use.
 Malformed Prolog data may raise a read error. `run_entry_tests/5` provides
 bounded sandboxed regression checks against the stored candidate and original,
-but stored test suites and authenticated persistent test records are not
-implemented.
+while `run_and_record_entry_tests/5` can record successful results. Persistent
+test-case suites and authenticated test records are not implemented.
 
 `update_entry(Directory, Entry, Result)` accepts a replacement only after
 validating its shape and metadata and independently rechecking its proof. It

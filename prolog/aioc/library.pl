@@ -4,6 +4,7 @@
             remove_entry/3,
             get_entry/3,
             run_entry_tests/5,
+            run_and_record_entry_tests/5,
             list_entries/2,
             assess_library/2,
             rank_library/2
@@ -66,12 +67,39 @@ run_entry_tests(Directory, Name, TestCases, Options, Result) :-
     get_entry(Directory, Name, EntryResult),
     run_entry_tests_result(EntryResult, Name, TestCases, Options, Result).
 
+run_and_record_entry_tests(Directory, Name, TestCases, Options, Result) :-
+    get_entry(Directory, Name, EntryResult),
+    run_and_record_entry_tests_result(
+        EntryResult, Directory, Name, TestCases, Options, Result).
+
 run_entry_tests_result(
         accepted(mnn_library_entry(Name, Candidate, Original, _, _, _, _, _, _)),
         Name, TestCases, Options, entry_test_report(Name, Results)) :-
     mnn_aioc_test_runner:compare_programs(
         Candidate, Original, TestCases, Options, Results).
 run_entry_tests_result(rejected(Reason), _, _, _, rejected(Reason)).
+
+run_and_record_entry_tests_result(
+        accepted(Entry), Directory, Name, TestCases, Options, Result) :-
+    Entry = mnn_library_entry(Name, Candidate, Original, Proof, Assessment,
+                              Cost, Cycle, SourceForm, _),
+    mnn_aioc_test_runner:compare_programs(
+        Candidate, Original, TestCases, Options, Results),
+    (   Results \= [],
+        maplist(passed_test_result, Results)
+    ->  UpdatedEntry = mnn_library_entry(
+                           Name, Candidate, Original, Proof, Assessment,
+                           Cost, Cycle, SourceForm, Results),
+        update_entry(Directory, UpdatedEntry, UpdateResult),
+        record_status(UpdateResult, Status)
+    ;   Status = not_recorded
+    ),
+    Result = entry_test_report(Name, Results, Status).
+run_and_record_entry_tests_result(
+        rejected(Reason), _, _, _, _, rejected(Reason)).
+
+record_status(updated, recorded).
+record_status(rejected(Reason), not_recorded(Reason)).
 
 validate_entry(Entry) :-
     (   valid_entry(Entry)

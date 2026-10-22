@@ -257,6 +257,66 @@ test(runs_bounded_regression_cases_for_verified_entry) :-
         ),
         delete_directory_and_contents(Directory)).
 
+test(records_test_results_only_after_every_case_passes) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          mnn_aioc_library:store_entry(Directory, Entry),
+          mnn_aioc_library:run_and_record_entry_tests(
+              Directory, sample,
+              [test_case(identity, answer(value, value))], [],
+              entry_test_report(
+                  sample, [test_result(identity, passed)], recorded)),
+          mnn_aioc_library:get_entry(
+              Directory, sample,
+              accepted(mnn_library_entry(
+                           sample, _, _, _, _, _, _, _,
+                           [test_result(identity, passed)])))
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(does_not_record_results_when_a_case_fails) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          mnn_aioc_library:store_entry(Directory, Entry),
+          mnn_aioc_library:run_and_record_entry_tests(
+              Directory, sample,
+              [test_case(error, throw(error(test_failure, _)))], [],
+              entry_test_report(
+                  sample, [test_result(error, failed(candidate_error(_)))],
+                  not_recorded)),
+          mnn_aioc_library:get_entry(
+              Directory, sample,
+              accepted(mnn_library_entry(
+                           sample, _, _, _, _, _, _, _,
+                           [test_result(full_suite, passed)])))
+        ),
+        delete_directory_and_contents(Directory)).
+
+test(does_not_record_inconclusive_test_results) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( sample_entry(sample, Entry, _),
+          mnn_aioc_library:store_entry(Directory, Entry),
+          mnn_aioc_library:run_and_record_entry_tests(
+              Directory, sample, [test_case(members, member(_, [a, b]))],
+              [max_answers(1)],
+              entry_test_report(
+                  sample,
+                  [test_result(members, inconclusive(answer_limit_exceeded(1)))],
+                  not_recorded)),
+          mnn_aioc_library:get_entry(
+              Directory, sample,
+              accepted(mnn_library_entry(
+                           sample, _, _, _, _, _, _, _,
+                           [test_result(full_suite, passed)])))
+        ),
+        delete_directory_and_contents(Directory)).
+
 test(reports_missing_entry_when_running_tests) :-
     temporary_library_directory(Directory),
     setup_call_cleanup(

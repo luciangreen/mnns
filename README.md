@@ -158,8 +158,10 @@ feature and its focused test suite.
   `rank_library/2` ranks proof-checked entries by structural size. It does not
   execute or authenticate stored test suites, or assess runtime or qualitative
   properties. Bounded sandboxed example checks compare candidate and original
-  answers, and `run_entry_tests/5` runs them for a proof-rechecked library entry;
-  these checks are not proofs and do not authenticate stored test metadata.
+  answers, and `run_entry_tests/5` runs them for a proof-rechecked library entry.
+  `run_and_record_entry_tests/5` records results only when all supplied cases
+  pass; case definitions are not persisted, and result terms are not
+  cryptographically authenticated. These checks are not proofs.
   The bundle writer and verifier emit and re-check only proof-certified bundles. See
   [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).
