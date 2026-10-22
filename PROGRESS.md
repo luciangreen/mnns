@@ -239,12 +239,15 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   entries separately. `run_entry_tests/5` rechecks an entry's proof before
   comparing candidate and original on caller-supplied queries in the bounded
   sandbox; reports are returned but do not alter the entry or authenticate
-  stored test metadata. The initial simplifier also removes explicit `true`
+  stored test metadata. `run_and_record_entry_tests/5` updates the entry's result
+  terms only when every nonempty supplied case passes; the cases themselves are
+  not persisted, and recorded terms are not cryptographically authenticated. The
+  initial simplifier also removes explicit `true`
   conjuncts and `fail` disjuncts through individual proof-checked steps, including
   nested normalized control goals, while declining each rewrite if the program
-  defines the corresponding predicate. Persistent stored suites and authenticated test records,
-  incorporation front ends, broader semantic simplification, broader assessment,
-  REPL interfaces, and the rest of the AIOC controller remain.
+  defines the corresponding predicate. Persisted test-case suites, authenticated
+  test records, incorporation front ends, broader semantic simplification,
+  broader assessment, REPL interfaces, and the rest of the AIOC controller remain.
 
 ## Remaining stages
 

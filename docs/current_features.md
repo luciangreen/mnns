@@ -31,7 +31,7 @@ sharing a change.
 | AIOC proof-gated structural size comparison (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC assessment](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-gated structural candidate ranking (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate ranking](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-checked removal of explicit `true` conjuncts and `fail` disjuncts (initial) | `prolog/aioc/simplify.pl` | `swipl -q -g "load_files('tests/aioc_simplify_tests.pl'), run_tests(mnn_aioc_simplify), halt"` | [AIOC simplification](aioc.md#proof-checked-simplification) |
-| AIOC proof-checked algorithm library and structural ranking (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
+| AIOC proof-checked algorithm library, structural ranking, and run-and-record regression checks (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
 | Bounded sandboxed candidate-vs-original example verification and verified library-entry tests | `prolog/aioc/test_runner.pl`, `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`; `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC example verification](aioc.md#bounded-example-verification); [proof-checked library](aioc.md#proof-checked-library) |
 
@@ -70,6 +70,17 @@ candidate and original using the bounded sandboxed verifier. It returns
 passed, failed, or inconclusive; missing or unproved entries return
 `rejected(Reason)` without execution. The call does not change the stored entry,
 and stored test-result claims remain caller-supplied metadata.
+
+`run_and_record_entry_tests/5` performs the same proof-rechecked, bounded
+comparison and replaces the entry's test-result terms only when the nonempty
+set of supplied cases all passes. The report is
+`entry_test_report(Name, Results, recorded)` after an update,
+`entry_test_report(Name, Results, not_recorded)` when a case fails or is
+inconclusive (or no cases were supplied), and
+`entry_test_report(Name, Results, not_recorded(Reason))` if the entry could not
+be updated. Missing or unproved entries return `rejected(Reason)`. The case
+definitions are not persisted; recorded terms remain editable data and are not
+cryptographically authenticated.
 
 `update_entry(Directory, Entry, Result)` replaces an existing entry only after
 validating its metadata and rechecking its proof. It returns `updated`, or
