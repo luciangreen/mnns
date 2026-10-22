@@ -23,6 +23,8 @@ check_supported_proof(Program, Original, Proof, Result) :-
     ->  Result = accepted
     ;   valid_true_conjunct_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_fail_disjunct_proof(Program, Original, Proof)
+    ->  Result = accepted
     ;   valid_definition_introduction_proof(Program, Original, Proof)
     ->  Result = accepted
     ;   valid_definition_rewrite_proof(Program, Original, Proof)
@@ -71,6 +73,19 @@ valid_true_conjunct_proof(Program, Original, Proof) :-
     valid_rewrite_program(Original),
     copy_term(Original, OriginalCopy),
     remove_true_conjunct_program(OriginalCopy, Rewritten),
+    Program =@= Rewritten.
+
+valid_fail_disjunct_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, remove_fail_disjunct, [],
+                              equivalent(domain(Domain), modes(Modes)))]),
+    integer(Id),
+    Id > 0,
+    ground(Domain),
+    ground(Modes),
+    valid_rewrite_program(Original),
+    copy_term(Original, OriginalCopy),
+    remove_fail_disjunct_program(OriginalCopy, Rewritten),
     Program =@= Rewritten.
 
 valid_definition_introduction_proof(Program, Original, Proof) :-
@@ -213,6 +228,10 @@ apply_proof_rule(remove_true_conjunct, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
     remove_true_conjunct_program(ProgramCopy, Rewritten).
+apply_proof_rule(remove_fail_disjunct, Program, Rewritten) :-
+    valid_rewrite_program(Program),
+    copy_term(Program, ProgramCopy),
+    remove_fail_disjunct_program(ProgramCopy, Rewritten).
 apply_proof_rule(introduce_definition, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
@@ -234,12 +253,87 @@ remove_true_conjunct_program(
     \+ defines_true_predicate(Predicates),
     remove_true_conjunct_predicates(Predicates, RewrittenPredicates).
 
+remove_fail_disjunct_program(
+    mnn_program(Name, Meta, Predicates, Proof, Trace),
+    mnn_program(Name, Meta, RewrittenPredicates, Proof, Trace)) :-
+    is_list(Predicates),
+    \+ defines_fail_predicate(Predicates),
+    remove_fail_disjunct_predicates(Predicates, RewrittenPredicates).
+
 defines_true_predicate(Predicates) :-
     member(Predicate, Predicates),
     nonvar(Predicate),
     functor(Predicate, mnn_pred, 5),
     arg(1, Predicate, Key),
     Key == true/0.
+
+defines_fail_predicate(Predicates) :-
+    member(Predicate, Predicates),
+    nonvar(Predicate),
+    functor(Predicate, mnn_pred, 5),
+    arg(1, Predicate, Key),
+    Key == fail/0.
+
+remove_fail_disjunct_predicates(
+    [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
+    [mnn_pred(Key, Modes, Domains, RewrittenClauses, Status)|Predicates]) :-
+    remove_fail_disjunct_clauses(Clauses, RewrittenClauses),
+    !.
+remove_fail_disjunct_predicates([Predicate|Predicates],
+                                [Predicate|RewrittenPredicates]) :-
+    remove_fail_disjunct_predicates(Predicates, RewrittenPredicates).
+
+remove_fail_disjunct_clauses(
+    [mnn_clause(Id, Head, Body, Source)|Clauses],
+    [mnn_clause(Id, Head, RewrittenBody, Source)|Clauses]) :-
+    remove_fail_disjunct_goal(Body, RewrittenBody),
+    !.
+remove_fail_disjunct_clauses([Clause|Clauses], [Clause|RewrittenClauses]) :-
+    remove_fail_disjunct_clauses(Clauses, RewrittenClauses).
+
+remove_fail_disjunct_goal(Goal, Rewritten) :-
+    nonvar(Goal),
+    remove_fail_disjunct_nonvar_goal(Goal, Rewritten).
+
+remove_fail_disjunct_nonvar_goal(disj(Left, Right), Right) :-
+    Left == fail,
+    !.
+remove_fail_disjunct_nonvar_goal(disj(Left, Right), Left) :-
+    Right == fail,
+    !.
+remove_fail_disjunct_nonvar_goal(disj(Left, Right),
+                                 disj(RewrittenLeft, Right)) :-
+    remove_fail_disjunct_goal(Left, RewrittenLeft),
+    !.
+remove_fail_disjunct_nonvar_goal(disj(Left, Right),
+                                 disj(Left, RewrittenRight)) :-
+    remove_fail_disjunct_goal(Right, RewrittenRight),
+    !.
+remove_fail_disjunct_nonvar_goal(conj(Left, Right),
+                                 conj(RewrittenLeft, Right)) :-
+    remove_fail_disjunct_goal(Left, RewrittenLeft),
+    !.
+remove_fail_disjunct_nonvar_goal(conj(Left, Right),
+                                 conj(Left, RewrittenRight)) :-
+    remove_fail_disjunct_goal(Right, RewrittenRight),
+    !.
+remove_fail_disjunct_nonvar_goal(ite(Condition, Then, Else),
+                                 ite(RewrittenCondition, Then, Else)) :-
+    remove_fail_disjunct_goal(Condition, RewrittenCondition),
+    !.
+remove_fail_disjunct_nonvar_goal(ite(Condition, Then, Else),
+                                 ite(Condition, RewrittenThen, Else)) :-
+    remove_fail_disjunct_goal(Then, RewrittenThen),
+    !.
+remove_fail_disjunct_nonvar_goal(ite(Condition, Then, Else),
+                                 ite(Condition, Then, RewrittenElse)) :-
+    remove_fail_disjunct_goal(Else, RewrittenElse),
+    !.
+remove_fail_disjunct_nonvar_goal(not(Goal), not(RewrittenGoal)) :-
+    remove_fail_disjunct_goal(Goal, RewrittenGoal),
+    !.
+remove_fail_disjunct_nonvar_goal(once(Goal), once(RewrittenGoal)) :-
+    remove_fail_disjunct_goal(Goal, RewrittenGoal).
 
 remove_true_conjunct_predicates(
     [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],

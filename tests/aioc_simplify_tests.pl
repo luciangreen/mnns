@@ -53,15 +53,53 @@ test(simplifies_conjunctions_nested_under_control_goals) :-
                   proof([]), trace([])),
     mnn_aioc_simplify:simplify_program(
         Program, Simplified, Proof,
-        simplification_report(changes(1), _, _, structural_effect(smaller))),
+        simplification_report(changes(2), _, _, structural_effect(smaller))),
     Simplified = mnn_program(
                      sample, meta(source, [clause(1)]),
                      [mnn_pred(p/1, ['?'], [any],
                                [mnn_clause(
-                                    1, p(Y), disj(once(q(Y)), fail),
+                                    1, p(Y), once(q(Y)),
                                     source(test, 1))],
                                original)],
                      proof([]), trace([])),
+    mnn_proof_checker:check_proof(Simplified, Program, Proof, accepted).
+
+test(removes_fail_disjuncts_with_sequential_checked_steps) :-
+    Program = mnn_program(
+                  sample, meta(source, [clause(1)]),
+                  [mnn_pred(p/1, ['?'], [any],
+                            [mnn_clause(
+                                 1, p(X),
+                                 disj(fail, conj(q(X), disj(r(X), fail))),
+                                 source(test, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_aioc_simplify:simplify_program(
+        Program, Simplified, Proof,
+        simplification_report(changes(2), _, _, structural_effect(smaller))),
+    Simplified = mnn_program(
+                     sample, meta(source, [clause(1)]),
+                     [mnn_pred(p/1, ['?'], [any],
+                               [mnn_clause(
+                                    1, p(Y), conj(q(Y), r(Y)), source(test, 1))],
+                               original)],
+                     proof([]), trace([])),
+    mnn_proof_checker:check_proof(Simplified, Program, Proof, accepted).
+
+test(does_not_remove_fail_when_source_defines_fail_predicate) :-
+    Program = mnn_program(
+                  sample, meta(source, [clause(1), clause(2)]),
+                  [mnn_pred(p/0, [], [any],
+                            [mnn_clause(1, p, disj(fail, q), source(test, 1))],
+                            original),
+                   mnn_pred(fail/0, [], [any],
+                            [mnn_clause(2, fail, true, source(test, 2))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_aioc_simplify:simplify_program(
+        Program, Simplified, Proof,
+        simplification_report(changes(0), _, _, structural_effect(unchanged))),
+    assertion(Simplified =@= Program),
     mnn_proof_checker:check_proof(Simplified, Program, Proof, accepted).
 
 test(does_not_instantiate_an_unbound_clause_body) :-

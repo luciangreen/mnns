@@ -145,9 +145,9 @@ feature and its focused test suite.
 - **AIOC structural size metric (initial):** reports clause, goal, predicate, and
   term-node counts for an IR program, plus an equal-weight total. This measures
   representation size only; it does not estimate runtime or memory cost. An
-  initial proof-checked simplifier removes explicit `true` conjuncts, repeating
-  one independently checked rewrite per proof step; it does not yet perform
-  general dead-code or semantic simplification. An
+  initial proof-checked simplifier removes explicit `true` conjuncts and `fail`
+  disjuncts, independently checking each rewrite; it does not yet perform general
+  dead-code or semantic simplification. An
   initial proof-gated comparison reports candidate-versus-original structural
   change and deterministic ranking of supplied candidates are available only
   after the independent checker accepts each proof; ranking uses structural
