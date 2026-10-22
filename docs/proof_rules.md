@@ -1,6 +1,7 @@
 # Proof rules
 
 The checker supports `identity`, restricted `reorder_goals` and
+`remove_true_conjunct`,
 `introduce_definition`, and narrowly scoped `unfold` and `fold` rules. It
 certifies these transformations directly from the IR, without executing either
 program. It also checks a limited set of `findall_to_fold` cases.
@@ -46,6 +47,13 @@ swapping them therefore preserves success or failure and cannot move an
 arithmetic exception across another goal. Variable-bearing goals, other
 predicates, extra changes, and unsupported proof rules are rejected. Domain and
 mode annotations must be ground, but this restricted rule does not infer them.
+
+`remove_true_conjunct` accepts exactly one rewrite from `conj(true, Goal)` or
+`conj(Goal, true)` to `Goal` in a clause body. The occurrence may be nested in
+conjunction, disjunction, if-then-else, negation, or `once/1`. The checker
+rejects this rule if the source IR defines `true/0`; it does not infer general
+purity or authorize removing other goals. A sequence may repeat the rule, with
+each step independently checked.
 
 The unfold and fold rules use the same proof-step shape, with `unfold` or `fold`
 as the rule name. They accept exactly one occurrence change in one clause body.

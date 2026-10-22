@@ -21,10 +21,48 @@ the four reported counts with weight one for each.
 
 This is a deterministic representation-size metric, not an inference-count,
 runtime, or memory estimate. It does not establish equivalence, assess candidate
-quality, or simplify programs. See the initial proof-checked comparison below
-and the [library documentation](#proof-checked-library).
+quality, or simplify programs by itself. The initial proof-checked
+[simplification slice](#proof-checked-simplification) and the
+[candidate comparison](#proof-gated-structural-comparison) use this metric.
 The initial proof-checked bundle writer and verifier are described in
 [`bundle.md`](bundle.md).
+
+## Proof-checked simplification
+
+`mnn_aioc_simplify:simplify_program/4` removes explicit `true` operands from
+conjunctions, including conjunctions nested under disjunction, if-then-else,
+negation, and `once/1`. It removes one conjunct per proof step and repeats until
+no supported occurrence remains:
+
+```prolog
+mnn_aioc_simplify:simplify_program(
+    Program, Simplified, Proof,
+    simplification_report(changes(Count), OriginalSize, SimplifiedSize,
+                          structural_effect(Effect))).
+```
+
+Each step uses `remove_true_conjunct`; the independent proof checker verifies
+every step and the complete result. An unchanged program receives an identity
+proof. If the program defines `true/0`, no simplification is attempted, avoiding
+assumptions about a locally defined predicate. The result preserves the IR
+metadata, clause order, and source locations. The report measures representation
+size only, not runtime or memory.
+
+This is a deliberately narrow initial rule. It does not remove unreachable
+predicates or clauses, merge clauses, remove arguments, or factor repeated
+structure. No broader simplification is claimed.
+
+Run its focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_simplify_tests.pl'), run_tests(mnn_aioc_simplify), halt"
+```
+
+The tests are also included in the full suite:
+
+```sh
+swipl -q -s tests/run.pl
+```
 
 ## Bounded example verification
 
