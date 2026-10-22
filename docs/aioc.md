@@ -30,9 +30,10 @@ The initial proof-checked bundle writer and verifier are described in
 ## Proof-checked simplification
 
 `mnn_aioc_simplify:simplify_program/4` removes explicit `true` operands from
-conjunctions, including conjunctions nested under disjunction, if-then-else,
-negation, and `once/1`. It removes one conjunct per proof step and repeats until
-no supported occurrence remains:
+conjunctions and explicit `fail` operands from disjunctions, including
+occurrences nested under conjunction, disjunction, if-then-else, negation, and
+`once/1`. It removes one occurrence per proof step and repeats until no
+supported occurrence remains:
 
 ```prolog
 mnn_aioc_simplify:simplify_program(
@@ -41,16 +42,18 @@ mnn_aioc_simplify:simplify_program(
                           structural_effect(Effect))).
 ```
 
-Each step uses `remove_true_conjunct`; the independent proof checker verifies
-every step and the complete result. An unchanged program receives an identity
-proof. If the program defines `true/0`, no simplification is attempted, avoiding
-assumptions about a locally defined predicate. The result preserves the IR
-metadata, clause order, and source locations. The report measures representation
-size only, not runtime or memory.
+Each step uses `remove_true_conjunct` or `remove_fail_disjunct`; the independent
+proof checker verifies every step and the complete result. An unchanged program
+receives an identity proof. If the program defines `true/0`, the true-conjunct
+rule is declined; if it defines `fail/0`, the fail-disjunct rule is declined.
+This avoids assumptions about locally defined predicates without blocking the
+other independently safe rule. The result preserves the IR metadata, clause
+order, and source locations. The report measures representation size only, not
+runtime or memory.
 
-This is a deliberately narrow initial rule. It does not remove unreachable
-predicates or clauses, merge clauses, remove arguments, or factor repeated
-structure. No broader simplification is claimed.
+These remain deliberately narrow rules. The simplifier does not remove
+unreachable predicates or clauses, merge clauses, remove arguments, or factor
+repeated structure. No broader simplification is claimed.
 
 Run its focused tests from the repository root:
 
