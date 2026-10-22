@@ -58,4 +58,17 @@ test(counts_each_clause_in_a_predicate) :-
         program_size(clauses(2), goals(2), predicates(1), term_nodes(6),
                      weighted_total(11))).
 
+test(counts_an_unbound_goal_as_a_leaf_without_instantiating_it) :-
+    Program = mnn_program(
+                  sample, meta(sample, []),
+                  [mnn_pred(sample/1, ['?'], [any],
+                            [mnn_clause(1, sample(_), Goal, source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_aioc_size:measure_program_size(
+        Program,
+        program_size(clauses(1), goals(1), predicates(1), term_nodes(1),
+                     weighted_total(4))),
+    assertion(var(Goal)).
+
 :- end_tests(mnn_aioc_size).
