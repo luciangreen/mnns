@@ -432,6 +432,24 @@ test(removes_a_named_test_suite) :-
         ),
         delete_directory_and_contents(Directory)).
 
+test(rejects_overwriting_a_named_test_suite) :-
+    temporary_library_directory(Directory),
+    setup_call_cleanup(
+        true,
+        ( TestCases = [test_case(original, answer(value, value))],
+          mnn_aioc_library:store_test_suite(Directory, focused, TestCases),
+          catch(mnn_aioc_library:store_test_suite(
+                    Directory, focused,
+                    [test_case(replacement, fail)]),
+                Error,
+                true),
+          assertion(nonvar(Error)),
+          mnn_aioc_library:get_test_suite(
+              Directory, focused, accepted(test_suite(focused, StoredCases))),
+          assertion(StoredCases =@= TestCases)
+        ),
+        delete_directory_and_contents(Directory)).
+
 test(runs_and_records_a_persisted_test_suite) :-
     temporary_library_directory(Directory),
     setup_call_cleanup(
@@ -440,17 +458,17 @@ test(runs_and_records_a_persisted_test_suite) :-
           mnn_aioc_library:store_entry(Directory, Entry),
           mnn_aioc_library:store_test_suite(
               Directory, focused, [test_case(identity, answer(value, value))]),
-          mnn_aioc_library:run_entry_test_suite(
+          once(mnn_aioc_library:run_entry_test_suite(
               Directory, sample, focused, [],
-              entry_test_report(sample, [test_result(identity, passed)])),
-          mnn_aioc_library:run_and_record_entry_test_suite(
+              entry_test_report(sample, [test_result(identity, passed)]))),
+          once(mnn_aioc_library:run_and_record_entry_test_suite(
               Directory, sample, focused, [],
-              entry_test_report(sample, [test_result(identity, passed)], recorded)),
-          mnn_aioc_library:get_entry(
+              entry_test_report(sample, [test_result(identity, passed)], recorded))),
+          once(mnn_aioc_library:get_entry(
               Directory, sample,
               accepted(mnn_library_entry(
                            sample, _, _, _, _, _, _, _,
-                           [test_result(identity, passed)])))
+                           [test_result(identity, passed)]))))
         ),
         delete_directory_and_contents(Directory)).
 

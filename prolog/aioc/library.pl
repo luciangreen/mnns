@@ -77,7 +77,10 @@ store_test_suite(Directory, Name, TestCases) :-
     ),
     make_directory_path(Directory),
     test_suite_file(Directory, Name, File),
-    write_test_suite_file(File, test_suite(Name, TestCases)).
+    (   exists_file(File)
+    ->  throw(error(permission_error(overwrite, file, File), _))
+    ;   write_test_suite_file(File, test_suite(Name, TestCases))
+    ).
 
 get_test_suite(Directory, Name, Result) :-
     must_be(atom, Directory),

@@ -236,7 +236,8 @@ their names may contain only letters, digits, underscores, and hyphens.
 consulting it; it returns `accepted(test_suite(Name, TestCases))` or
 `rejected(Reason)`. `list_test_suites/2` returns sorted suite names, and
 `remove_test_suite/3` removes a suite. Suite names are separate from library
-entry names even when the same name is used.
+entry names even when the same name is used. Existing suites cannot be
+overwritten; remove the old suite before storing a replacement.
 
 `run_entry_test_suite(Directory, EntryName, SuiteName, Options, Result)` runs a
 stored suite against the named entry after rechecking its proof.
