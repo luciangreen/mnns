@@ -218,6 +218,36 @@ definitions are supplied to each call and are not persisted; only successful
 result terms are recorded. Those terms remain editable file data and are not
 cryptographically authenticated. Example execution is not a proof of equivalence.
 
+### Persistent test suites
+
+Named regression suites can be stored alongside library entries as data-only
+`.suite.pl` files:
+
+```prolog
+mnn_aioc_library:store_test_suite(
+    '/path/to/library', sort_numbers,
+    [test_case(small, sort([3,1], [1,3])),
+     test_case(empty, sort([], []))]).
+```
+
+Suites must be nonempty lists of `test_case(AtomName, CallableGoal)` terms, and
+their names may contain only letters, digits, underscores, and hyphens.
+`get_test_suite(Directory, Name, Result)` reads and validates one suite without
+consulting it; it returns `accepted(test_suite(Name, TestCases))` or
+`rejected(Reason)`. `list_test_suites/2` returns sorted suite names, and
+`remove_test_suite/3` removes a suite. Suite names are separate from library
+entry names even when the same name is used.
+
+`run_entry_test_suite(Directory, EntryName, SuiteName, Options, Result)` runs a
+stored suite against the named entry after rechecking its proof.
+`run_and_record_entry_test_suite/5` does the same and records results only if all
+cases pass. Both use the bounded sandbox and return the same report forms as the
+caller-supplied suite APIs above. Test suites are read as Prolog data, not
+consulted; their goals execute only through the sandbox. Suite files and recorded
+results remain editable and are not cryptographically authenticated. Malformed
+Prolog data may raise a read error, and example execution does not establish
+equivalence.
+
 `get_entry(Directory, Name, Result)` reads the entry as a Prolog term, never
 consults it, and checks its proof again. It returns `accepted(Entry)` when
 verified and `rejected(Reason)` for missing, malformed-shape, or unproved
@@ -225,8 +255,10 @@ entries. `list_entries(Directory, Names)` returns sorted names for files with
 the library suffix; each should be fetched with `get_entry/3` before use.
 Malformed Prolog data may raise a read error. `run_entry_tests/5` provides
 bounded sandboxed regression checks against the stored candidate and original,
-while `run_and_record_entry_tests/5` can record successful results. Persistent
-test-case suites and authenticated test records are not implemented.
+while `run_and_record_entry_tests/5` can record successful results. Persisted
+suites can be run with `run_entry_test_suite/5` or
+`run_and_record_entry_test_suite/5`; authenticated test records are not
+implemented.
 
 `update_entry(Directory, Entry, Result)` accepts a replacement only after
 validating its shape and metadata and independently rechecking its proof. It
