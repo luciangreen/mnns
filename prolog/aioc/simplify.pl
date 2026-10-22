@@ -35,21 +35,31 @@ remove_one_true_conjunct(
     mnn_program(Name, Meta, Predicates, Proof, Trace),
     mnn_program(Name, Meta, SimplifiedPredicates, Proof, Trace)) :-
     is_list(Predicates),
-    \+ member(mnn_pred(true/0, _, _, _, _), Predicates),
+    \+ defines_true_predicate(Predicates),
     simplify_predicates(Predicates, SimplifiedPredicates).
 
-simplify_predicates(
-    [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
-    [mnn_pred(Key, Modes, Domains, SimplifiedClauses, Status)|Predicates]) :-
+defines_true_predicate(Predicates) :-
+    member(Predicate, Predicates),
+    nonvar(Predicate),
+    functor(Predicate, mnn_pred, 5),
+    arg(1, Predicate, Key),
+    Key == true/0.
+
+simplify_predicates([Predicate|Predicates],
+                    [mnn_pred(Key, Modes, Domains, SimplifiedClauses, Status)
+                     |Predicates]) :-
+    nonvar(Predicate),
+    Predicate = mnn_pred(Key, Modes, Domains, Clauses, Status),
     simplify_clauses(Clauses, SimplifiedClauses),
     !.
 simplify_predicates([Predicate|Predicates],
                     [Predicate|SimplifiedPredicates]) :-
     simplify_predicates(Predicates, SimplifiedPredicates).
 
-simplify_clauses(
-    [mnn_clause(Id, Head, Body, Source)|Clauses],
-    [mnn_clause(Id, Head, SimplifiedBody, Source)|Clauses]) :-
+simplify_clauses([Clause|Clauses],
+                 [mnn_clause(Id, Head, SimplifiedBody, Source)|Clauses]) :-
+    nonvar(Clause),
+    Clause = mnn_clause(Id, Head, Body, Source),
     simplify_goal(Body, SimplifiedBody),
     !.
 simplify_clauses([Clause|Clauses], [Clause|SimplifiedClauses]) :-
@@ -59,9 +69,11 @@ simplify_goal(Goal, Simplified) :-
     nonvar(Goal),
     simplify_nonvar_goal(Goal, Simplified).
 
-simplify_nonvar_goal(conj(true, Goal), Goal) :-
+simplify_nonvar_goal(conj(Left, Right), Right) :-
+    Left == true,
     !.
-simplify_goal(conj(Goal, true), Goal) :-
+simplify_nonvar_goal(conj(Left, Right), Left) :-
+    Right == true,
     !.
 simplify_nonvar_goal(conj(Left, Right), conj(SimplifiedLeft, Right)) :-
     simplify_goal(Left, SimplifiedLeft),

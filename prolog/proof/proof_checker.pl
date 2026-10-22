@@ -231,8 +231,15 @@ remove_true_conjunct_program(
     mnn_program(Name, Meta, Predicates, Proof, Trace),
     mnn_program(Name, Meta, RewrittenPredicates, Proof, Trace)) :-
     is_list(Predicates),
-    \+ member(mnn_pred(true/0, _, _, _, _), Predicates),
+    \+ defines_true_predicate(Predicates),
     remove_true_conjunct_predicates(Predicates, RewrittenPredicates).
+
+defines_true_predicate(Predicates) :-
+    member(Predicate, Predicates),
+    nonvar(Predicate),
+    functor(Predicate, mnn_pred, 5),
+    arg(1, Predicate, Key),
+    Key == true/0.
 
 remove_true_conjunct_predicates(
     [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],
@@ -255,9 +262,11 @@ remove_true_conjunct_goal(Goal, Rewritten) :-
     nonvar(Goal),
     remove_true_conjunct_nonvar_goal(Goal, Rewritten).
 
-remove_true_conjunct_nonvar_goal(conj(true, Goal), Goal) :-
+remove_true_conjunct_nonvar_goal(conj(Left, Right), Right) :-
+    Left == true,
     !.
-remove_true_conjunct_goal(conj(Goal, true), Goal) :-
+remove_true_conjunct_nonvar_goal(conj(Left, Right), Left) :-
+    Right == true,
     !.
 remove_true_conjunct_nonvar_goal(conj(Left, Right),
                                  conj(RewrittenLeft, Right)) :-
