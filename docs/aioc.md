@@ -1,5 +1,48 @@
 # AIOC structural size metric
 
+## Decision-tree incorporation
+
+`mnn_aioc_dtree:incorporate_dtree/5` compiles the restricted data form
+`dtree(Test, Yes, No)` and `leaf(Value)` into one predicate `Name/2` in the
+shared IR. The distinguished input is an unbound variable shared by the tests
+and leaves; leaves unify the output with their value. Tests may be `atom/1`,
+`atomic/1`, `compound/1`, `ground/1`, `integer/1`, `is_list/1`, or `number/1`,
+or a numeric comparison (`<`, `=<`, `>`, `>=`, `=:=`, `=\=`) whose expressions
+use only the input, numeric constants, unary `+`, `-`, and `abs`, and binary
+`+`, `-`, `*`, `/`, `//`, `mod`, `rem`, `max`, `min`, `**`, and `^`. Other
+variables, cycles, side-effecting tests, and unsupported test forms are
+rejected. Source trees are inspected as data and are never executed during
+incorporation.
+
+The returned proof uses `incorporate_dtree`. The independent proof checker
+validates the source shape and reconstructs the canonical IR before accepting
+the proof; changing the generated program or supplying a noncanonical tree
+translation is rejected. This certifies the structural compilation of this
+specific tree notation, not a proof about an external decision-tree format or
+the safety/termination of arbitrary numeric inputs. Generated tests still run
+only through the sandboxed runner.
+
+Example:
+
+```prolog
+Input = _,
+Tree = dtree(integer(Input),
+             dtree(Input < 0, leaf(negative),
+                   dtree(Input =:= 0, leaf(zero), leaf(positive))),
+             leaf(non_integer)),
+mnn_aioc_dtree:incorporate_dtree(classify, Input, Tree, Program, Proof),
+mnn_proof_checker:check_proof(
+    Program, dtree_source(classify, Input, Tree), Proof, accepted).
+```
+
+Run its focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_dtree_tests.pl'), run_tests(mnn_aioc_dtree), halt"
+```
+
+The suite is included in the full command `swipl -q -s tests/run.pl`.
+
 `mnn_aioc_size:measure_program_size/2` reports structural counts for an
 `mnn_program/5`:
 

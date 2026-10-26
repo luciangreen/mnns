@@ -4,7 +4,16 @@ The checker supports `identity`, restricted `reorder_goals` and
 `remove_true_conjunct`,
 `introduce_definition`, and narrowly scoped `unfold` and `fold` rules. It
 certifies these transformations directly from the IR, without executing either
-program. It also checks a limited set of `findall_to_fold` cases.
+program. It also checks a limited set of `findall_to_fold` cases and a
+restricted decision-tree-to-IR incorporation rule.
+
+The `incorporate_dtree` rule accepts a `dtree_source(Name, Input, Tree)` source
+and verifies that the proposed IR is the canonical translation of the supported
+`dtree(Test, Yes, No)` / `leaf(Value)` notation. Its tests are limited to the
+pure type checks and numeric comparisons documented in
+[`aioc.md`](aioc.md#decision-tree-incorporation). The rule checks the generated
+structure; it does not execute source terms or certify an external tree
+semantics.
 
 The accepted proof shape is:
 
