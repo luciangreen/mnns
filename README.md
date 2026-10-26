@@ -67,10 +67,11 @@ feature and its focused test suite.
   Bounded literal `between/3`
   calls are classified, and `once/1` caps reported successes at one. General
   choicepoint transformation and operational cut conversion are not implemented;
-  Detlog removes only a redundant cut after a deterministic guard in a singleton
+  Detlog removes a cut after a deterministic built-in guard in a singleton
   clause, and lowers a terminal cut after a supported guard in a singleton
   clause to committed if-then-else IR; cuts in multi-clause predicates and
-  unsupported cut placements remain unchanged. Finite built-in
+  unsupported cut placements remain unchanged. These syntactic transformations
+  are not machine-checked proofs. Finite built-in
   `member/2` calls over ground proper lists are also classified for variable,
   ground, and partially instantiated element patterns, preserving duplicate
   successes without binding the analyzed program; `select/3` over ground proper
@@ -99,8 +100,8 @@ feature and its focused test suite.
   documented pure built-in/control-flow subset, including built-in `member/2`,
   `between/3`, `length/2`, `nth0/3`, `nth1/3`, `append/3`, and `select/3`, to IR
   if-then-else, preserving unsupported and locally defined predicates unchanged.
-  It also removes only a redundant green cut in a single-clause predicate when
-  preceded by one deterministic unification (or `true`); other cuts are kept.
+  It also removes a redundant green cut in a single-clause predicate after a
+  conjunction of deterministic built-ins; other cuts are kept.
   It does not yet implement choicepoint splicing, choice packets, or general
   cut conversion. See
   [`docs/detlog.md`](docs/detlog.md).
@@ -201,5 +202,4 @@ commands for every implemented test group.
 
 
 * Manual Neuronets (MNNs) are Green's invention and a way to represent the hidden workings of black-box neural nets. They combine the [Spec to Algorithm](https://github.com/luciangreen/Philosophy/tree/master/s2a), [Starlog](https://github.com/luciangreen/Starlog), [Prolog Inductive Debugger](https://github.com/luciangreen/Prolog_Inductive_Debugger), [loop2](https://github.com/luciangreen/loop2), [PLOp](https://github.com/luciangreen/plop)/[AlgebraPLOp](https://github.com/luciangreen/algebraplop), [Detlog](https://github.com/luciangreen/detlog), and [Piglog2](https://github.com/luciangreen/piglog2) repositories. Later, a chatbot incorporating natural language, manual attention, manual time series and other aspects of NNs such as signposting, ranking, analysis, conversations and personality overlays will be added.
-
 

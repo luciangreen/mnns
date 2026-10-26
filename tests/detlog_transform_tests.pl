@@ -502,4 +502,69 @@ test(keeps_cut_in_multi_clause_predicate) :-
         Program, Transformed, detlog_transform_report([])),
     assertion(Transformed = Program).
 
+test(removes_cut_after_deterministic_builtin_guard) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1)]),
+                  [mnn_pred(positive/1, ['?'], [any],
+                            [mnn_clause(1, positive(Value),
+                                        conj(conj(integer(Value),
+                                                  Value > 0),
+                                             !),
+                                        source(sample, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(positive/1, _, _,
+                                    [mnn_clause(1, positive(CompiledValue),
+                                                conj(integer(CompiledValue),
+                                                     CompiledValue > 0),
+                                                _)],
+                                    original)], _, _),
+        detlog_transform_report([removed_green_cut(positive/1, 1)])),
+    findall(Input,
+            ( member(Input, [a, -1, 0, 1, 2]),
+              deterministic_guard_with_cut(Input)
+            ),
+            SourceAnswers),
+    findall(Input,
+            ( member(Input, [a, -1, 0, 1, 2]),
+              deterministic_guard_without_cut(Input)
+            ),
+            TransformedAnswers),
+    assertion(SourceAnswers == TransformedAnswers).
+
+test(does_not_assume_shadowed_guard_is_deterministic) :-
+    Program = mnn_program(
+                  sample, meta(sample, [clause(1), clause(2)]),
+                  [mnn_pred(positive/1, ['?'], [any],
+                            [mnn_clause(1, positive(Value),
+                                        conj(integer(Value), !),
+                                        source(sample, 1))],
+                            original),
+                   mnn_pred(integer/1, ['?'], [any],
+                            [mnn_clause(2, integer(_), true,
+                                        source(sample, 2))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_detlog_transform:transform_program(
+        Program,
+        mnn_program(_, _, [mnn_pred(positive/1, _, _,
+                                    [mnn_clause(1, positive(CompiledValue),
+                                                ite(integer(CompiledValue),
+                                                    true, fail), _)],
+                                    original),
+                           _], _, _),
+        detlog_transform_report(
+            [compiled_cut(positive/1, 1, integer(_))])).
+
+deterministic_guard_with_cut(Value) :-
+    integer(Value),
+    Value > 0,
+    !.
+
+deterministic_guard_without_cut(Value) :-
+    integer(Value),
+    Value > 0.
+
 :- end_tests(mnn_detlog_transform).

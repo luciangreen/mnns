@@ -318,15 +318,17 @@ goals unchanged and reports each compiled or
 retained occurrence as `compiled_once/3` or `kept_once/3`. Program metadata,
 clause order, and source locations are retained. The resulting control construct commits to the first success, matching `once/1`
 for this side-effect-free subset. This report is not an independently checked
-proof. The transform removes a redundant cut only when a predicate has one clause
-and the complete body is `true, !` or one unification followed by `!`; it records
-`removed_green_cut/2`. It also lowers a terminal cut after a nonvar guard in a
-single-clause predicate to `ite(Guard, true, fail)`, recording
+proof. The transform removes a redundant cut only when a predicate has one clause and
+its complete body is `Guard, !`, where `Guard` is a conjunction of deterministic
+built-ins (unification, comparisons, `is/2`, and type tests); a source-defined
+predicate is not assumed to be one of these built-ins. It records
+`removed_green_cut/2`. It also lowers a terminal cut after a supported guard in
+a single-clause predicate to `ite(Guard, true, fail)`, recording
 `compiled_cut/3`. The guard must contain no cut or explicit `call/N`; nested
-cuts, multi-clause predicates, and other cut placements are preserved. Neither
-cut transformation is independently proof-checked. General cut conversion,
-`if_commit/3`, red-cut safety proofs, mode inference, choicepoint splicing, and
-choice packets remain unimplemented.
+cuts, multi-clause predicates, and other cut placements are preserved. These
+syntactic side conditions are not machine-checked proofs. General cut
+conversion, `if_commit/3`, red-cut safety proofs, mode inference, choicepoint
+splicing, and choice packets remain unimplemented.
 
 Run this focused suite from the repository root:
 
@@ -334,9 +336,10 @@ Run this focused suite from the repository root:
 swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"
 ```
 
-The transformation tests include safe redundant-cut removal, first-answer
-preservation for a nondeterministic terminal-cut guard, and regression checks
-that nested and multi-clause cuts are preserved.
+The transformation tests include safe redundant-cut removal after unification
+and a conjunction of deterministic built-ins, first-answer preservation for a
+nondeterministic terminal-cut guard, and regression checks that nested and
+multi-clause cuts are preserved.
 
 ## S2A synthesis
 
