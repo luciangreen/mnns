@@ -140,20 +140,25 @@ Goal)` and `kept_once(Predicate, ClauseId, unsupported_goal(Goal))` entries.
 Other program fields, clause order, and source locations are preserved. This is
 a bounded transformation report, not an independently checked proof.
 
-The transform also removes a narrowly redundant green cut when a predicate has
-exactly one clause whose complete body is `true, !` or a single unification
-followed by `!`. The clause has no earlier choicepoint and the guard is
-deterministic, so this cut cannot change the answers. The report records
-`removed_green_cut(Predicate, ClauseId)`. Cuts after potentially nondeterministic
-goals can also be lowered when a predicate has exactly one clause whose complete
-body is `Guard, !`. If `Guard` is nonvar and contains neither a cut nor an
-explicit `call/N`, the result is `ite(Guard, true, fail)`, which commits to the
-first success just as the terminal cut does. The report records
+The transform removes a narrowly redundant green cut in a predicate with one
+clause when its complete body is `Guard, !` and `Guard` consists only of
+conjunctions of deterministic built-ins: unification and comparisons, `is/2`,
+and the listed type tests. A built-in is accepted only when the source does not
+define that predicate. Each accepted goal can succeed at most once, so the guard
+cannot leave a choicepoint for the cut to remove. The report records
+`removed_green_cut(Predicate, ClauseId)`. For example, a guard
+`integer(N), N > 0` qualifies; `member/2` does not.
+
+Other terminal cuts can be lowered when a predicate has exactly one clause
+whose complete body is `Guard, !`. If `Guard` is nonvar and contains neither a
+cut nor an explicit `call/N`, the result is `ite(Guard, true, fail)`, which
+commits to the first success just as the terminal cut does. The report records
 `compiled_cut(Predicate, ClauseId, Guard)`. This lets supported nondeterministic
 guards such as `member/2` preserve their first answer while removing the
 operational cut. Nested cuts, explicit meta-calls, cuts in multi-clause
-predicates, and all other cut placements remain unchanged. These syntactic
-transformations are not independently proof-checked.
+predicates, and all other cut placements remain unchanged. The transformer
+reports syntactic side conditions; it does not produce a machine-checkable cut
+proof, and general red-cut safety proofs remain unimplemented.
 
 General mode inference, choicepoint splicing, choice-packet generation, general
 cut conversion, red-cut safety proofs, lowering to the `if_commit/3` runtime
@@ -172,8 +177,9 @@ The transformation tests include first-answer behavior for built-in `member/2`,
 preservation for `length/2`, `nth0/3`, `nth1/3`, `append/3`, and `select/3`, and
 checks that program-defined versions of these built-ins are not treated as
 built-ins. They also cover removal of a redundant cut after a deterministic
-unification in a singleton clause, lowering a terminal cut after a
-nondeterministic guard, and preservation of nested or multi-clause cuts.
+unification or conjunction of deterministic built-ins in a singleton clause,
+lowering a terminal cut after a nondeterministic guard, and preservation of
+nested or multi-clause cuts.
 
 The transformation tests also compare first-answer behavior for a terminal cut
 after a nondeterministic guard and confirm that nested and multi-clause cuts are

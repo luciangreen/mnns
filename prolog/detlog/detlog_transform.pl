@@ -28,7 +28,7 @@ transform_clauses(
     SourcePredicates,
     [mnn_clause(Id, Head, TransformedGuard, Location)],
     Events) :-
-    deterministic_unification_guard(Guard),
+    deterministic_guard(Guard, SourcePredicates),
     !,
     transform_goal(Guard, Key, Id, SourcePredicates,
                    TransformedGuard, GuardEvents),
@@ -87,10 +87,39 @@ transform_goal(not(Goal), Key, Id, SourcePredicates, not(NewGoal), Events) :-
     transform_goal(Goal, Key, Id, SourcePredicates, NewGoal, Events).
 transform_goal(Goal, _, _, _, Goal, []).
 
-deterministic_unification_guard(true).
-deterministic_unification_guard(Goal) :-
+deterministic_guard(true, _).
+deterministic_guard(conj(Left, Right), Predicates) :-
+    !,
+    deterministic_guard(Left, Predicates),
+    deterministic_guard(Right, Predicates).
+deterministic_guard(Goal, Predicates) :-
     nonvar(Goal),
-    Goal =.. ['=', _, _].
+    callable(Goal),
+    functor(Goal, Name, Arity),
+    Key = Name/Arity,
+    deterministic_builtin(Key),
+    \+ source_predicate(Predicates, Key).
+
+deterministic_builtin((=)/2).
+deterministic_builtin((\=)/2).
+deterministic_builtin((==)/2).
+deterministic_builtin((\==)/2).
+deterministic_builtin(is/2).
+deterministic_builtin((>)/2).
+deterministic_builtin((>=)/2).
+deterministic_builtin((<)/2).
+deterministic_builtin((=<)/2).
+deterministic_builtin((=:=)/2).
+deterministic_builtin((=\=)/2).
+deterministic_builtin(var/1).
+deterministic_builtin(nonvar/1).
+deterministic_builtin(atom/1).
+deterministic_builtin(atomic/1).
+deterministic_builtin(compound/1).
+deterministic_builtin(ground/1).
+deterministic_builtin(integer/1).
+deterministic_builtin(number/1).
+deterministic_builtin(is_list/1).
 
 supported_cut_guard(Guard) :-
     nonvar(Guard),
