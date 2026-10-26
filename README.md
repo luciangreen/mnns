@@ -148,11 +148,13 @@ feature and its focused test suite.
   representation size only; it does not estimate runtime or memory cost. A
   restricted data-only decision-tree front end compiles pure type checks and
   numeric comparisons to the shared IR and carries an independently checked
-  canonical-translation proof; CFG and broader source-form incorporation remain
-  unimplemented. An initial proof-checked simplifier removes explicit `true`
-  conjuncts and `fail`
-  disjuncts, independently checking each rewrite; it does not yet perform general
-  dead-code or semantic simplification. An
+  canonical-translation proof; restricted data-only CFG and normalized-DCG
+  grammars also compile to the shared IR with independent canonical-translation
+  checks. Raw DCG clause parsing, grammar semantic actions, and broader
+  source-form incorporation remain unimplemented. An initial proof-checked
+  simplifier removes explicit `true` conjuncts and `fail` disjuncts,
+  independently checking each rewrite; it does not yet perform general dead-code
+  or semantic simplification. An
   initial proof-gated comparison reports candidate-versus-original structural
   change and deterministic ranking of supplied candidates are available only
   after the independent checker accepts each proof; ranking uses structural

@@ -43,6 +43,52 @@ swipl -q -g "load_files('tests/aioc_dtree_tests.pl'), run_tests(mnn_aioc_dtree),
 
 The suite is included in the full command `swipl -q -s tests/run.pl`.
 
+## CFG and DCG incorporation
+
+`mnn_aioc_cfg:incorporate_cfg/4` and `incorporate_dcg/4` compile a restricted,
+data-only grammar representation into the shared IR. A CFG source has the form
+`cfg(Start, [rule(Nonterminal, Symbols), ...])`; a DCG source uses
+`dcg(Start, [dcg_rule(Nonterminal, Symbols), ...])`. `Symbols` is a list of
+`terminal(Token)` and `nonterminal(Name)` terms. Terminals must be ground,
+acyclic terms. Nonterminal names must be atoms that are not SWI-Prolog built-in
+predicate names or the list functor `.`. The grammar must have at least one
+production, define its start symbol, and define every referenced nonterminal.
+Empty symbol lists represent epsilon productions, and multiple productions
+for a nonterminal represent alternatives.
+
+Each nonterminal becomes a predicate of arity two that consumes a token list
+and returns the unconsumed suffix. For example:
+
+```prolog
+Grammar = cfg(sentence,
+              [ rule(sentence, [nonterminal(noun), nonterminal(verb)]),
+                rule(noun, [terminal(cat)]),
+                rule(verb, [terminal(sleeps)])
+              ]),
+mnn_aioc_cfg:incorporate_cfg(grammar, Grammar, Program, Proof),
+mnn_proof_checker:check_proof(
+    Program, cfg_source(grammar, Grammar), Proof, accepted).
+```
+
+The DCG form uses the same production-symbol notation inside `dcg_rule/2` and
+returns its source wrapper as `dcg_source(Name, Grammar)`. The independent proof
+checker validates the grammar data and reconstructs the canonical IR rather
+than importing or calling the front end. Neither front end executes source
+terms. This certifies the structural translation of these explicit data
+notations; it does not parse raw Prolog DCG clauses or support DCG semantic
+actions, constraints, or other grammar directives. Recursive and ambiguous
+grammars retain their ordinary Prolog search behavior; this translation does
+not prove termination or determinism.
+
+Run the CFG/DCG tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_cfg_tests.pl'), run_tests(mnn_aioc_cfg), halt"
+```
+
+These tests, including bounded-sandbox execution examples, are also part of
+`swipl -q -s tests/run.pl`.
+
 `mnn_aioc_size:measure_program_size/2` reports structural counts for an
 `mnn_program/5`:
 

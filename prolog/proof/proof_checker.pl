@@ -7,7 +7,7 @@ check_proof(Program, Original, Proof, Result) :-
     ->  (   mnn_program_term(Original)
         ->  check_supported_proof(Program, Original, Proof, Result)
         ;   nonvar(Original),
-            functor(Original, dtree_source, 3)
+            source_incorporation_term(Original)
         ->  check_source_incorporation(Program, Original, Proof, Result)
         ;   Result = rejected(invalid_program)
         )
@@ -18,8 +18,18 @@ mnn_program_term(Program) :-
     nonvar(Program),
     functor(Program, mnn_program, 5).
 
+source_incorporation_term(Source) :-
+    functor(Source, dtree_source, 3).
+source_incorporation_term(Source) :-
+    functor(Source, cfg_source, 2).
+source_incorporation_term(Source) :-
+    functor(Source, dcg_source, 2).
+
 check_source_incorporation(Program, Source, Proof, Result) :-
-    (   valid_dtree_incorporation(Program, Source, Proof)
+    (   (   valid_dtree_incorporation(Program, Source, Proof)
+        ;   valid_cfg_incorporation(Program, Source, Proof)
+        ;   valid_dcg_incorporation(Program, Source, Proof)
+        )
     ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
     ).
@@ -125,6 +135,147 @@ expected_dtree_body(dtree(Test, Yes, No), Output,
                     ite(Test, YesBody, NoBody)) :-
     expected_dtree_body(Yes, Output, YesBody),
     expected_dtree_body(No, Output, NoBody).
+
+valid_cfg_incorporation(Program, cfg_source(Name, cfg(Start, Rules)), Proof) :-
+    valid_grammar_source(Name, Start, Rules),
+    valid_grammar_proof(Proof, incorporate_cfg),
+    expected_grammar_program(cfg, Name, Start, Rules, Expected),
+    Program =@= Expected.
+
+valid_dcg_incorporation(Program, dcg_source(Name, dcg(Start, DcgRules)), Proof) :-
+    valid_dcg_source(Name, Start, DcgRules, Rules),
+    valid_grammar_proof(Proof, incorporate_dcg),
+    expected_grammar_program(dcg, Name, Start, Rules, Expected),
+    Program =@= Expected.
+
+valid_grammar_proof(Proof, Rule) :-
+    ground(Proof),
+    Proof = proof([proof_step(1, Rule, [],
+                              equivalent(domain(all), modes(all)))]).
+
+valid_grammar_source(Name, Start, Rules) :-
+    atom(Name),
+    atom(Start),
+    is_list(Rules),
+    Rules = [_|_],
+    maplist(valid_cfg_source_rule, Rules),
+    cfg_source_rule_names(Rules, Names),
+    memberchk(Start, Names),
+    maplist(valid_source_rule_references(Names), Rules).
+
+valid_cfg_source_rule(rule(Name, Symbols)) :-
+    valid_cfg_nonterminal_name(Name),
+    is_list(Symbols),
+    maplist(valid_cfg_source_symbol, Symbols).
+
+valid_cfg_source_symbol(terminal(Token)) :-
+    ground(Token),
+    acyclic_term(Token).
+valid_cfg_source_symbol(nonterminal(Name)) :-
+    atom(Name).
+
+valid_cfg_nonterminal_name(Name) :-
+    atom(Name),
+    Name \== '.',
+    Head =.. [Name, _, _],
+    \+ predicate_property(system:Head, built_in).
+
+valid_source_rule_references(Names, rule(_, Symbols)) :-
+    maplist(valid_source_symbol_reference(Names), Symbols).
+
+valid_source_symbol_reference(Names, nonterminal(Name)) :-
+    memberchk(Name, Names).
+valid_source_symbol_reference(_, terminal(_)).
+
+valid_dcg_source(Name, Start, DcgRules, Rules) :-
+    atom(Name),
+    atom(Start),
+    is_list(DcgRules),
+    DcgRules = [_|_],
+    maplist(valid_dcg_source_rule, DcgRules),
+    dcg_source_rules(DcgRules, Rules),
+    valid_grammar_source(Name, Start, Rules).
+
+valid_dcg_source_rule(dcg_rule(Name, Symbols)) :-
+    valid_cfg_nonterminal_name(Name),
+    is_list(Symbols),
+    maplist(valid_cfg_source_symbol, Symbols).
+
+dcg_source_rules([], []).
+dcg_source_rules([dcg_rule(Name, Symbols)|DcgRules],
+                 [rule(Name, Symbols)|Rules]) :-
+    dcg_source_rules(DcgRules, Rules).
+
+cfg_source_rule_names([], []).
+cfg_source_rule_names([rule(Name, _)|Rules], [Name|Names]) :-
+    cfg_source_rule_names(Rules, Names).
+
+expected_grammar_program(Kind, Name, Start, Rules, Program) :-
+    cfg_source_rule_names(Rules, RuleNames),
+    unique_source_names(RuleNames, [], Names),
+    expected_grammar_predicates(Names, Rules, Kind, Name, Predicates),
+    length(Rules, RuleCount),
+    numlist(1, RuleCount, RuleIds),
+    maplist(expected_clause_event, RuleIds, Events),
+    SourceForm =.. [Kind, Name, Start],
+    Program = mnn_program(
+                  Name, meta(SourceForm, Events), Predicates,
+                  proof([]), trace([])).
+
+unique_source_names([], _, []).
+unique_source_names([Name|Names], Seen, Unique) :-
+    (   memberchk(Name, Seen)
+    ->  unique_source_names(Names, Seen, Unique)
+    ;   Unique = [Name|Rest],
+        unique_source_names(Names, [Name|Seen], Rest)
+    ).
+
+expected_grammar_predicates([], _, _, _, []).
+expected_grammar_predicates([Name|Names], Rules, Kind, ProgramName,
+                            [Predicate|Predicates]) :-
+    expected_grammar_clauses(Rules, Name, Kind, ProgramName, 1, Clauses),
+    Predicate = mnn_pred(Name/2, ['?', '?'], [any, any], Clauses, original),
+    expected_grammar_predicates(Names, Rules, Kind, ProgramName, Predicates).
+
+expected_grammar_clauses([], _, _, _, _, []).
+expected_grammar_clauses([rule(Name, Symbols)|Rules], Target, Kind,
+                         ProgramName, RuleId, Clauses) :-
+    (   Name == Target
+    ->  expected_grammar_clause(
+            Name, Symbols, Kind, ProgramName, RuleId, Clause),
+        Clauses = [Clause|Rest]
+    ;   Clauses = Rest
+    ),
+    NextId is RuleId + 1,
+    expected_grammar_clauses(Rules, Target, Kind, ProgramName, NextId, Rest).
+
+expected_grammar_clause(
+    Name, Symbols, Kind, ProgramName, RuleId,
+    mnn_clause(RuleId, Head, Body, source(SourceKind, RuleId))) :-
+    Input = _,
+    Rest = _,
+    Head =.. [Name, Input, Rest],
+    expected_grammar_symbols(Symbols, Input, Rest, Goals),
+    expected_conjunction(Goals, Body),
+    SourceKind =.. [Kind, ProgramName].
+
+expected_grammar_symbols([], Rest, Rest, []).
+expected_grammar_symbols([terminal(Token)|Symbols], Input, Rest,
+                         [Input = [Token|Next]|Goals]) :-
+    expected_grammar_symbols(Symbols, Next, Rest, Goals).
+expected_grammar_symbols([nonterminal(Name)|Symbols], Input, Rest,
+                         [Call|Goals]) :-
+    Next = _,
+    Call =.. [Name, Input, Next],
+    expected_grammar_symbols(Symbols, Next, Rest, Goals).
+
+expected_conjunction([], true).
+expected_conjunction([Goal], Goal) :-
+    !.
+expected_conjunction([Goal|Goals], conj(Goal, Rest)) :-
+    expected_conjunction(Goals, Rest).
+
+expected_clause_event(Id, clause(Id)).
 
 check_supported_proof(Program, Original, Proof, Result) :-
     (   valid_identity_proof(Proof)
