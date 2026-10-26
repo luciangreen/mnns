@@ -3,15 +3,128 @@
           ]).
 
 check_proof(Program, Original, Proof, Result) :-
-    (   mnn_program_term(Program),
-        mnn_program_term(Original)
-    ->  check_supported_proof(Program, Original, Proof, Result)
+    (   mnn_program_term(Program)
+    ->  (   mnn_program_term(Original)
+        ->  check_supported_proof(Program, Original, Proof, Result)
+        ;   nonvar(Original),
+            functor(Original, dtree_source, 3)
+        ->  check_source_incorporation(Program, Original, Proof, Result)
+        ;   Result = rejected(invalid_program)
+        )
     ;   Result = rejected(invalid_program)
     ).
 
 mnn_program_term(Program) :-
     nonvar(Program),
     functor(Program, mnn_program, 5).
+
+check_source_incorporation(Program, Source, Proof, Result) :-
+    (   valid_dtree_incorporation(Program, Source, Proof)
+    ->  Result = accepted
+    ;   Result = rejected(invalid_or_unsupported_proof)
+    ).
+
+valid_dtree_incorporation(Program, Source, Proof) :-
+    ground(Proof),
+    Source = dtree_source(Name, Input, Tree),
+    Proof = proof([proof_step(Id, incorporate_dtree, [],
+                              equivalent(domain(all), modes(all)))]),
+    ground(Id),
+    integer(Id),
+    Id =:= 1,
+    valid_dtree_source(Name, Input, Tree),
+    expected_dtree_program(Name, Input, Tree, Expected),
+    Program =@= Expected.
+
+valid_dtree_source(Name, Input, Tree) :-
+    atom(Name),
+    var(Input),
+    acyclic_term(Tree),
+    valid_dtree_node(Tree, Input).
+
+valid_dtree_node(leaf(Value), Input) :-
+    !,
+    variables_are_input(Value, Input).
+valid_dtree_node(dtree(Test, Yes, No), Input) :-
+    valid_dtree_test(Test, Input),
+    valid_dtree_node(Yes, Input),
+    valid_dtree_node(No, Input).
+
+valid_dtree_test(Test, Input) :-
+    nonvar(Test),
+    callable(Test),
+    term_variables(Test, Variables),
+    maplist(variable_is_input(Input), Variables),
+    functor(Test, Name, Arity),
+    valid_dtree_test_shape(Name, Arity, Test, Input).
+
+valid_dtree_test_shape(Name, 1, Test, _) :-
+    memberchk(Name, [atom, atomic, compound, ground, integer, is_list, number]),
+    arg(1, Test, _).
+valid_dtree_test_shape(Name, 2, Test, Input) :-
+    memberchk(Name, ['<', '=<', '>', '>=', '=:=', '=\\=']),
+    arg(1, Test, Left),
+    arg(2, Test, Right),
+    valid_dtree_expression(Left, Input),
+    valid_dtree_expression(Right, Input).
+
+valid_dtree_expression(Expression, Input) :-
+    var(Expression),
+    !,
+    Expression == Input.
+valid_dtree_expression(Expression, _) :-
+    number(Expression),
+    !.
+valid_dtree_expression(Expression, Input) :-
+    compound(Expression),
+    functor(Expression, Name, Arity),
+    valid_dtree_expression_operator(Name, Arity),
+    Expression =.. [_|Arguments],
+    maplist(valid_dtree_expression_with_input(Input), Arguments).
+
+valid_dtree_expression_with_input(Input, Expression) :-
+    valid_dtree_expression(Expression, Input).
+
+valid_dtree_expression_operator('+', 1).
+valid_dtree_expression_operator('-', 1).
+valid_dtree_expression_operator('+', 2).
+valid_dtree_expression_operator('-', 2).
+valid_dtree_expression_operator('*', 2).
+valid_dtree_expression_operator('/', 2).
+valid_dtree_expression_operator('//', 2).
+valid_dtree_expression_operator(mod, 2).
+valid_dtree_expression_operator(rem, 2).
+valid_dtree_expression_operator(abs, 1).
+valid_dtree_expression_operator(max, 2).
+valid_dtree_expression_operator(min, 2).
+valid_dtree_expression_operator('**', 2).
+valid_dtree_expression_operator('^', 2).
+
+variables_are_input(Term, Input) :-
+    term_variables(Term, Variables),
+    maplist(variable_is_input(Input), Variables).
+
+variable_is_input(Input, Variable) :-
+    Variable == Input.
+
+expected_dtree_program(Name, Input, Tree, Program) :-
+    Output = _,
+    expected_dtree_body(Tree, Output, Body),
+    Head =.. [Name, Input, Output],
+    Predicate = mnn_pred(
+                    Name/2, ['?', '?'], [any, any],
+                    [mnn_clause(1, Head, Body,
+                                source(dtree(Name), 1))],
+                    original),
+    Program = mnn_program(
+                  Name, meta(dtree(Name), [clause(1)]),
+                  [Predicate], proof([]), trace([])).
+
+expected_dtree_body(leaf(Value), Output, Output = Value).
+expected_dtree_body(dtree(Test, Yes, No), Output,
+                    ite(Test, YesBody, NoBody)) :-
+    expected_dtree_body(Yes, Output, YesBody),
+    expected_dtree_body(No, Output, NoBody).
 
 check_supported_proof(Program, Original, Proof, Result) :-
     (   valid_identity_proof(Proof)

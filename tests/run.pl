@@ -30,6 +30,8 @@ main :-
     load_files(StarlogTests, [silent(true)]),
     directory_file_path(Directory, 'aioc_size_tests.pl', AIOCSizeTests),
     load_files(AIOCSizeTests, [silent(true)]),
+    directory_file_path(Directory, 'aioc_dtree_tests.pl', AIOCDTreeTests),
+    load_files(AIOCDTreeTests, [silent(true)]),
     directory_file_path(Directory, 'bundle_tests.pl', BundleTests),
     load_files(BundleTests, [silent(true)]),
     directory_file_path(Directory, 'aioc_assessment_tests.pl',

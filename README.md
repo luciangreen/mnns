@@ -145,8 +145,12 @@ feature and its focused test suite.
   See [`docs/starlog.md`](docs/starlog.md).
 - **AIOC structural size metric (initial):** reports clause, goal, predicate, and
   term-node counts for an IR program, plus an equal-weight total. This measures
-  representation size only; it does not estimate runtime or memory cost. An
-  initial proof-checked simplifier removes explicit `true` conjuncts and `fail`
+  representation size only; it does not estimate runtime or memory cost. A
+  restricted data-only decision-tree front end compiles pure type checks and
+  numeric comparisons to the shared IR and carries an independently checked
+  canonical-translation proof; CFG and broader source-form incorporation remain
+  unimplemented. An initial proof-checked simplifier removes explicit `true`
+  conjuncts and `fail`
   disjuncts, independently checking each rewrite; it does not yet perform general
   dead-code or semantic simplification. An
   initial proof-gated comparison reports candidate-versus-original structural
@@ -202,4 +206,3 @@ commands for every implemented test group.
 
 
 * Manual Neuronets (MNNs) are Green's invention and a way to represent the hidden workings of black-box neural nets. They combine the [Spec to Algorithm](https://github.com/luciangreen/Philosophy/tree/master/s2a), [Starlog](https://github.com/luciangreen/Starlog), [Prolog Inductive Debugger](https://github.com/luciangreen/Prolog_Inductive_Debugger), [loop2](https://github.com/luciangreen/loop2), [PLOp](https://github.com/luciangreen/plop)/[AlgebraPLOp](https://github.com/luciangreen/algebraplop), [Detlog](https://github.com/luciangreen/detlog), and [Piglog2](https://github.com/luciangreen/piglog2) repositories. Later, a chatbot incorporating natural language, manual attention, manual time series and other aspects of NNs such as signposting, ranking, analysis, conversations and personality overlays will be added.
-

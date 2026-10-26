@@ -27,6 +27,7 @@ sharing a change.
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 | AIOC structural size metric (initial) | `prolog/aioc/size.pl` | `swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"` | [AIOC size metric](aioc.md) |
+| AIOC decision-tree incorporation (restricted) | `prolog/aioc/dtree.pl` | `swipl -q -g "load_files('tests/aioc_dtree_tests.pl'), run_tests(mnn_aioc_dtree), halt"` | [AIOC decision-tree incorporation](aioc.md#decision-tree-incorporation) |
 | Starlog readable function view (initial) | `prolog/starlog/starlog.pl` | `swipl -q -g "load_files('tests/starlog_tests.pl'), run_tests(mnn_starlog), halt"` | [Starlog](starlog.md) |
 | AIOC proof-gated structural size comparison (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC assessment](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-gated structural candidate ranking (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate ranking](aioc.md#proof-gated-structural-comparison) |
