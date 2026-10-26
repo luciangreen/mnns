@@ -148,11 +148,13 @@ feature and its focused test suite.
   representation size only; it does not estimate runtime or memory cost. A
   restricted data-only decision-tree front end compiles pure type checks and
   numeric comparisons to the shared IR and carries an independently checked
-  canonical-translation proof; CFG and broader source-form incorporation remain
-  unimplemented. An initial proof-checked simplifier removes explicit `true`
-  conjuncts and `fail`
-  disjuncts, independently checking each rewrite; it does not yet perform general
-  dead-code or semantic simplification. An
+  canonical-translation proof. A restricted data-only CFG front end compiles
+  terminal/nonterminal productions into shared IR and carries an independently
+  checked canonical-translation proof; DCG and broader source-form
+  incorporation remain unimplemented. An initial proof-checked simplifier
+  removes explicit `true` conjuncts and `fail` disjuncts, independently
+  checking each rewrite; it does not yet perform general dead-code or semantic
+  simplification. An
   initial proof-gated comparison reports candidate-versus-original structural
   change and deterministic ranking of supplied candidates are available only
   after the independent checker accepts each proof; ranking uses structural
@@ -187,8 +189,8 @@ swipl -q -s tests/run.pl
 ```
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
-loop2, Detlog, PLOp, AlgebraPLOp, S2A, Starlog, AIOC size-metric, simplifier,
-and bundle tests. Focused
+loop2, Detlog, PLOp, AlgebraPLOp, S2A, Starlog, AIOC size-metric,
+decision-tree and CFG incorporation, simplifier, and bundle tests. Focused
 commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 

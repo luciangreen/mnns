@@ -43,6 +43,42 @@ swipl -q -g "load_files('tests/aioc_dtree_tests.pl'), run_tests(mnn_aioc_dtree),
 
 The suite is included in the full command `swipl -q -s tests/run.pl`.
 
+## Context-free grammar incorporation
+
+`mnn_aioc_cfg:incorporate_cfg/4` compiles the restricted data form
+`cfg(Start, Rules)` into a parser predicate `Name/1` in the shared IR.
+Productions are `rule(Nonterminal, Symbols)` terms; each symbol is explicitly
+`terminal(Token)` or `nonterminal(Name)`, and an empty symbol list is an
+epsilon production. For example:
+
+```prolog
+Grammar = cfg(s,
+              [ rule(s, [terminal(a), nonterminal(s), terminal(b)]),
+                rule(s, [])
+              ]),
+mnn_aioc_cfg:incorporate_cfg(balanced, Grammar, Program, Proof),
+mnn_proof_checker:check_proof(
+    Program, cfg_source(balanced, Grammar), Proof, accepted).
+```
+
+The generated parser succeeds when its input token list is fully consumed.
+Production order and duplicate alternatives are retained. The source is
+inspected as data and never executed during incorporation. The independent
+checker validates the grammar form and reconstructs the canonical IR before
+accepting the `incorporate_cfg` proof. This certifies the translation from this
+specific grammar notation; it is not a proof about an external grammar format,
+termination, or any extra-logical source semantics. Undefined nonterminals,
+non-ground terminals, cycles, and unsupported rule forms are rejected. This
+front end does not yet parse DCG syntax.
+
+Run the focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_cfg_tests.pl'), run_tests(mnn_aioc_cfg), halt"
+```
+
+The suite is also included in `swipl -q -s tests/run.pl`.
+
 `mnn_aioc_size:measure_program_size/2` reports structural counts for an
 `mnn_program/5`:
 

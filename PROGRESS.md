@@ -217,8 +217,8 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   type mismatches are rejected unless coercion is explicitly enabled. Recursive
   list generalization, broader arithmetic/list templates, formal example proofs,
   and the broader Starlog language remain unimplemented.
-- **Stage 9 — AIOC: restricted data-only decision-tree incorporation, initial
-  structural-size metric, proof-gated structural
+- **Stage 9 — AIOC: restricted data-only decision-tree and CFG incorporation,
+  initial structural-size metric, proof-gated structural
   candidate comparison and ranking, proof-checked bundles, data-only library
   storage, and persistent regression suites.** The metric
   reports clause, normalized-goal, predicate-record, and term-node counts with a
@@ -250,11 +250,15 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   A restricted decision-tree front end now compiles the documented pure
   type-test and numeric-comparison tree subset into the shared IR; the
   independent checker reconstructs and validates the canonical translation
-  without executing source terms. CFG/DCG and S2A incorporation proofs remain
-  outstanding. The initial simplifier also removes explicit `true`
-  conjuncts and `fail` disjuncts through individual proof-checked steps, including
-  nested normalized control goals, while declining each rewrite if the program
-  defines the corresponding predicate. CFG/DCG and S2A incorporation front ends,
+  without executing source terms. A restricted `cfg(Start, Rules)` front end
+  now compiles explicit terminal/nonterminal productions, including epsilon
+  rules, into a parser in the shared IR; its independent checker validates the
+  data-only grammar and reconstructs the canonical translation. DCG syntax and
+  S2A incorporation proofs remain outstanding. The initial simplifier also
+  removes explicit `true` conjuncts and `fail` disjuncts through individual
+  proof-checked steps, including nested normalized control goals, while
+  declining each rewrite if the program defines the corresponding predicate.
+  DCG syntax and S2A incorporation front ends,
   authenticated test records, broader semantic simplification,
   broader assessment, REPL interfaces, and the rest of the AIOC controller remain.
 
@@ -270,7 +274,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 6 | PLOp optimization pipeline and proved closed forms | In progress (multiple sequentially proof-gated finite-generator conversions; general rewrite search, cost estimates and closed forms remain) |
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; initial declared/module-qualified function expressions and string/list/atom concatenation view; no formal proof; recursive/list generalization, broader arithmetic templates, and broader Starlog syntax remain unimplemented) |
-| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (restricted decision-tree data front end with canonical independent translation checking; initial deterministic IR structural-size metric; proof-checked removal of explicit `true` conjuncts and `fail` disjuncts, including nested normalized control goals; proof-gated comparison and ranking of supplied candidates and stored library entries; proof-checked bundle writer/verifier; proof-checked data-only library storage with revalidated entry replacement and named removal; bounded sandboxed example verification with persistent named suites and proof-rechecked suite execution. CFG/DCG and S2A incorporation proofs, broader semantic simplification, authenticated test records, broader assessment, and REPL remain) |
+| 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (restricted decision-tree and data-only CFG front ends with canonical independent translation checking; initial deterministic IR structural-size metric; proof-checked removal of explicit `true` conjuncts and `fail` disjuncts, including nested normalized control goals; proof-gated comparison and ranking of supplied candidates and stored library entries; proof-checked bundle writer/verifier; proof-checked data-only library storage with revalidated entry replacement and named removal; bounded sandboxed example verification with persistent named suites and proof-rechecked suite execution. DCG syntax and S2A incorporation proofs, broader semantic simplification, authenticated test records, broader assessment, and REPL remain) |
 | 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |
