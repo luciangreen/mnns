@@ -1,5 +1,55 @@
 # AIOC structural size metric
 
+## Deterministic resource allocation
+
+`mnn_aioc_allocate:allocate_resources/3` splits integer resource budgets across
+named candidates and returns a deterministic allocation report. Each candidate
+has the form
+`candidate(Name, assessment(Score), cost(Cost), amplitude(Amplitude))`, where
+all numeric values are nonnegative integers. Assessment and cost are controller
+inputs, not proof results; candidate admission and proof checking remain the
+caller's responsibility.
+
+```prolog
+Candidates = [
+    candidate(simple, assessment(2), cost(1), amplitude(3)),
+    candidate(compact, assessment(1), cost(0), amplitude(1))
+],
+mnn_aioc_allocate:allocate_resources(
+    Candidates,
+    [seed(7), quantum(inspired),
+     budget(time, 100), budget(memory, 64), budget(workers, 4),
+     budget(depth, 12), budget(data, 32), budget(effort, 20)],
+    Report).
+```
+
+Options are `seed(NonNegativeInteger)`, `quantum(off|inspired)`, and any of
+`budget(time|memory|workers|depth|data|effort, NonNegativeInteger)`. Unspecified
+budgets are zero. Candidate names and resource budgets must be unique; unknown
+options and malformed values raise domain/type errors. Allocations use integer
+proportional shares based on
+`max(1, (Score + 1) // (Cost + 1))` in classical mode and
+`max(1, ((Score + 1) * (Amplitude + 1)) // (Cost + 1))` in inspired mode.
+Largest remainders receive leftover units, with candidate names sorted before a
+seeded rotation breaks exact ties. Therefore totals never exceed a supplied
+budget and equal inputs produce the same report for a given seed.
+
+The report is
+`allocation_report(Seed, Mode, [budget(Resource, Amount), ...], Allocations)`.
+Each entry records the candidate's score, cost, amplitude, computed weight,
+per-resource shares, and the proportional-allocation reason. This module
+computes an allocation plan only: it does not reserve/enforce machine
+resources, dispatch workers, split ANN datasets, or adjust allocations from
+measured cycle feedback. It is not yet wired into an AIOC cycle controller.
+
+Run the focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_allocate_tests.pl'), run_tests(mnn_aioc_allocate), halt"
+```
+
+The suite is included in `swipl -q -s tests/run.pl`.
+
 ## Decision-tree incorporation
 
 `mnn_aioc_dtree:incorporate_dtree/5` compiles the restricted data form

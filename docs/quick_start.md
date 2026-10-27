@@ -67,13 +67,15 @@ also run by CI on pushes and pull requests.
 
 ## Implementation status
 
-Stages 1–9 have partial implementations; stages 10–14 have not started. The
+Stages 1–10 have partial implementations; stages 11–14 have not started. The
 implemented slices include the shared IR and sandbox runner, restricted proof
 checking, PID and Detlog analysis, finite-generator loop conversion, an initial
 proof-gated PLOp pipeline, sequence inference, S2A example synthesis, an initial
 Starlog function-expression view, restricted AIOC decision-tree and CFG
-incorporation, size measurement, proof-gated structural comparison, and
-proof-checked bundles.
+incorporation, size measurement, proof-gated structural comparison, deterministic
+budget allocation, and proof-checked bundles. Stage 10 includes the initial
+quantum-inspired candidate search/export and an allocation planner, but no
+integrated cycle controller.
 The full optimization chain,
 general synthesis and proof rules, the broader Starlog language, ANN/AMNN
 generation, Neuroprolog, the MNN chatbot and agent, and benchmark suite are not
