@@ -36,6 +36,8 @@ main :-
     load_files(AIOCDTreeTests, [silent(true)]),
     directory_file_path(Directory, 'aioc_cfg_tests.pl', AIOCCFGTests),
     load_files(AIOCCFGTests, [silent(true)]),
+    directory_file_path(Directory, 'aioc_dcg_tests.pl', AIOCDCGTests),
+    load_files(AIOCDCGTests, [silent(true)]),
     directory_file_path(Directory, 'bundle_tests.pl', BundleTests),
     load_files(BundleTests, [silent(true)]),
     directory_file_path(Directory, 'aioc_assessment_tests.pl',

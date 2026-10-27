@@ -154,9 +154,11 @@ feature and its focused test suite.
   representation size only; it does not estimate runtime or memory cost. A
   restricted data-only decision-tree front end compiles pure type checks and
   numeric comparisons to the shared IR and carries an independently checked
-  canonical-translation proof. A restricted data-only CFG front end compiles
-  terminal/nonterminal productions into shared IR and carries an independently
-  checked canonical-translation proof; DCG and broader source-form
+  canonical-translation proof. Restricted data-only CFG and DCG front ends
+  compile terminal/nonterminal productions into shared IR and carry
+  independently checked canonical-translation proofs. The DCG front end
+  supports terminal lists, atom nonterminals, conjunction, disjunction, and
+  epsilon productions; arbitrary DCG goals and broader source-form
   incorporation remain unimplemented. An initial proof-checked simplifier
   removes explicit `true` conjuncts and `fail` disjuncts, independently
   checking each rewrite; it does not yet perform general dead-code or semantic

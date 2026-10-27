@@ -43,6 +43,45 @@ swipl -q -g "load_files('tests/aioc_dtree_tests.pl'), run_tests(mnn_aioc_dtree),
 
 The suite is included in the full command `swipl -q -s tests/run.pl`.
 
+## DCG syntax incorporation
+
+`mnn_aioc_dcg:incorporate_dcg/4` compiles a restricted data representation of
+Definite Clause Grammar rules into the shared IR:
+
+```prolog
+DCG = dcg(s,
+          [ (s --> [a], item, [b]),
+            (item --> [x]),
+            (item --> [])
+          ]),
+mnn_aioc_dcg:incorporate_dcg(parser, DCG, Program, Proof),
+mnn_proof_checker:check_proof(
+    Program, dcg_source(parser, DCG), Proof, accepted).
+```
+
+The supported body forms are terminal lists such as `[a,b]`, bare atom
+nonterminal references, conjunctions, disjunctions, and `[]` for epsilon.
+Conjunctions are expanded into production sequences and alternatives retain
+their source order, including duplicates. The generated `parser/1` succeeds
+only when the complete token list has been consumed. Inputs are inspected as
+ground data and never executed. Braced goals, variables, non-atom heads, and
+undefined nonterminals are rejected. The independent proof checker separately
+normalizes this subset and reconstructs the canonical IR before accepting the
+`incorporate_dcg` proof. This does not support arbitrary Prolog DCGs, semantic
+actions, extra-logical goals, or external DCG formats.
+
+Run its focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_dcg_tests.pl'), run_tests(mnn_aioc_dcg), halt"
+```
+
+The tests are also included in the full suite:
+
+```sh
+swipl -q -s tests/run.pl
+```
+
 ## Context-free grammar incorporation
 
 `mnn_aioc_cfg:incorporate_cfg/4` compiles the restricted data form
@@ -68,8 +107,8 @@ checker validates the grammar form and reconstructs the canonical IR before
 accepting the `incorporate_cfg` proof. This certifies the translation from this
 specific grammar notation; it is not a proof about an external grammar format,
 termination, or any extra-logical source semantics. Undefined nonterminals,
-non-ground terminals, cycles, and unsupported rule forms are rejected. This
-front end does not yet parse DCG syntax.
+non-ground terminals, cycles, and unsupported rule forms are rejected. The
+restricted DCG data front end is documented above.
 
 Run the focused tests from the repository root:
 
