@@ -34,7 +34,7 @@ sharing a change.
 | Starlog readable function view (initial) | `prolog/starlog/starlog.pl` | `swipl -q -g "load_files('tests/starlog_tests.pl'), run_tests(mnn_starlog), halt"` | [Starlog](starlog.md) |
 | AIOC proof-gated structural size comparison (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC assessment](aioc.md#proof-gated-structural-comparison) |
 | AIOC proof-gated structural candidate ranking (initial) | `prolog/aioc/assessment.pl` | `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"` | [AIOC candidate ranking](aioc.md#proof-gated-structural-comparison) |
-| AIOC proof-checked removal of explicit `true` conjuncts and `fail` disjuncts (initial) | `prolog/aioc/simplify.pl` | `swipl -q -g "load_files('tests/aioc_simplify_tests.pl'), run_tests(mnn_aioc_simplify), halt"` | [AIOC simplification](aioc.md#proof-checked-simplification) |
+| AIOC proof-checked removal of explicit `true` conjuncts, `fail` disjuncts, and redundant `once(true)` / `once(fail)` (initial) | `prolog/aioc/simplify.pl` | `swipl -q -g "load_files('tests/aioc_simplify_tests.pl'), run_tests(mnn_aioc_simplify), halt"` | [AIOC simplification](aioc.md#proof-checked-simplification) |
 | AIOC proof-checked algorithm library, structural ranking, and run-and-record regression checks (initial) | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC library](aioc.md#proof-checked-library) |
 | Persistent named AIOC test suites and proof-rechecked suite execution | `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC test suites](aioc.md#persistent-test-suites) |
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
@@ -586,6 +586,9 @@ Run every test, including the corpus and all subsystem tests:
 swipl -q -s tests/run.pl
 ```
 
+If your shell uses an ASCII `C` locale, prefix Prolog commands with
+`LC_ALL=C.UTF-8` because the Starlog tests exercise Unicode operators.
+
 Run an individual test group:
 
 ```sh
@@ -598,11 +601,17 @@ swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog
 swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
 swipl -q -g "load_files('tests/detlog_tests.pl'), run_tests(mnn_detlog), halt"
 swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
+swipl -q -g "load_files('tests/qi_search_tests.pl'), run_tests(mnn_qi_search), halt"
 swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"
 swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
+swipl -q -g "load_files('tests/starlog_tests.pl'), run_tests(mnn_starlog), halt"
 swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"
+swipl -q -g "load_files('tests/aioc_dtree_tests.pl'), run_tests(mnn_aioc_dtree), halt"
+swipl -q -g "load_files('tests/aioc_cfg_tests.pl'), run_tests(mnn_aioc_cfg), halt"
+swipl -q -g "load_files('tests/aioc_dcg_tests.pl'), run_tests(mnn_aioc_dcg), halt"
 swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"
 swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"
+swipl -q -g "load_files('tests/aioc_simplify_tests.pl'), run_tests(mnn_aioc_simplify), halt"
 swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"
 swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"
 ```
@@ -645,9 +654,9 @@ The current work is an initial subset, not a completed version 1 suite:
   supplied passed-test metadata; `run_entry_tests/5` runs bounded regression
   checks only after rechecking a stored proof; named test suites are now
   persistable data and can run through these checks, but result records remain
-  unauthenticated. Incorporation front ends, semantic simplification,
-  authenticated test records, broader candidate
-  assessment, and REPL commands remain.
+  unauthenticated. Broader source incorporation, broader semantic
+  simplification, authenticated test records, broader candidate assessment, and
+  REPL commands remain.
 - **Stages 10–14 are not started:** quantum-inspired search/export, AMNN/ANN/manual
   gradient descent, Neuroprolog, the MNN core/chatbot/agent, and benchmarks.
 

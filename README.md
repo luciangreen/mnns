@@ -12,8 +12,11 @@ analysis and a restricted pure `once/1` compilation slice, but not general
 Detlog transformations. S2A supports a conservative unique input-address
 projection, integer polynomial relations through degree three, and explicitly
 opted-in example tables; Starlog currently has an initial function-expression
-view, while recursive generalization, the end-user MNN compiler, general PLOp
-optimization, AIOC, neural-network, chatbot, and agent features remain incomplete.
+view. AIOC has initial proof-checked decision-tree and grammar incorporation,
+simplification, assessment, bundles, and library features. Recursive
+generalization, the end-user MNN compiler, general PLOp optimization, the
+complete AIOC controller, neural-network, chatbot, and agent features remain
+incomplete.
 A proof-gated
 PLOp pipeline currently exposes a limited set of independently checked
 finite-generator conversions. See [`PROGRESS.md`](PROGRESS.md) for the
@@ -160,9 +163,10 @@ feature and its focused test suite.
   supports terminal lists, atom nonterminals, conjunction, disjunction, and
   epsilon productions; arbitrary DCG goals and broader source-form
   incorporation remain unimplemented. An initial proof-checked simplifier
-  removes explicit `true` conjuncts and `fail` disjuncts, independently
-  checking each rewrite; it does not yet perform general dead-code or semantic
-  simplification. An
+  removes explicit `true` conjuncts and `fail` disjuncts and collapses
+  redundant `once(true)` / `once(fail)` wrappers,
+  independently checking each rewrite; it does not yet perform general
+  dead-code or semantic simplification. An
   initial proof-gated comparison reports candidate-versus-original structural
   change and deterministic ranking of supplied candidates are available only
   after the independent checker accepts each proof; ranking uses structural
@@ -198,7 +202,8 @@ swipl -q -s tests/run.pl
 
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
 loop2, Detlog, PLOp, AlgebraPLOp, S2A, Starlog, AIOC size-metric,
-decision-tree and CFG incorporation, simplifier, and bundle tests. Focused
+decision-tree, CFG and DCG incorporation, simplifier, assessment, bundle,
+library, bounded test-runner, and quantum-search tests. Focused
 commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 
@@ -207,6 +212,9 @@ swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_che
 swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
 swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 ```
+
+If your shell uses an ASCII `C` locale, prefix Prolog commands with
+`LC_ALL=C.UTF-8` because the Starlog tests exercise Unicode operators.
 
 The full suite is also run on pushes and pull requests by
 [`.github/workflows/prolog-tests.yml`](.github/workflows/prolog-tests.yml).

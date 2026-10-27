@@ -36,6 +36,8 @@ simplify_once(Program, Next, remove_true_conjunct) :-
     !.
 simplify_once(Program, Next, remove_fail_disjunct) :-
     remove_one_fail_disjunct(Program, Next).
+simplify_once(Program, Next, simplify_once_constant) :-
+    remove_one_once_constant(Program, Next).
 
 remove_one_true_conjunct(
     mnn_program(Name, Meta, Predicates, Proof, Trace),
@@ -51,6 +53,13 @@ remove_one_fail_disjunct(
     \+ defines_fail_predicate(Predicates),
     simplify_fail_predicates(Predicates, SimplifiedPredicates).
 
+remove_one_once_constant(
+    mnn_program(Name, Meta, Predicates, Proof, Trace),
+    mnn_program(Name, Meta, SimplifiedPredicates, Proof, Trace)) :-
+    is_list(Predicates),
+    simplify_once_constant_predicates(
+        Predicates, Predicates, SimplifiedPredicates).
+
 defines_true_predicate(Predicates) :-
     member(Predicate, Predicates),
     nonvar(Predicate),
@@ -64,6 +73,90 @@ defines_fail_predicate(Predicates) :-
     functor(Predicate, mnn_pred, 5),
     arg(1, Predicate, Key),
     Key == fail/0.
+
+defines_once_constant(Predicates, true) :-
+    defines_true_predicate(Predicates),
+    !.
+defines_once_constant(Predicates, fail) :-
+    defines_fail_predicate(Predicates).
+
+simplify_once_constant_predicates(
+    [Predicate|Predicates], AllPredicates,
+    [mnn_pred(Key, Modes, Domains, SimplifiedClauses, Status)|Predicates]) :-
+    nonvar(Predicate),
+    Predicate = mnn_pred(Key, Modes, Domains, Clauses, Status),
+    simplify_once_constant_clauses(
+        Clauses, AllPredicates, SimplifiedClauses),
+    !.
+simplify_once_constant_predicates(
+    [Predicate|Predicates], AllPredicates,
+    [Predicate|SimplifiedPredicates]) :-
+    simplify_once_constant_predicates(
+        Predicates, AllPredicates, SimplifiedPredicates).
+
+simplify_once_constant_clauses(
+    [Clause|Clauses], AllPredicates,
+    [mnn_clause(Id, Head, SimplifiedBody, Source)|Clauses]) :-
+    nonvar(Clause),
+    Clause = mnn_clause(Id, Head, Body, Source),
+    simplify_once_constant_goal(Body, AllPredicates, SimplifiedBody),
+    !.
+simplify_once_constant_clauses(
+    [Clause|Clauses], AllPredicates, [Clause|SimplifiedClauses]) :-
+    simplify_once_constant_clauses(
+        Clauses, AllPredicates, SimplifiedClauses).
+
+simplify_once_constant_goal(Goal, Predicates, Simplified) :-
+    nonvar(Goal),
+    simplify_once_constant_nonvar_goal(Goal, Predicates, Simplified).
+
+simplify_once_constant_nonvar_goal(once(Goal), Predicates, true) :-
+    Goal == true,
+    \+ defines_once_constant(Predicates, true),
+    !.
+simplify_once_constant_nonvar_goal(once(Goal), Predicates, fail) :-
+    Goal == fail,
+    \+ defines_once_constant(Predicates, fail),
+    !.
+simplify_once_constant_nonvar_goal(conj(Left, Right), Predicates,
+                                   conj(SimplifiedLeft, Right)) :-
+    simplify_once_constant_goal(Left, Predicates, SimplifiedLeft),
+    !.
+simplify_once_constant_nonvar_goal(conj(Left, Right), Predicates,
+                                   conj(Left, SimplifiedRight)) :-
+    simplify_once_constant_goal(Right, Predicates, SimplifiedRight),
+    !.
+simplify_once_constant_nonvar_goal(disj(Left, Right), Predicates,
+                                   disj(SimplifiedLeft, Right)) :-
+    simplify_once_constant_goal(Left, Predicates, SimplifiedLeft),
+    !.
+simplify_once_constant_nonvar_goal(disj(Left, Right), Predicates,
+                                   disj(Left, SimplifiedRight)) :-
+    simplify_once_constant_goal(Right, Predicates, SimplifiedRight),
+    !.
+simplify_once_constant_nonvar_goal(
+    ite(Condition, Then, Else), Predicates,
+    ite(SimplifiedCondition, Then, Else)) :-
+    simplify_once_constant_goal(
+        Condition, Predicates, SimplifiedCondition),
+    !.
+simplify_once_constant_nonvar_goal(
+    ite(Condition, Then, Else), Predicates,
+    ite(Condition, SimplifiedThen, Else)) :-
+    simplify_once_constant_goal(Then, Predicates, SimplifiedThen),
+    !.
+simplify_once_constant_nonvar_goal(
+    ite(Condition, Then, Else), Predicates,
+    ite(Condition, Then, SimplifiedElse)) :-
+    simplify_once_constant_goal(Else, Predicates, SimplifiedElse),
+    !.
+simplify_once_constant_nonvar_goal(not(Goal), Predicates,
+                                   not(SimplifiedGoal)) :-
+    simplify_once_constant_goal(Goal, Predicates, SimplifiedGoal),
+    !.
+simplify_once_constant_nonvar_goal(once(Goal), Predicates,
+                                   once(SimplifiedGoal)) :-
+    simplify_once_constant_goal(Goal, Predicates, SimplifiedGoal).
 
 simplify_predicates([Predicate|Predicates],
                     [mnn_pred(Key, Modes, Domains, SimplifiedClauses, Status)
