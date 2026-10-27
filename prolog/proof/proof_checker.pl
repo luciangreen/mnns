@@ -7,7 +7,9 @@ check_proof(Program, Original, Proof, Result) :-
     ->  (   mnn_program_term(Original)
         ->  check_supported_proof(Program, Original, Proof, Result)
         ;   nonvar(Original),
-            functor(Original, dtree_source, 3)
+            (   functor(Original, dtree_source, 3)
+            ;   functor(Original, cfg_source, 2)
+            )
         ->  check_source_incorporation(Program, Original, Proof, Result)
         ;   Result = rejected(invalid_program)
         )
@@ -19,7 +21,9 @@ mnn_program_term(Program) :-
     functor(Program, mnn_program, 5).
 
 check_source_incorporation(Program, Source, Proof, Result) :-
-    (   valid_dtree_incorporation(Program, Source, Proof)
+    (   (   valid_dtree_incorporation(Program, Source, Proof)
+        ;   valid_cfg_incorporation(Program, Source, Proof)
+        )
     ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
     ).
@@ -125,6 +129,138 @@ expected_dtree_body(dtree(Test, Yes, No), Output,
                     ite(Test, YesBody, NoBody)) :-
     expected_dtree_body(Yes, Output, YesBody),
     expected_dtree_body(No, Output, NoBody).
+
+valid_cfg_incorporation(Program, Source, Proof) :-
+    ground(Proof),
+    Source = cfg_source(Name, Grammar),
+    Proof = proof([proof_step(Id, incorporate_cfg, [],
+                              equivalent(domain(all), modes(all)))]),
+    integer(Id),
+    Id =:= 1,
+    valid_cfg_source(Name, Grammar),
+    expected_cfg_program(Name, Grammar, Expected),
+    Program =@= Expected.
+
+valid_cfg_source(Name, cfg(Start, Rules)) :-
+    atom(Name),
+    atom(Start),
+    is_list(Rules),
+    Rules = [_|_],
+    acyclic_term(Rules),
+    cfg_source_nonterminals(Rules, Nonterminals),
+    memberchk(Start, Nonterminals),
+    maplist(valid_cfg_source_rule(Nonterminals), Rules).
+
+cfg_source_nonterminals(Rules, Nonterminals) :-
+    maplist(cfg_source_rule_nonterminal, Rules, All),
+    list_to_set(All, Nonterminals).
+
+cfg_source_rule_nonterminal(rule(Nonterminal, _), Nonterminal) :-
+    atom(Nonterminal).
+
+valid_cfg_source_rule(Nonterminals, rule(Nonterminal, Symbols)) :-
+    atom(Nonterminal),
+    memberchk(Nonterminal, Nonterminals),
+    is_list(Symbols),
+    maplist(valid_cfg_source_symbol(Nonterminals), Symbols).
+
+valid_cfg_source_symbol(_, terminal(Token)) :-
+    ground(Token),
+    acyclic_term(Token).
+valid_cfg_source_symbol(Nonterminals, nonterminal(Nonterminal)) :-
+    atom(Nonterminal),
+    memberchk(Nonterminal, Nonterminals).
+
+expected_cfg_program(Name, cfg(Start, Rules), Program) :-
+    cfg_source_nonterminals(Rules, Nonterminals),
+    expected_cfg_mapping(Name, Nonterminals, 1, Mapping),
+    expected_cfg_lookup(Start, Mapping, StartPredicate),
+    WrapperHead =.. [Name, Tokens],
+    StartGoal =.. [StartPredicate, Tokens, []],
+    Wrapper = mnn_pred(
+                  Name/1, ['?'], [any],
+                  [mnn_clause(1, WrapperHead, StartGoal,
+                              source(cfg(Name), 1))],
+                  original),
+    expected_cfg_predicates(
+        Nonterminals, Rules, Mapping, Name, 2, RulePredicates),
+    append([Wrapper], RulePredicates, Predicates),
+    expected_cfg_events(Predicates, [], ReverseEvents),
+    reverse(ReverseEvents, Events),
+    Program = mnn_program(
+                  Name, meta(cfg(Name), Events), Predicates,
+                  proof([]), trace([])).
+
+expected_cfg_mapping(_, [], _, []).
+expected_cfg_mapping(Name, [Nonterminal|Nonterminals], Index,
+                     [Nonterminal-Predicate|Mapping]) :-
+    format(atom(Predicate), '~w__cfg_nt_~d', [Name, Index]),
+    Next is Index + 1,
+    expected_cfg_mapping(Name, Nonterminals, Next, Mapping).
+
+expected_cfg_lookup(Nonterminal,
+                    [Nonterminal-Predicate|_], Predicate) :-
+    !.
+expected_cfg_lookup(Nonterminal, [_|Mapping], Predicate) :-
+    expected_cfg_lookup(Nonterminal, Mapping, Predicate).
+
+expected_cfg_predicates([], _, _, _, _, []).
+expected_cfg_predicates([Nonterminal|Nonterminals], Rules, Mapping,
+                        Name, ClauseId, [Predicate|Predicates]) :-
+    include(expected_cfg_rule(Nonterminal), Rules, Selected),
+    expected_cfg_lookup(Nonterminal, Mapping, PredicateName),
+    expected_cfg_clauses(
+        Selected, PredicateName, Mapping, Name, ClauseId,
+        Clauses, NextClauseId),
+    Predicate = mnn_pred(
+                    PredicateName/2, ['?', '?'], [any, any],
+                    Clauses, original),
+    expected_cfg_predicates(
+        Nonterminals, Rules, Mapping, Name, NextClauseId, Predicates).
+
+expected_cfg_rule(Nonterminal, rule(Other, _)) :-
+    Nonterminal == Other.
+
+expected_cfg_clauses([], _, _, _, ClauseId, [], ClauseId).
+expected_cfg_clauses([rule(_, Symbols)|Rules], PredicateName, Mapping,
+                     Name, ClauseId, [Clause|Clauses], NextClauseId) :-
+    Input = _,
+    Output = _,
+    Head =.. [PredicateName, Input, Output],
+    expected_cfg_body(Symbols, Input, Output, Mapping, Body),
+    Clause = mnn_clause(
+                 ClauseId, Head, Body, source(cfg(Name), ClauseId)),
+    Following is ClauseId + 1,
+    expected_cfg_clauses(
+        Rules, PredicateName, Mapping, Name, Following,
+        Clauses, NextClauseId).
+
+expected_cfg_body([], Input, Output, _, Input = Output).
+expected_cfg_body([Symbol|Symbols], Input, Output, Mapping, Body) :-
+    expected_cfg_symbol_goal(Symbol, Input, NextInput, Mapping, Goal),
+    (   Symbols == []
+    ->  Body = (Goal, NextInput = Output)
+    ;   expected_cfg_body(Symbols, NextInput, Output, Mapping, Rest),
+        Body = (Goal, Rest)
+    ).
+
+expected_cfg_symbol_goal(
+    terminal(Token), Input, Rest, _, Input = [Token|Rest]).
+expected_cfg_symbol_goal(
+    nonterminal(Nonterminal), Input, Rest, Mapping, Goal) :-
+    expected_cfg_lookup(Nonterminal, Mapping, Predicate),
+    Goal =.. [Predicate, Input, Rest].
+
+expected_cfg_events([], Events, Events).
+expected_cfg_events(
+    [mnn_pred(_, _, _, Clauses, _)|Predicates], Acc, Events) :-
+    expected_cfg_clause_events(Clauses, Acc, Next),
+    expected_cfg_events(Predicates, Next, Events).
+
+expected_cfg_clause_events([], Events, Events).
+expected_cfg_clause_events(
+    [mnn_clause(Id, _, _, _)|Clauses], Acc, Events) :-
+    expected_cfg_clause_events(Clauses, [clause(Id)|Acc], Events).
 
 check_supported_proof(Program, Original, Proof, Result) :-
     (   valid_identity_proof(Proof)
