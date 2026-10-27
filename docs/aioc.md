@@ -50,6 +50,42 @@ swipl -q -g "load_files('tests/aioc_allocate_tests.pl'), run_tests(mnn_aioc_allo
 
 The suite is included in `swipl -q -s tests/run.pl`.
 
+## Single-cycle search and resource planning
+
+`mnn_aioc_cycle:run_cycle/5` connects the existing proof-gated, quantum-inspired
+candidate search to deterministic resource allocation for one candidate cycle:
+
+```prolog
+mnn_aioc_cycle:run_cycle(
+    Program,
+    [seed(7), links([qi_link(values/1, num/1)])],
+    [seed(7), quantum(inspired), budget(time, 100),
+     budget(workers, 4), budget(effort, 20)],
+    Best,
+    cycle_report(SearchReport, AllocationReport)).
+```
+
+The search validates candidate proofs before reporting them. The allocation
+plan covers the reported candidates and derives its assessment score only from
+structural-size reduction relative to the original program; it is not a
+qualitative assessment or runtime estimate. Search and allocation options are
+separate: pass the same seed to both when a single reproducibility seed is
+desired. Invalid options and search errors are surfaced by the underlying
+modules.
+
+This is one search-and-planning pass, not the complete AIOC cycle controller.
+It does not dispatch work, enforce time or memory limits, compare a Pareto set,
+transfer proved structures between sources, consume measured feedback, or
+iterate to a fixed point. Allocations are plans only.
+
+Run the focused tests from the repository root:
+
+```sh
+swipl -q -g "load_files('tests/aioc_cycle_tests.pl'), run_tests(mnn_aioc_cycle), halt"
+```
+
+The suite is also included in `swipl -q -s tests/run.pl`.
+
 ## Decision-tree incorporation
 
 `mnn_aioc_dtree:incorporate_dtree/5` compiles the restricted data form
