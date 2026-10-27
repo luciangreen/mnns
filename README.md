@@ -13,7 +13,9 @@ Detlog transformations. S2A supports a conservative unique input-address
 projection, integer polynomial relations through degree three, and explicitly
 opted-in example tables; Starlog currently has an initial function-expression
 view. AIOC has initial proof-checked decision-tree and grammar incorporation,
-simplification, assessment, bundles, and library features. Recursive
+simplification, assessment, deterministic budget allocation, bundles, and
+library features. The allocation planner is not yet connected to an AIOC cycle
+controller. Recursive
 generalization, the end-user MNN compiler, general PLOp optimization, the
 complete AIOC controller, neural-network, chatbot, and agent features remain
 incomplete.
@@ -171,6 +173,10 @@ feature and its focused test suite.
   change and deterministic ranking of supplied candidates are available only
   after the independent checker accepts each proof; ranking uses structural
   size, not runtime or quality. The
+  resource allocator deterministically divides caller-supplied time, memory,
+  worker, depth, data, and effort budgets according to candidate assessment/cost
+  scores, with optional amplitude weighting. It plans integer shares only; it
+  does not dispatch workers or enforce machine resource limits. The
   proof-checked library records candidate metadata and test-result claims, then
   rechecks proofs when entries are retrieved, updated, or included in a
   library-wide structural assessment; named entries can be removed, and
@@ -203,7 +209,7 @@ swipl -q -s tests/run.pl
 The runner loads the IR, proof checker, round-trip corpus, sandbox runner, PID,
 loop2, Detlog, PLOp, AlgebraPLOp, S2A, Starlog, AIOC size-metric,
 decision-tree, CFG and DCG incorporation, simplifier, assessment, bundle,
-library, bounded test-runner, and quantum-search tests. Focused
+resource-allocation, library, bounded test-runner, and quantum-search tests. Focused
 commands for every PlUnit group are listed in
 [`docs/current_features.md`](docs/current_features.md). For example:
 
