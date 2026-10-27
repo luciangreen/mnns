@@ -9,6 +9,7 @@ check_proof(Program, Original, Proof, Result) :-
         ;   nonvar(Original),
             (   functor(Original, dtree_source, 3)
             ;   functor(Original, cfg_source, 2)
+            ;   functor(Original, dcg_source, 2)
             )
         ->  check_source_incorporation(Program, Original, Proof, Result)
         ;   Result = rejected(invalid_program)
@@ -23,6 +24,7 @@ mnn_program_term(Program) :-
 check_source_incorporation(Program, Source, Proof, Result) :-
     (   (   valid_dtree_incorporation(Program, Source, Proof)
         ;   valid_cfg_incorporation(Program, Source, Proof)
+        ;   valid_dcg_incorporation(Program, Source, Proof)
         )
     ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
@@ -141,6 +143,69 @@ valid_cfg_incorporation(Program, Source, Proof) :-
     expected_cfg_program(Name, Grammar, Expected),
     Program =@= Expected.
 
+valid_dcg_incorporation(Program, Source, Proof) :-
+    ground(Proof),
+    Source = dcg_source(Name, DCG),
+    Proof = proof([proof_step(Id, incorporate_dcg, [],
+                              equivalent(domain(all), modes(all)))]),
+    integer(Id),
+    Id =:= 1,
+    valid_dcg_source(Name, DCG, Grammar),
+    expected_cfg_program(Name, Grammar, dcg(Name), Expected),
+    Program =@= Expected.
+
+valid_dcg_source(Name, dcg(Start, Clauses), cfg(Start, Rules)) :-
+    atom(Name),
+    ground(dcg(Start, Clauses)),
+    acyclic_term(dcg(Start, Clauses)),
+    atom(Start),
+    is_list(Clauses),
+    Clauses = [_|_],
+    maplist(expected_dcg_clause_rules, Clauses, RuleGroups),
+    append(RuleGroups, Rules),
+    valid_cfg_source(Name, cfg(Start, Rules)).
+
+expected_dcg_clause_rules((Head --> Body), Rules) :-
+    atom(Head),
+    expected_dcg_body_alternatives(Body, Alternatives),
+    maplist(expected_dcg_rule(Head), Alternatives, Rules).
+
+expected_dcg_rule(Head, Symbols, rule(Head, Symbols)).
+
+expected_dcg_body_alternatives(Body, Alternatives) :-
+    (   Body = (Left ; Right)
+    ->  expected_dcg_body_alternatives(Left, LeftAlternatives),
+        expected_dcg_body_alternatives(Right, RightAlternatives),
+        append(LeftAlternatives, RightAlternatives, Alternatives)
+    ;   Body = (Left, Right)
+    ->  expected_dcg_body_alternatives(Left, LeftAlternatives),
+        expected_dcg_body_alternatives(Right, RightAlternatives),
+        expected_dcg_append_alternatives(
+            LeftAlternatives, RightAlternatives, Alternatives)
+    ;   Body == []
+    ->  Alternatives = [[]]
+    ;   is_list(Body)
+    ->  maplist(expected_dcg_terminal, Body, Symbols),
+        Alternatives = [Symbols]
+    ;   atom(Body)
+    ->  Alternatives = [[nonterminal(Body)]]
+    ).
+
+expected_dcg_terminal(Token, terminal(Token)) :-
+    ground(Token),
+    acyclic_term(Token).
+
+expected_dcg_append_alternatives([], _, []).
+expected_dcg_append_alternatives([Left|Lefts], Rights, Alternatives) :-
+    expected_dcg_append_for(Left, Rights, First),
+    expected_dcg_append_alternatives(Lefts, Rights, Rest),
+    append(First, Rest, Alternatives).
+
+expected_dcg_append_for(_, [], []).
+expected_dcg_append_for(Left, [Right|Rights], [Combined|Rest]) :-
+    append(Left, Right, Combined),
+    expected_dcg_append_for(Left, Rights, Rest).
+
 valid_cfg_source(Name, cfg(Start, Rules)) :-
     atom(Name),
     atom(Start),
@@ -172,6 +237,9 @@ valid_cfg_source_symbol(Nonterminals, nonterminal(Nonterminal)) :-
     memberchk(Nonterminal, Nonterminals).
 
 expected_cfg_program(Name, cfg(Start, Rules), Program) :-
+    expected_cfg_program(Name, cfg(Start, Rules), cfg(Name), Program).
+
+expected_cfg_program(Name, cfg(Start, Rules), SourceTag, Program) :-
     cfg_source_nonterminals(Rules, Nonterminals),
     expected_cfg_mapping(Name, Nonterminals, 1, Mapping),
     expected_cfg_lookup(Start, Mapping, StartPredicate),
@@ -180,15 +248,15 @@ expected_cfg_program(Name, cfg(Start, Rules), Program) :-
     Wrapper = mnn_pred(
                   Name/1, ['?'], [any],
                   [mnn_clause(1, WrapperHead, StartGoal,
-                              source(cfg(Name), 1))],
+                              source(SourceTag, 1))],
                   original),
     expected_cfg_predicates(
-        Nonterminals, Rules, Mapping, Name, 2, RulePredicates),
+        Nonterminals, Rules, Mapping, SourceTag, 2, RulePredicates),
     append([Wrapper], RulePredicates, Predicates),
     expected_cfg_events(Predicates, [], ReverseEvents),
     reverse(ReverseEvents, Events),
     Program = mnn_program(
-                  Name, meta(cfg(Name), Events), Predicates,
+                  Name, meta(SourceTag, Events), Predicates,
                   proof([]), trace([])).
 
 expected_cfg_mapping(_, [], _, []).
@@ -206,33 +274,33 @@ expected_cfg_lookup(Nonterminal, [_|Mapping], Predicate) :-
 
 expected_cfg_predicates([], _, _, _, _, []).
 expected_cfg_predicates([Nonterminal|Nonterminals], Rules, Mapping,
-                        Name, ClauseId, [Predicate|Predicates]) :-
+                        SourceTag, ClauseId, [Predicate|Predicates]) :-
     include(expected_cfg_rule(Nonterminal), Rules, Selected),
     expected_cfg_lookup(Nonterminal, Mapping, PredicateName),
     expected_cfg_clauses(
-        Selected, PredicateName, Mapping, Name, ClauseId,
+        Selected, PredicateName, Mapping, SourceTag, ClauseId,
         Clauses, NextClauseId),
     Predicate = mnn_pred(
                     PredicateName/2, ['?', '?'], [any, any],
                     Clauses, original),
     expected_cfg_predicates(
-        Nonterminals, Rules, Mapping, Name, NextClauseId, Predicates).
+        Nonterminals, Rules, Mapping, SourceTag, NextClauseId, Predicates).
 
 expected_cfg_rule(Nonterminal, rule(Other, _)) :-
     Nonterminal == Other.
 
 expected_cfg_clauses([], _, _, _, ClauseId, [], ClauseId).
 expected_cfg_clauses([rule(_, Symbols)|Rules], PredicateName, Mapping,
-                     Name, ClauseId, [Clause|Clauses], NextClauseId) :-
+                     SourceTag, ClauseId, [Clause|Clauses], NextClauseId) :-
     Input = _,
     Output = _,
     Head =.. [PredicateName, Input, Output],
     expected_cfg_body(Symbols, Input, Output, Mapping, Body),
     Clause = mnn_clause(
-                 ClauseId, Head, Body, source(cfg(Name), ClauseId)),
+                 ClauseId, Head, Body,                  source(SourceTag, ClauseId)),
     Following is ClauseId + 1,
     expected_cfg_clauses(
-        Rules, PredicateName, Mapping, Name, Following,
+        Rules, PredicateName, Mapping, SourceTag, Following,
         Clauses, NextClauseId).
 
 expected_cfg_body([], Input, Output, _, Input = Output).

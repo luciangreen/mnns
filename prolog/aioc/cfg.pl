@@ -9,11 +9,14 @@ incorporate_cfg(Name, Grammar, Program, Proof) :-
     must_be(atom, Name),
     Source = cfg_source(Name, Grammar),
     (   valid_cfg_source(Name, Grammar)
-    ->  build_cfg_program(Name, Grammar, Program),
+    ->  build_cfg_program(Name, Grammar, cfg(Name), Program),
         cfg_incorporation_proof(Proof),
         mnn_proof_checker:check_proof(Program, Source, Proof, accepted)
     ;   throw(error(domain_error(cfg_source, Source), _))
     ).
+
+build_dcg_program(Name, Grammar, Program) :-
+    build_cfg_program(Name, Grammar, dcg(Name), Program).
 
 valid_cfg_source(Name, cfg(Start, Rules)) :-
     atom(Name),
@@ -45,7 +48,7 @@ valid_cfg_symbol(Nonterminals, nonterminal(Nonterminal)) :-
     atom(Nonterminal),
     memberchk(Nonterminal, Nonterminals).
 
-build_cfg_program(Name, cfg(Start, Rules), Program) :-
+build_cfg_program(Name, cfg(Start, Rules), SourceTag, Program) :-
     cfg_nonterminals(Rules, Nonterminals),
     cfg_predicate_mapping(Name, Nonterminals, Mapping),
     cfg_mapped_predicate(Start, Mapping, StartPredicate),
@@ -54,14 +57,14 @@ build_cfg_program(Name, cfg(Start, Rules), Program) :-
     Wrapper = mnn_pred(
                   Name/1, ['?'], [any],
                   [mnn_clause(1, WrapperHead, StartGoal,
-                              source(cfg(Name), 1))],
+                              source(SourceTag, 1))],
                   original),
     cfg_rule_predicates(
-        Nonterminals, Rules, Mapping, Name, 2, RulePredicates),
+        Nonterminals, Rules, Mapping, SourceTag, 2, RulePredicates),
     append([Wrapper], RulePredicates, Predicates),
     cfg_clause_events(Predicates, Events),
     Program = mnn_program(
-                  Name, meta(cfg(Name), Events), Predicates,
+                  Name, meta(SourceTag, Events), Predicates,
                   proof([]), trace([])).
 
 cfg_predicate_mapping(Name, Nonterminals, Mapping) :-
@@ -81,16 +84,16 @@ cfg_mapped_predicate(Nonterminal, [_|Mapping], Predicate) :-
 
 cfg_rule_predicates([], _, _, _, _, []).
 cfg_rule_predicates([Nonterminal|Nonterminals], Rules, Mapping,
-                    Name, ClauseId,
+                    SourceTag, ClauseId,
                     Predicates) :-
     rules_for_nonterminal(Nonterminal, Rules, Selected),
     cfg_mapped_predicate(Nonterminal, Mapping, PredicateName),
-    cfg_rule_clauses(Selected, PredicateName, Mapping, Name, ClauseId,
+    cfg_rule_clauses(Selected, PredicateName, Mapping, SourceTag, ClauseId,
                      Clauses, NextClauseId),
     Predicate = mnn_pred(
                     PredicateName/2, ['?', '?'], [any, any],
                     Clauses, original),
-    cfg_rule_predicates(Nonterminals, Rules, Mapping, Name,
+    cfg_rule_predicates(Nonterminals, Rules, Mapping, SourceTag,
                         NextClauseId, Rest),
     Predicates = [Predicate|Rest].
 
@@ -101,16 +104,18 @@ rule_for_nonterminal(Nonterminal, rule(Other, _)) :-
     Nonterminal == Other.
 
 cfg_rule_clauses([], _, _, _, ClauseId, [], ClauseId).
-cfg_rule_clauses([rule(_, Symbols)|Rules], PredicateName, Mapping, Name, ClauseId,
+cfg_rule_clauses([rule(_, Symbols)|Rules], PredicateName, Mapping,
+                 SourceTag, ClauseId,
                  [Clause|Clauses], NextClauseId) :-
     Input = _,
     Output = _,
     Head =.. [PredicateName, Input, Output],
     cfg_rule_body(Symbols, Input, Output, Mapping, Body),
     Clause = mnn_clause(
-                 ClauseId, Head, Body, source(cfg(Name), ClauseId)),
+                 ClauseId, Head, Body, source(SourceTag, ClauseId)),
     FollowingClauseId is ClauseId + 1,
-    cfg_rule_clauses(Rules, PredicateName, Mapping, Name, FollowingClauseId,
+    cfg_rule_clauses(Rules, PredicateName, Mapping, SourceTag,
+                     FollowingClauseId,
                      Clauses, NextClauseId).
 
 cfg_rule_body([], Input, Output, _, Input = Output).
