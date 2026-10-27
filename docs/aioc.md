@@ -148,10 +148,10 @@ The initial proof-checked bundle writer and verifier are described in
 ## Proof-checked simplification
 
 `mnn_aioc_simplify:simplify_program/4` removes explicit `true` operands from
-conjunctions and explicit `fail` operands from disjunctions, including
-occurrences nested under conjunction, disjunction, if-then-else, negation, and
-`once/1`. It removes one occurrence per proof step and repeats until no
-supported occurrence remains:
+conjunctions, explicit `fail` operands from disjunctions, and redundant
+`once(true)` or `once(fail)` wrappers. These occurrences may be nested under
+conjunction, disjunction, if-then-else, negation, and `once/1`. It removes one
+occurrence per proof step and repeats until no supported occurrence remains:
 
 ```prolog
 mnn_aioc_simplify:simplify_program(
@@ -160,14 +160,14 @@ mnn_aioc_simplify:simplify_program(
                           structural_effect(Effect))).
 ```
 
-Each step uses `remove_true_conjunct` or `remove_fail_disjunct`; the independent
-proof checker verifies every step and the complete result. An unchanged program
-receives an identity proof. If the program defines `true/0`, the true-conjunct
-rule is declined; if it defines `fail/0`, the fail-disjunct rule is declined.
-This avoids assumptions about locally defined predicates without blocking the
-other independently safe rule. The result preserves the IR metadata, clause
-order, and source locations. The report measures representation size only, not
-runtime or memory.
+Each step uses `remove_true_conjunct`, `remove_fail_disjunct`, or
+`simplify_once_constant`; the independent proof checker reconstructs each
+rewrite and verifies the complete result. An unchanged program receives an
+identity proof. Rules that treat `true/0` or `fail/0` as built-ins are declined
+when the source defines the corresponding predicate. This avoids assumptions
+about locally defined predicates without blocking an independently safe rule.
+The result preserves the IR metadata, clause order, and source locations. The
+report measures representation size only, not runtime or memory.
 
 These remain deliberately narrow rules. The simplifier does not remove
 unreachable predicates or clauses, merge clauses, remove arguments, or factor

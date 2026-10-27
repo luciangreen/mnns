@@ -342,6 +342,8 @@ check_supported_proof(Program, Original, Proof, Result) :-
     ->  Result = accepted
     ;   valid_fail_disjunct_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_once_constant_proof(Program, Original, Proof)
+    ->  Result = accepted
     ;   valid_definition_introduction_proof(Program, Original, Proof)
     ->  Result = accepted
     ;   valid_definition_rewrite_proof(Program, Original, Proof)
@@ -403,6 +405,19 @@ valid_fail_disjunct_proof(Program, Original, Proof) :-
     valid_rewrite_program(Original),
     copy_term(Original, OriginalCopy),
     remove_fail_disjunct_program(OriginalCopy, Rewritten),
+    Program =@= Rewritten.
+
+valid_once_constant_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, simplify_once_constant, [],
+                              equivalent(domain(Domain), modes(Modes)))]),
+    integer(Id),
+    Id > 0,
+    ground(Domain),
+    ground(Modes),
+    valid_rewrite_program(Original),
+    copy_term(Original, OriginalCopy),
+    simplify_once_constant_program(OriginalCopy, Rewritten),
     Program =@= Rewritten.
 
 valid_definition_introduction_proof(Program, Original, Proof) :-
@@ -549,6 +564,10 @@ apply_proof_rule(remove_fail_disjunct, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
     remove_fail_disjunct_program(ProgramCopy, Rewritten).
+apply_proof_rule(simplify_once_constant, Program, Rewritten) :-
+    valid_rewrite_program(Program),
+    copy_term(Program, ProgramCopy),
+    simplify_once_constant_program(ProgramCopy, Rewritten).
 apply_proof_rule(introduce_definition, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
@@ -577,6 +596,13 @@ remove_fail_disjunct_program(
     \+ defines_fail_predicate(Predicates),
     remove_fail_disjunct_predicates(Predicates, RewrittenPredicates).
 
+simplify_once_constant_program(
+    mnn_program(Name, Meta, Predicates, Proof, Trace),
+    mnn_program(Name, Meta, RewrittenPredicates, Proof, Trace)) :-
+    is_list(Predicates),
+    simplify_once_constant_predicates(
+        Predicates, Predicates, RewrittenPredicates).
+
 defines_true_predicate(Predicates) :-
     member(Predicate, Predicates),
     nonvar(Predicate),
@@ -590,6 +616,82 @@ defines_fail_predicate(Predicates) :-
     functor(Predicate, mnn_pred, 5),
     arg(1, Predicate, Key),
     Key == fail/0.
+
+simplify_once_constant_predicates(
+    [Predicate|Predicates], AllPredicates,
+    [mnn_pred(Key, Modes, Domains, RewrittenClauses, Status)|Predicates]) :-
+    nonvar(Predicate),
+    Predicate = mnn_pred(Key, Modes, Domains, Clauses, Status),
+    simplify_once_constant_clauses(
+        Clauses, AllPredicates, RewrittenClauses),
+    !.
+simplify_once_constant_predicates(
+    [Predicate|Predicates], AllPredicates,
+    [Predicate|RewrittenPredicates]) :-
+    simplify_once_constant_predicates(
+        Predicates, AllPredicates, RewrittenPredicates).
+
+simplify_once_constant_clauses(
+    [mnn_clause(Id, Head, Body, Source)|Clauses], AllPredicates,
+    [mnn_clause(Id, Head, RewrittenBody, Source)|Clauses]) :-
+    simplify_once_constant_goal(Body, AllPredicates, RewrittenBody),
+    !.
+simplify_once_constant_clauses(
+    [Clause|Clauses], AllPredicates, [Clause|RewrittenClauses]) :-
+    simplify_once_constant_clauses(
+        Clauses, AllPredicates, RewrittenClauses).
+
+simplify_once_constant_goal(Goal, Predicates, Rewritten) :-
+    nonvar(Goal),
+    simplify_once_constant_nonvar_goal(Goal, Predicates, Rewritten).
+
+simplify_once_constant_nonvar_goal(once(Goal), Predicates, true) :-
+    Goal == true,
+    \+ defines_true_predicate(Predicates),
+    !.
+simplify_once_constant_nonvar_goal(once(Goal), Predicates, fail) :-
+    Goal == fail,
+    \+ defines_fail_predicate(Predicates),
+    !.
+simplify_once_constant_nonvar_goal(conj(Left, Right), Predicates,
+                                   conj(RewrittenLeft, Right)) :-
+    simplify_once_constant_goal(Left, Predicates, RewrittenLeft),
+    !.
+simplify_once_constant_nonvar_goal(conj(Left, Right), Predicates,
+                                   conj(Left, RewrittenRight)) :-
+    simplify_once_constant_goal(Right, Predicates, RewrittenRight),
+    !.
+simplify_once_constant_nonvar_goal(disj(Left, Right), Predicates,
+                                   disj(RewrittenLeft, Right)) :-
+    simplify_once_constant_goal(Left, Predicates, RewrittenLeft),
+    !.
+simplify_once_constant_nonvar_goal(disj(Left, Right), Predicates,
+                                   disj(Left, RewrittenRight)) :-
+    simplify_once_constant_goal(Right, Predicates, RewrittenRight),
+    !.
+simplify_once_constant_nonvar_goal(
+    ite(Condition, Then, Else), Predicates,
+    ite(RewrittenCondition, Then, Else)) :-
+    simplify_once_constant_goal(
+        Condition, Predicates, RewrittenCondition),
+    !.
+simplify_once_constant_nonvar_goal(
+    ite(Condition, Then, Else), Predicates,
+    ite(Condition, RewrittenThen, Else)) :-
+    simplify_once_constant_goal(Then, Predicates, RewrittenThen),
+    !.
+simplify_once_constant_nonvar_goal(
+    ite(Condition, Then, Else), Predicates,
+    ite(Condition, Then, RewrittenElse)) :-
+    simplify_once_constant_goal(Else, Predicates, RewrittenElse),
+    !.
+simplify_once_constant_nonvar_goal(not(Goal), Predicates,
+                                   not(RewrittenGoal)) :-
+    simplify_once_constant_goal(Goal, Predicates, RewrittenGoal),
+    !.
+simplify_once_constant_nonvar_goal(once(Goal), Predicates,
+                                   once(RewrittenGoal)) :-
+    simplify_once_constant_goal(Goal, Predicates, RewrittenGoal).
 
 remove_fail_disjunct_predicates(
     [mnn_pred(Key, Modes, Domains, Clauses, Status)|Predicates],

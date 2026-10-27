@@ -102,6 +102,75 @@ test(does_not_remove_fail_when_source_defines_fail_predicate) :-
     assertion(Simplified =@= Program),
     mnn_proof_checker:check_proof(Simplified, Program, Proof, accepted).
 
+test(simplifies_once_of_true_and_fail_under_control_goals) :-
+    Program = mnn_program(
+                  sample, meta(source, [clause(1)]),
+                  [mnn_pred(p/1, ['?'], [any],
+                            [mnn_clause(
+                                 1, p(X), ite(once(true), q(X), once(fail)),
+                                 source(test, 1))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_aioc_simplify:simplify_program(
+        Program, Simplified, Proof,
+        simplification_report(changes(2), _, _, structural_effect(smaller))),
+    Simplified = mnn_program(
+                     sample, meta(source, [clause(1)]),
+                     [mnn_pred(p/1, ['?'], [any],
+                               [mnn_clause(
+                                    1, p(Y), ite(true, q(Y), fail),
+                                    source(test, 1))],
+                               original)],
+                     proof([]), trace([])),
+    mnn_proof_checker:check_proof(Simplified, Program, Proof, accepted).
+
+test(does_not_simplify_once_constants_when_source_defines_them) :-
+    Program = mnn_program(
+                  sample, meta(source, [clause(1), clause(2), clause(3)]),
+                  [mnn_pred(p/0, [], [any],
+                            [mnn_clause(
+                                 1, p, conj(once(true), once(fail)),
+                                 source(test, 1))],
+                            original),
+                   mnn_pred(true/0, [], [any],
+                            [mnn_clause(2, true, fail, source(test, 2))],
+                            original),
+                   mnn_pred(fail/0, [], [any],
+                            [mnn_clause(3, fail, true, source(test, 3))],
+                            original)],
+                  proof([]), trace([])),
+    mnn_aioc_simplify:simplify_program(
+        Program, Simplified, Proof,
+        simplification_report(changes(0), _, _, structural_effect(unchanged))),
+    assertion(Simplified =@= Program),
+    mnn_proof_checker:check_proof(Simplified, Program, Proof, accepted).
+
+test(rejects_once_constant_removal_when_builtin_is_shadowed) :-
+    Program = mnn_program(
+                  sample, meta(source, [clause(1), clause(2)]),
+                  [mnn_pred(p/0, [], [any],
+                            [mnn_clause(1, p, once(fail), source(test, 1))],
+                            original),
+                   mnn_pred(fail/0, [], [any],
+                            [mnn_clause(2, fail, true, source(test, 2))],
+                            original)],
+                  proof([]), trace([])),
+    Candidate = mnn_program(
+                    sample, meta(source, [clause(1), clause(2)]),
+                    [mnn_pred(p/0, [], [any],
+                              [mnn_clause(1, p, fail, source(test, 1))],
+                              original),
+                     mnn_pred(fail/0, [], [any],
+                              [mnn_clause(2, fail, true, source(test, 2))],
+                              original)],
+                    proof([]), trace([])),
+    Proof = proof([proof_step(
+                       1, simplify_once_constant, [],
+                       equivalent(domain(any), modes(all)))]),
+    mnn_proof_checker:check_proof(
+        Candidate, Program, Proof,
+        rejected(invalid_or_unsupported_proof)).
+
 test(does_not_instantiate_an_unbound_clause_body) :-
     variable_body_program(Program, Body),
     mnn_aioc_simplify:simplify_program(
