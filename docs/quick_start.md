@@ -74,8 +74,8 @@ proof-gated PLOp pipeline, sequence inference, S2A example synthesis, an initial
 Starlog function-expression view, restricted AIOC decision-tree and CFG
 incorporation, size measurement, proof-gated structural comparison, deterministic
 budget allocation, and proof-checked bundles. Stage 10 includes the initial
-quantum-inspired candidate search/export and an allocation planner, but no
-integrated cycle controller.
+quantum-inspired candidate search/export and one-pass search/resource-planning
+integration, but no iterative cycle controller.
 The full optimization chain,
 general synthesis and proof rules, the broader Starlog language, ANN/AMNN
 generation, Neuroprolog, the MNN chatbot and agent, and benchmark suite are not

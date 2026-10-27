@@ -273,11 +273,15 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   memory, worker, depth, data, and effort budgets proportionally to candidate
   assessment/cost weights, optionally including seeded quantum-inspired
   amplitude weighting; largest-remainder ties are deterministic for the seed
-  and every allocation records its inputs and reason. This is a standalone
-  planning slice, not machine resource enforcement or cycle execution.
-  General rewrite-sequence search, allocation integrated with cycle interaction,
-  measured cost feedback, cycle termination/reporting, benchmark comparisons
-  and timing, and actual quantum execution remain unimplemented.
+  and every allocation records its inputs and reason.
+  `mnn_aioc_cycle:run_cycle/5` now connects one proof-gated candidate search to
+  that planner, assigning scores from structural-size reduction only. This is
+  still one search-and-planning pass, not machine resource enforcement or an
+  iterative cycle controller.
+  General rewrite-sequence search, full allocation integration with an
+  iterative cycle controller, measured cost feedback, cycle termination/reporting,
+  benchmark comparisons and timing, and actual quantum execution remain
+  unimplemented.
 
 ## Remaining stages
 
@@ -292,7 +296,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; initial declared/module-qualified function expressions and string/list/atom concatenation view; no formal proof; recursive/list generalization, broader arithmetic templates, and broader Starlog syntax remain unimplemented) |
 | 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (restricted decision-tree, data-only CFG, and data-only DCG front ends with canonical independent translation checking; initial deterministic IR structural-size metric; proof-checked removal of explicit `true` conjuncts and `fail` disjuncts and simplification of `once(true)` / `once(fail)`, including nested normalized control goals; proof-gated comparison and ranking of supplied candidates and stored library entries; proof-checked bundle writer/verifier; proof-checked data-only library storage with revalidated entry replacement and named removal; bounded sandboxed example verification with persistent named suites and proof-rechecked suite execution. Broader source incorporation, S2A incorporation proofs, broader semantic simplification, authenticated test records, broader assessment, and REPL remain) |
-| 10 | Quantum-inspired search/export, allocation and cycle interaction | In progress (seeded proof-gated search over current PLOp candidates, schematic OpenQASM 3 export, and deterministic budget-bounded allocation planning; allocation is not integrated into a cycle controller, and general rewrite-sequence search, measured-cost feedback, cycle termination/reporting, and benchmarking remain) |
+| 10 | Quantum-inspired search/export, allocation and cycle interaction | In progress (seeded proof-gated search over current PLOp candidates, schematic OpenQASM 3 export, deterministic budget-bounded planning connected to one candidate-search pass; full cycle iteration, Pareto comparison, transfer, measured-cost feedback, cycle termination/reporting, and benchmarking remain) |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |
 | 13 | MNN core, chatbot and sandboxed agent | Not started |
@@ -313,6 +317,8 @@ The proof-gated AIOC size-assessment tests can be run with
 `swipl -q -g "load_files('tests/aioc_assessment_tests.pl'), run_tests(mnn_aioc_assessment), halt"`.
 The deterministic AIOC resource-allocation tests can also be run with
 `swipl -q -g "load_files('tests/aioc_allocate_tests.pl'), run_tests(mnn_aioc_allocate), halt"`.
+The single-cycle search and resource-planning tests can also be run with
+`swipl -q -g "load_files('tests/aioc_cycle_tests.pl'), run_tests(mnn_aioc_cycle), halt"`.
 The AIOC decision-tree incorporation tests can be run with
 `swipl -q -g "load_files('tests/aioc_dtree_tests.pl'), run_tests(mnn_aioc_dtree), halt"`.
 The AIOC DCG incorporation tests can be run with
