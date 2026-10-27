@@ -25,6 +25,7 @@ sharing a change.
 | Detlog transformations: `once/1` and restricted cut lowering | `prolog/detlog/detlog_transform.pl` | `swipl -q -g "load_files('tests/detlog_transform_tests.pl'), run_tests(mnn_detlog_transform), halt"` | [Detlog transformation](detlog.md#restricted-once-compilation) |
 | loop2 conversion | `prolog/loop2/loop2.pl` | `swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"` | [loop2 conversion](loop2.md) |
 | Proof-gated PLOp pipeline | `prolog/plop/plop.pl` | `swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"` | [PLOp pipeline](#plop-pipeline) |
+| Quantum-inspired proof-gated candidate search and OpenQASM export (initial) | `prolog/quantum/qi_search.pl` | `swipl -q -g "load_files('tests/qi_search_tests.pl'), run_tests(mnn_qi_search), halt"` | [Quantum-inspired search](quantum.md) |
 | AlgebraPLOp sequence analysis (initial) | `prolog/algebraplop/algebraplop.pl` | `swipl -q -g "load_files('tests/algebraplop_tests.pl'), run_tests(mnn_algebraplop), halt"` | [AlgebraPLOp](#algebraplop-sequence-inference) |
 | AIOC structural size metric (initial) | `prolog/aioc/size.pl` | `swipl -q -g "load_files('tests/aioc_size_tests.pl'), run_tests(mnn_aioc_size), halt"` | [AIOC size metric](aioc.md) |
 | AIOC decision-tree incorporation (restricted) | `prolog/aioc/dtree.pl` | `swipl -q -g "load_files('tests/aioc_dtree_tests.pl'), run_tests(mnn_aioc_dtree), halt"` | [AIOC decision-tree incorporation](aioc.md#decision-tree-incorporation) |
@@ -45,6 +46,31 @@ swipl -q -s tests/run.pl
 ```
 
 This is also the command used by [CI](../.github/workflows/prolog-tests.yml).
+
+## Quantum-inspired search
+
+The initial `mnn_qi_search:qi_search/4` explores the original program,
+whole-program PLOp output, and outputs from each single-predicate PLOp call.
+The independent proof checker gates candidate admission and checks the chosen
+candidate again. Deterministic seeded amplitudes reward accepted structural
+reductions and attenuate non-reducing candidates. Optional `qi_link/2`
+declarations cause proof rechecks to be recorded when a linked predicate is
+rewritten. The report retains candidate costs, amplitudes, proof sizes,
+linked-recheck outcomes, and supporting/opposing evidence.
+
+This is a bounded initial candidate search, not general rewrite-sequence
+exploration. It uses structural size rather than runtime or memory cost, and
+does not execute a quantum circuit. `qi_export/3` writes a schematic OpenQASM 3
+selection register only; it is not an executable optimizer.
+
+See [`quantum.md`](quantum.md) for the interface, report shape, limits, and
+examples. Run the focused suite with:
+
+```sh
+swipl -q -g "load_files('tests/qi_search_tests.pl'), run_tests(mnn_qi_search), halt"
+```
+
+The suite is also included in `swipl -q -s tests/run.pl`.
 
 ## AIOC proof-checked library
 

@@ -122,6 +122,12 @@ feature and its focused test suite.
   Unsupported or ambiguous cases are left unchanged. It does not yet implement
   closed-form discovery, a cost model, or the general PLOp rewrite set. See
   [`docs/current_features.md`](docs/current_features.md#plop-pipeline).
+- **Quantum-inspired search (initial slice):** deterministically compares the
+  original program with proof-checked whole-program and per-predicate PLOp
+  candidates, records amplitude updates and optional linked-predicate proof
+  rechecks, and can emit a schematic OpenQASM 3 selection register. It does not
+  search arbitrary rewrite sequences or execute quantum circuits. See
+  [`docs/quantum.md`](docs/quantum.md).
 - **AlgebraPLOp (initial slice):** deterministically recognizes exact constant,
   affine, quadratic, higher-degree integer polynomial, and integer-base geometric
   sequences and checks all provided samples, including held-out samples for fitted

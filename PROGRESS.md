@@ -261,6 +261,14 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   DCG syntax and S2A incorporation front ends,
   authenticated test records, broader semantic simplification,
   broader assessment, REPL interfaces, and the rest of the AIOC controller remain.
+- **Stage 10 — Quantum-inspired search (initial slice):** a deterministic,
+  seed-aware candidate set evaluates the original and the existing whole-program
+  and per-predicate PLOp outputs. Candidate admission and final selection are
+  independently proof-gated; structural reductions are amplified, other
+  candidates attenuated, and declared links record proof rechecks. A schematic
+  OpenQASM 3 selection-register exporter is available. General rewrite-sequence
+  search, allocation and cycle interaction, benchmark comparisons/timing, and
+  actual quantum execution remain unimplemented.
 
 ## Remaining stages
 
@@ -275,7 +283,7 @@ marked complete only when its listed deliverables and acceptance criteria pass.
 | 7 | AlgebraPLOp positional algebra | In progress (exact constant/affine/quadratic and higher-degree integer polynomial, plus integer-base geometric sequence inference with held-out validation; supported formulas have exact evaluation and inverse lookup, while program-position extraction, complexity ranking, splice-index loops, `r_spec` provenance, and proof-backed formulas remain) |
 | 8 | S2A synthesis and Starlog view | In progress (unique input-address projection and integer-affine, quadratic, and cubic inference from examples, plus explicit opt-in table fallback; initial declared/module-qualified function expressions and string/list/atom concatenation view; no formal proof; recursive/list generalization, broader arithmetic templates, and broader Starlog syntax remain unimplemented) |
 | 9 | AIOC incorporation, simplification, assessment, bundles, library, REPL | In progress (restricted decision-tree and data-only CFG front ends with canonical independent translation checking; initial deterministic IR structural-size metric; proof-checked removal of explicit `true` conjuncts and `fail` disjuncts, including nested normalized control goals; proof-gated comparison and ranking of supplied candidates and stored library entries; proof-checked bundle writer/verifier; proof-checked data-only library storage with revalidated entry replacement and named removal; bounded sandboxed example verification with persistent named suites and proof-rechecked suite execution. DCG syntax and S2A incorporation proofs, broader semantic simplification, authenticated test records, broader assessment, and REPL remain) |
-| 10 | Quantum-inspired search/export, allocation and cycle interaction | Not started |
+| 10 | Quantum-inspired search/export, allocation and cycle interaction | In progress (seeded proof-gated search over current PLOp candidates and schematic OpenQASM 3 export; general rewrite-sequence search, cost/time benchmarking, resource allocation, and cycle interaction remain) |
 | 11 | AMNN, ANN and manual gradient descent | Not started |
 | 12 | Neuroprolog mode | Not started |
 | 13 | MNN core, chatbot and sandboxed agent | Not started |
@@ -302,5 +310,7 @@ The bounded AIOC example-verification tests can be run with
 `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`.
 The proof-checked AIOC simplification tests can be run with
 `swipl -q -g "load_files('tests/aioc_simplify_tests.pl'), run_tests(mnn_aioc_simplify), halt"`.
+The quantum-inspired search tests can be run with
+`swipl -q -g "load_files('tests/qi_search_tests.pl'), run_tests(mnn_qi_search), halt"`.
 The Starlog tests can be run with
 `swipl -q -g "load_files('tests/starlog_tests.pl'), run_tests(mnn_starlog), halt"`.
