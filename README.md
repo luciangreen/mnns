@@ -14,8 +14,9 @@ projection, integer polynomial relations through degree three, and explicitly
 opted-in example tables; Starlog currently has an initial function-expression
 view. AIOC has initial proof-checked decision-tree and grammar incorporation,
 simplification, assessment, deterministic budget allocation, bundles, and
-library features. The allocation planner is now connected to one proof-gated
-candidate-search pass, but not yet to an iterative AIOC cycle controller.
+library features. The allocation planner is connected to proof-gated candidate
+search and a bounded iterative controller that stops at a structural fixed
+point or cycle limit; it does not dispatch work or enforce resource budgets.
 Recursive generalization, the end-user MNN compiler, general PLOp optimization,
 the complete AIOC controller, neural-network, chatbot, and agent features remain
 incomplete.
