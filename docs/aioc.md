@@ -73,10 +73,35 @@ separate: pass the same seed to both when a single reproducibility seed is
 desired. Invalid options and search errors are surfaced by the underlying
 modules.
 
-This is one search-and-planning pass, not the complete AIOC cycle controller.
-It does not dispatch work, enforce time or memory limits, compare a Pareto set,
-transfer proved structures between sources, consume measured feedback, or
-iterate to a fixed point. Allocations are plans only.
+This is one search-and-planning pass. `run_cycles/6` repeats it on the latest
+strictly smaller, proof-checked candidate:
+
+```prolog
+mnn_aioc_cycle:run_cycles(
+    Program,
+    [seed(7), links([qi_link(values/1, num/1)])],
+    [seed(7), quantum(inspired), budget(time, 100),
+     budget(workers, 4), budget(effort, 20)],
+    5,
+    Best,
+    cycle_history(StopReason, Cycles, ComposedProof)).
+```
+
+`CycleLimit` must be a positive integer. The controller stops with
+`fixed_point` when a pass finds no strictly smaller candidate, or with
+`cycle_limit` after the requested number of improving passes. A fixed point
+takes precedence when it is reached on the last allowed pass. The report
+records the selected candidate, before/after structural sizes, search report,
+and allocation report for each attempted pass. It composes the accepted
+per-pass proof steps and independently checks the composed proof against the
+initial program before returning `Best`. Repeating the same inputs is
+deterministic.
+
+The cycle limit is the only enforced controller bound: resource budgets remain
+allocation plans and do not trigger a budget stop. The controller does not
+dispatch work, enforce time or memory limits, compare a Pareto set, transfer
+proved structures between sources, or consume measured feedback. Structural
+size is the only improvement signal.
 
 Run the focused tests from the repository root:
 
