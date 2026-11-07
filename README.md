@@ -191,6 +191,29 @@ feature and its focused test suite.
   [`docs/aioc.md`](docs/aioc.md) and
   [`docs/bundle.md`](docs/bundle.md).
 
+## Optimise a file in one command
+
+`optimise.pl` runs every proof-checked optimisation stage in turn: PLOp's
+finite-generator conversion, then the AIOC simplifier. If a stage's proof is
+not accepted, that stage leaves the program unchanged. Detlog's transform is
+not used, because its rewrites are not machine-checked.
+
+```sh
+swipl optimise.pl input.pl output.pl
+```
+
+It prints one line, which tools such as
+[fastos](https://github.com/luciangreen/fastos) read:
+
+```
+MNN_OPTIMISE ok changed=true size_before=40 size_after=36 plop=accepted simplify=0
+```
+
+If the input uses syntax outside the supported subset, it prints
+`MNN_OPTIMISE error ...`, exits with status 1 and writes nothing. From Prolog,
+use `mnn_optimise:optimise_file/3` or `mnn_optimise:optimise_program/3`
+([`prolog/optimise/optimise.pl`](prolog/optimise/optimise.pl)).
+
 ## Requirements
 
 Install SWI-Prolog 9.x or 10.x. On Debian or Ubuntu:
@@ -218,6 +241,7 @@ commands for every PlUnit group are listed in
 swipl -q -g "load_files('tests/proof_checker_tests.pl'), run_tests(mnn_proof_checker), halt"
 swipl -q -g "load_files('tests/loop2_tests.pl'), run_tests(mnn_loop2), halt"
 swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
+swipl -q -g "load_files('tests/optimise_tests.pl'), run_tests(mnn_optimise), halt"
 ```
 
 If your shell uses an ASCII `C` locale, prefix Prolog commands with

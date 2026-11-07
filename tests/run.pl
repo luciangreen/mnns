@@ -22,6 +22,8 @@ main :-
     load_files(DetlogTransformTests, [silent(true)]),
     directory_file_path(Directory, 'plop_tests.pl', PlopTests),
     load_files(PlopTests, [silent(true)]),
+    directory_file_path(Directory, 'optimise_tests.pl', OptimiseTests),
+    load_files(OptimiseTests, [silent(true)]),
     directory_file_path(Directory, 'qi_search_tests.pl', QISearchTests),
     load_files(QISearchTests, [silent(true)]),
     directory_file_path(Directory, 'algebraplop_tests.pl', AlgebraPLOpTests),
