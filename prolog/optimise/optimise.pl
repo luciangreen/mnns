@@ -63,7 +63,35 @@ simplify_stage(Program, Optimised, simplify(Changes)) :-
 optimise_file(InFile, OutFile, Report) :-
     mnn_ir:parse_program(InFile, Program),
     optimise_program(Program, Optimised, Report),
-    mnn_ir:emit_program(Optimised, OutFile).
+    emit_optimised(Optimised, OutFile).
+
+%!  emit_optimised(+Program, +File) is det.
+%   Writes the directives, then every clause of every predicate.
+%   mnn_ir:emit_program/2 writes only clauses recorded in the source events,
+%   so it would drop clauses that PLOp rewrote or generated (for example
+%   mnn_loop2_1/2); this writes them all.
+emit_optimised(mnn_program(_, meta(_, Events), Predicates, _, _), File) :-
+    findall((:- Directive), member(directive(_, Directive), Events), Directives),
+    findall(Term,
+            ( member(mnn_pred(_, _, _, Clauses, _), Predicates),
+              member(mnn_clause(_, Head, Body, _), Clauses),
+              clause_term(Head, Body, Term)
+            ),
+            ClauseTerms),
+    append(Directives, ClauseTerms, Terms),
+    setup_call_cleanup(
+        open(File, write, Stream),
+        forall(member(T, Terms),
+               ( write_term(Stream, T, [quoted(true), numbervars(true)]),
+                 write(Stream, '.\n\n') )),
+        close(Stream)).
+
+clause_term(Head, Body, Term) :-
+    mnn_ir:prolog_body(Body, Goal),
+    (   Goal == true
+    ->  Term = Head
+    ;   Term = (Head :- Goal)
+    ).
 
 %!  optimise_report_line(+Report, -Line) is det.
 %   One line for tools such as fastos:
