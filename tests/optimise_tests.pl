@@ -28,8 +28,8 @@ test(optimise_file_converts_and_reports) :-
     mnn_optimise:optimise_report_line(Report, Line),
     assertion(sub_string(Line, 0, _, _, "MNN_OPTIMISE ok changed=true")),
     read_file_to_string(Out, Emitted, []),
-    (   catch(( load_files(Out, [module(optimised_out)]),
-                optimised_out:values(Values) ),
+    (   catch(( load_files(Out, []),
+                values(Values) ),
               Error,
               ( format(user_error, "~q~n~s~n", [Error, Emitted]), fail ))
     ->  assertion(Values == [1, 2, 3])
