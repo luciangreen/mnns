@@ -200,8 +200,10 @@ finite-generator conversion, the AIOC simplifier, then Detlog's cut and
 leaves the program unchanged.
 
 ```sh
-swipl optimise.pl input.pl output.pl
+swipl optimise.pl -- input.pl output.pl
 ```
+
+The `--` stops `swipl` from loading `input.pl` and `output.pl` as program files.
 
 It prints one line, which tools such as
 [fastos](https://github.com/luciangreen/fastos) read:

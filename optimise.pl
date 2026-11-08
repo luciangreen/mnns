@@ -1,6 +1,6 @@
 /*  optimise.pl - optimise a Prolog file with every proof-checked MNN stage
 
-    Usage:  swipl optimise.pl INPUT.pl OUTPUT.pl
+    Usage:  swipl optimise.pl -- INPUT.pl OUTPUT.pl
 
     Prints one line:
       MNN_OPTIMISE ok changed=true size_before=40 size_after=36 plop=accepted simplify=0 detlog=proved detlog_steps=2
@@ -20,7 +20,7 @@ main([In, Out]) :-
     !,
     catch(optimise(In, Out), Error, failed(Error)).
 main(_) :-
-    format(user_error, "Usage: swipl optimise.pl INPUT.pl OUTPUT.pl~n", []),
+    format(user_error, "Usage: swipl optimise.pl -- INPUT.pl OUTPUT.pl~n", []),
     halt(2).
 
 optimise(In, Out) :-
