@@ -258,3 +258,7 @@ commands for every implemented test group.
 
 
 * Manual Neuronets (MNNs) are Green's invention and a way to represent the hidden workings of black-box neural nets. They combine the [Spec to Algorithm](https://github.com/luciangreen/Philosophy/tree/master/s2a), [Starlog](https://github.com/luciangreen/Starlog), [Prolog Inductive Debugger](https://github.com/luciangreen/Prolog_Inductive_Debugger), [loop2](https://github.com/luciangreen/loop2), [PLOp](https://github.com/luciangreen/plop)/[AlgebraPLOp](https://github.com/luciangreen/algebraplop), [Detlog](https://github.com/luciangreen/detlog), and [Piglog2](https://github.com/luciangreen/piglog2) repositories. Later, a chatbot incorporating natural language, manual attention, manual time series and other aspects of NNs such as signposting, ranking, analysis, conversations and personality overlays will be added.
+
+## Inputs and outputs
+
+`io/ios.txt` lists 200 inputs and the outputs they give, from real runs of this repo's predicates (which predicates, and how the inputs are made, is in `io/cases.pl`; the inputs are made the same way every time). `swipl io/check_ios.pl` runs them again and fails if any output changed; the "Inputs and outputs" workflow does the same on every push. If a change is meant, run `swipl io/make_ios.pl` and check the diff.
