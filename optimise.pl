@@ -3,7 +3,7 @@
     Usage:  swipl optimise.pl INPUT.pl OUTPUT.pl
 
     Prints one line:
-      MNN_OPTIMISE ok changed=true size_before=40 size_after=36 plop=accepted simplify=0
+      MNN_OPTIMISE ok changed=true size_before=40 size_after=36 plop=accepted simplify=0 detlog=proved detlog_steps=2
     or, if the file could not be optimised (for example, syntax outside the
     supported subset):
       MNN_OPTIMISE error <message>
