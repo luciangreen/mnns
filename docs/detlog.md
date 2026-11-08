@@ -137,8 +137,8 @@ changing effects or cut scope.
 Unsupported `once/1` goals remain unchanged. The report is
 `detlog_transform_report(Events)`, with `compiled_once(Predicate, ClauseId,
 Goal)` and `kept_once(Predicate, ClauseId, unsupported_goal(Goal))` entries.
-Other program fields, clause order, and source locations are preserved. This is
-a bounded transformation report, not an independently checked proof.
+Other program fields, clause order, and source locations are preserved. The
+report itself is not a proof; see *Checked Detlog proofs* below.
 
 The transform removes a narrowly redundant green cut in a predicate with one
 clause when its complete body is `Guard, !` and `Guard` consists only of
@@ -157,8 +157,35 @@ commits to the first success just as the terminal cut does. The report records
 guards such as `member/2` preserve their first answer while removing the
 operational cut. Nested cuts, explicit meta-calls, cuts in multi-clause
 predicates, and all other cut placements remain unchanged. The transformer
-reports syntactic side conditions; it does not produce a machine-checkable cut
-proof, and general red-cut safety proofs remain unimplemented.
+reports syntactic side conditions; the independent checker then validates each
+rewrite (see below). General red-cut safety proofs remain unimplemented.
+
+The guard in both cut cases is the right-nested conjunction before the final
+cut, so `G1, G2, !` (IR `conj(G1, conj(G2, !))`) has guard `G1, G2`.
+
+## Checked Detlog proofs
+
+Each Detlog event maps to a proof step that `mnn_proof_checker:check_proof/4`
+validates on its own, independently of the transformer:
+
+| Event | Proof step | Checker side conditions |
+| --- | --- | --- |
+| `removed_green_cut` | `remove_green_cut` | last clause of the predicate; body is `Guard, !`; every guard goal is a whitelisted deterministic built-in not defined by the program |
+| `compiled_cut` | `compile_cut` | last clause; body is `Guard, !`; guard has no cut and no `call/N`; result is `ite(Guard, true, fail)` |
+| `compiled_once` | `compile_once` | exactly one `once(Goal)` occurrence becomes `ite(Goal, true, fail)`; `Goal` has no cut; the program does not define `once/1` |
+
+`kept_once` events produce no step. Each step must change exactly one
+occurrence, and a multi-step proof is checked step by step against the IR the
+previous step produced. A cut in the last clause can only prune the guard's
+choicepoints (there are no later clauses), so `ite(Guard, true, fail)` gives the
+same first answer and the same failure behaviour; a cut in an earlier clause is
+rejected because it also prunes later clauses.
+
+`mnn optimise` runs Detlog as its third stage. The candidate is kept only when
+the checker accepts the full proof; the report is
+`detlog(Status, Steps)` with `Status` one of `unchanged`, `proved`,
+`rejected(Result)` or `failed`, and the report line gains
+`detlog=<status> detlog_steps=<n>`.
 
 General mode inference, choicepoint splicing, choice-packet generation, general
 cut conversion, red-cut safety proofs, lowering to the `if_commit/3` runtime

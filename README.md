@@ -194,9 +194,10 @@ feature and its focused test suite.
 ## Optimise a file in one command
 
 `optimise.pl` runs every proof-checked optimisation stage in turn: PLOp's
-finite-generator conversion, then the AIOC simplifier. If a stage's proof is
-not accepted, that stage leaves the program unchanged. Detlog's transform is
-not used, because its rewrites are not machine-checked.
+finite-generator conversion, the AIOC simplifier, then Detlog's cut and
+`once/1` rewrites, each checked by the `remove_green_cut`, `compile_cut` and
+`compile_once` proof rules. If a stage's proof is not accepted, that stage
+leaves the program unchanged.
 
 ```sh
 swipl optimise.pl input.pl output.pl
@@ -206,7 +207,7 @@ It prints one line, which tools such as
 [fastos](https://github.com/luciangreen/fastos) read:
 
 ```
-MNN_OPTIMISE ok changed=true size_before=40 size_after=36 plop=accepted simplify=0
+MNN_OPTIMISE ok changed=true size_before=40 size_after=36 plop=accepted simplify=0 detlog=unchanged detlog_steps=0
 ```
 
 If the input uses syntax outside the supported subset, it prints

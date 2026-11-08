@@ -20,6 +20,8 @@ main :-
     directory_file_path(Directory, 'detlog_transform_tests.pl',
                         DetlogTransformTests),
     load_files(DetlogTransformTests, [silent(true)]),
+    directory_file_path(Directory, 'detlog_proof_tests.pl', DetlogProofTests),
+    load_files(DetlogProofTests, [silent(true)]),
     directory_file_path(Directory, 'plop_tests.pl', PlopTests),
     load_files(PlopTests, [silent(true)]),
     directory_file_path(Directory, 'optimise_tests.pl', OptimiseTests),

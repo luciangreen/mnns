@@ -24,20 +24,22 @@ transform_predicates(
 
 transform_clauses([], _, _, [], []).
 transform_clauses(
-    [mnn_clause(Id, Head, conj(Guard, !), Location)], Key,
+    [mnn_clause(Id, Head, Body, Location)], Key,
     SourcePredicates,
     [mnn_clause(Id, Head, TransformedGuard, Location)],
     Events) :-
+    final_cut_guard(Body, Guard),
     deterministic_guard(Guard, SourcePredicates),
     !,
     transform_goal(Guard, Key, Id, SourcePredicates,
                    TransformedGuard, GuardEvents),
     append(GuardEvents, [removed_green_cut(Key, Id)], Events).
 transform_clauses(
-    [mnn_clause(Id, Head, conj(Guard, !), Location)], Key,
+    [mnn_clause(Id, Head, Body, Location)], Key,
     SourcePredicates,
     [mnn_clause(Id, Head, ite(TransformedGuard, true, fail), Location)],
     Events) :-
+    final_cut_guard(Body, Guard),
     supported_cut_guard(Guard),
     !,
     transform_goal(Guard, Key, Id, SourcePredicates,
@@ -53,6 +55,18 @@ transform_clauses(
     transform_clauses(Clauses, Key, SourcePredicates,
                       Transformed, OtherEvents),
     append(ClauseEvents, OtherEvents, Events).
+
+%   final_cut_guard(+Body, -Guard): Body is G1, ..., Gn, ! (a right-nested
+%   conjunction whose last goal is a cut); Guard is G1, ..., Gn, nested the
+%   same way. mnn_proof_checker rebuilds the guard identically.
+final_cut_guard(Body, Guard) :-
+    nonvar(Body),
+    Body = conj(Left, Right),
+    (   Right == !
+    ->  Guard = Left
+    ;   final_cut_guard(Right, RightGuard),
+        Guard = conj(Left, RightGuard)
+    ).
 
 transform_goal(once(Goal), Key, Id, SourcePredicates,
                ite(Condition, true, fail),
