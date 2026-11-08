@@ -68,7 +68,7 @@ first(X) :- once(member(X, [a, b, c])).
     read_file_to_string(Out, Emitted, []),
     assertion(\+ sub_string(Emitted, _, _, _, "!")),
     assertion(\+ sub_string(Emitted, _, _, _, "once(")),
-    load_files(Out, [module(detlog_out)]),
+    detlog_out:consult(Out),
     assertion(detlog_out:small(5)),
     assertion(\+ detlog_out:small(20)),
     findall(P, detlog_out:pick(P), Picks),
