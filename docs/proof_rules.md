@@ -255,3 +255,22 @@ IR produced by the preceding step; every step must be a supported rule with
 ground domain and mode annotations. The final IR must be alpha-equivalent to
 `Program`. This permits checked rewrite chains without treating a later step as
 evidence for an earlier one.
+
+## Detlog rules
+
+Three rules check Detlog's cut and `once/1` rewrites:
+
+- `remove_green_cut`: the last clause's body `Guard, !` becomes `Guard` when
+  every guard goal is a deterministic built-in (`=/2`, `\=/2`, `==/2`,
+  `\==/2`, `is/2`, arithmetic comparisons, `var/1`, `nonvar/1`, `atom/1`,
+  `atomic/1`, `compound/1`, `ground/1`, `integer/1`, `number/1`, `is_list/1`)
+  that the program does not redefine.
+- `compile_cut`: the last clause's body `Guard, !` becomes
+  `ite(Guard, true, fail)` when the guard contains no cut and no `call/N`.
+- `compile_once`: one `once(Goal)` anywhere in a body (including inside
+  `conj`, `disj`, `ite`, `not` and `once`) becomes `ite(Goal, true, fail)`
+  when `Goal` has no cut and the program does not define `once/1`.
+
+Each step must change exactly one occurrence; the checker recomputes the
+rewrite and compares with `=@=`. Earlier-clause cuts are rejected. See
+[`detlog.md`](detlog.md#checked-detlog-proofs).

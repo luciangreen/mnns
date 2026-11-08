@@ -350,6 +350,8 @@ check_supported_proof(Program, Original, Proof, Result) :-
     ->  Result = accepted
     ;   valid_findall_to_fold_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_detlog_proof(Program, Original, Proof)
+    ->  Result = accepted
     ;   valid_proof_sequence(Program, Original, Proof)
     ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
@@ -527,6 +529,23 @@ valid_findall_to_fold_proof(Program, Original, Proof) :-
     findall_to_fold_program(OriginalCopy, Rewritten),
     Program =@= Rewritten.
 
+%   Detlog's rewrites: remove_green_cut, compile_cut and compile_once.
+%   Each changes exactly one place; see docs/proof_rules.md for why each
+%   preserves every answer, in order, with the same exceptions.
+valid_detlog_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, Rule, [],
+                              equivalent(domain(Domain), modes(Modes)))]),
+    detlog_proof_rule(Rule),
+    integer(Id),
+    Id > 0,
+    ground(Domain),
+    ground(Modes),
+    valid_rewrite_program(Original),
+    copy_term(Original, OriginalCopy),
+    detlog_rewrite_program(Rule, OriginalCopy, Rewritten),
+    Program =@= Rewritten.
+
 valid_proof_sequence(Program, Original, proof(Steps)) :-
     ground(Steps),
     is_list(Steps),
@@ -577,6 +596,11 @@ apply_proof_rule(Rule, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
     rewrite_program(Rule, ProgramCopy, Rewritten).
+apply_proof_rule(Rule, Program, Rewritten) :-
+    detlog_proof_rule(Rule),
+    valid_rewrite_program(Program),
+    copy_term(Program, ProgramCopy),
+    detlog_rewrite_program(Rule, ProgramCopy, Rewritten).
 apply_proof_rule(findall_to_fold, Program, Rewritten) :-
     valid_rewrite_program(Program),
     copy_term(Program, ProgramCopy),
@@ -1774,3 +1798,153 @@ safe_pure_goal(conj(Left, Right)) :-
 safe_pure_goal(disj(Left, Right)) :-
     safe_pure_goal(Left),
     safe_pure_goal(Right).
+
+
+/* ------------------------------------------------------------------------
+   Detlog proof rules
+
+   (A body "Guard, !" is G1, ..., Gn, ! with the cut as the last goal of the
+   right-nested conjunction; Guard is G1, ..., Gn.)
+   remove_green_cut  In a predicate's LAST clause, a body conj(Guard, !)
+                     becomes Guard, when Guard is true or a conjunction of
+                     deterministic built-ins (at most one solution each) that
+                     the program does not redefine. With no later clause and
+                     no second solution of the guard, the cut prunes nothing.
+   compile_cut       In a predicate's LAST clause, a body conj(Guard, !)
+                     becomes ite(Guard, true, fail), when Guard has no cut and
+                     no call/N. Both give the guard's first solution only: the
+                     cut can prune only the guard's other solutions, because
+                     there is no later clause.
+   compile_once      One occurrence of once(Goal) anywhere in a clause body
+                     becomes ite(Goal, true, fail), when Goal has no cut and
+                     no call/N and the program does not define once/1. This is
+                     the ISO definition of once/1: once(G) :- (G -> true).
+
+   The rules assume the program is static: no clauses are added at run time
+   (assert/retract), which mnns programs never do.
+   ------------------------------------------------------------------------ */
+
+detlog_proof_rule(remove_green_cut).
+detlog_proof_rule(compile_cut).
+detlog_proof_rule(compile_once).
+
+detlog_rewrite_program(Rule,
+                       mnn_program(Name, Meta, Predicates, Proof, Trace),
+                       mnn_program(Name, Meta, Rewritten, Proof, Trace)) :-
+    detlog_rewrite_predicates(Rule, Predicates, Predicates, Rewritten).
+
+detlog_rewrite_predicates(Rule, Definitions, [Predicate|Predicates],
+                          [Rewritten|Predicates]) :-
+    detlog_rewrite_predicate(Rule, Definitions, Predicate, Rewritten).
+detlog_rewrite_predicates(Rule, Definitions, [Predicate|Predicates],
+                          [Predicate|Rewritten]) :-
+    detlog_rewrite_predicates(Rule, Definitions, Predicates, Rewritten).
+
+detlog_rewrite_predicate(Rule, Definitions,
+                         mnn_pred(Key, Modes, Domains, Clauses, Status),
+                         mnn_pred(Key, Modes, Domains, NewClauses, Status)) :-
+    memberchk(Rule, [remove_green_cut, compile_cut]),
+    append(Front, [mnn_clause(Id, Head, Body, Location)], Clauses),
+    detlog_final_cut_guard(Body, Guard),
+    detlog_cut_free(Guard),
+    (   Rule == remove_green_cut
+    ->  detlog_deterministic_guard(Guard, Definitions),
+        NewBody = Guard
+    ;   NewBody = ite(Guard, true, fail)
+    ),
+    append(Front, [mnn_clause(Id, Head, NewBody, Location)], NewClauses).
+detlog_rewrite_predicate(compile_once, Definitions,
+                         mnn_pred(Key, Modes, Domains, Clauses, Status),
+                         mnn_pred(Key, Modes, Domains, NewClauses, Status)) :-
+    \+ detlog_defines(Definitions, once/1),
+    detlog_once_clauses(Clauses, NewClauses).
+
+%   Body is G1, ..., Gn, ! nested to the right; Guard is G1, ..., Gn.
+detlog_final_cut_guard(Body, Guard) :-
+    nonvar(Body),
+    Body = conj(Left, Right),
+    (   Right == !
+    ->  Guard = Left
+    ;   detlog_final_cut_guard(Right, RightGuard),
+        Guard = conj(Left, RightGuard)
+    ).
+
+detlog_once_clauses([mnn_clause(Id, Head, Body, Location)|Clauses],
+                    [mnn_clause(Id, Head, NewBody, Location)|Clauses]) :-
+    detlog_once_goal(Body, NewBody).
+detlog_once_clauses([Clause|Clauses], [Clause|NewClauses]) :-
+    detlog_once_clauses(Clauses, NewClauses).
+
+detlog_once_goal(Goal, ite(Inner, true, fail)) :-
+    nonvar(Goal),
+    Goal = once(Inner),
+    detlog_cut_free(Inner).
+detlog_once_goal(Goal, Rewritten) :-
+    nonvar(Goal),
+    detlog_once_inside(Goal, Rewritten).
+
+detlog_once_inside(conj(L, R), conj(NL, R)) :- detlog_once_goal(L, NL).
+detlog_once_inside(conj(L, R), conj(L, NR)) :- detlog_once_goal(R, NR).
+detlog_once_inside(disj(L, R), disj(NL, R)) :- detlog_once_goal(L, NL).
+detlog_once_inside(disj(L, R), disj(L, NR)) :- detlog_once_goal(R, NR).
+detlog_once_inside(ite(I, T, E), ite(NI, T, E)) :- detlog_once_goal(I, NI).
+detlog_once_inside(ite(I, T, E), ite(I, NT, E)) :- detlog_once_goal(T, NT).
+detlog_once_inside(ite(I, T, E), ite(I, T, NE)) :- detlog_once_goal(E, NE).
+detlog_once_inside(not(G), not(NG)) :- detlog_once_goal(G, NG).
+detlog_once_inside(once(G), once(NG)) :- detlog_once_goal(G, NG).
+
+%   No cut anywhere in the goal, and no call/N (which could call a cut).
+detlog_cut_free(Goal) :-
+    nonvar(Goal),
+    \+ detlog_has_cut_or_call(Goal).
+
+detlog_has_cut_or_call(Goal) :-
+    var(Goal), !.
+detlog_has_cut_or_call(!) :- !.
+detlog_has_cut_or_call(Goal) :-
+    compound(Goal),
+    compound_name_arity(Goal, call, _), !.
+detlog_has_cut_or_call(conj(L, R)) :- !, ( detlog_has_cut_or_call(L) ; detlog_has_cut_or_call(R) ).
+detlog_has_cut_or_call(disj(L, R)) :- !, ( detlog_has_cut_or_call(L) ; detlog_has_cut_or_call(R) ).
+detlog_has_cut_or_call(ite(I, T, E)) :- !, ( detlog_has_cut_or_call(I) ; detlog_has_cut_or_call(T) ; detlog_has_cut_or_call(E) ).
+detlog_has_cut_or_call(not(G)) :- !, detlog_has_cut_or_call(G).
+detlog_has_cut_or_call(once(G)) :- !, detlog_has_cut_or_call(G).
+
+detlog_deterministic_guard(Guard, _) :-
+    Guard == true, !.
+detlog_deterministic_guard(Guard, Definitions) :-
+    nonvar(Guard),
+    Guard = conj(L, R), !,
+    detlog_deterministic_guard(L, Definitions),
+    detlog_deterministic_guard(R, Definitions).
+detlog_deterministic_guard(Goal, Definitions) :-
+    nonvar(Goal),
+    callable(Goal),
+    functor(Goal, Name, Arity),
+    detlog_deterministic_builtin(Name/Arity),
+    \+ detlog_defines(Definitions, Name/Arity).
+
+%   Built-ins that succeed at most once, with no side effects.
+detlog_deterministic_builtin((=)/2).
+detlog_deterministic_builtin((\=)/2).
+detlog_deterministic_builtin((==)/2).
+detlog_deterministic_builtin((\==)/2).
+detlog_deterministic_builtin(is/2).
+detlog_deterministic_builtin((>)/2).
+detlog_deterministic_builtin((>=)/2).
+detlog_deterministic_builtin((<)/2).
+detlog_deterministic_builtin((=<)/2).
+detlog_deterministic_builtin((=:=)/2).
+detlog_deterministic_builtin((=\=)/2).
+detlog_deterministic_builtin(var/1).
+detlog_deterministic_builtin(nonvar/1).
+detlog_deterministic_builtin(atom/1).
+detlog_deterministic_builtin(atomic/1).
+detlog_deterministic_builtin(compound/1).
+detlog_deterministic_builtin(ground/1).
+detlog_deterministic_builtin(integer/1).
+detlog_deterministic_builtin(number/1).
+detlog_deterministic_builtin(is_list/1).
+
+detlog_defines(Definitions, Key) :-
+    member(mnn_pred(Key, _, _, _, _), Definitions), !.
