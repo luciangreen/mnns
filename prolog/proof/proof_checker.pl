@@ -3,6 +3,8 @@
           ]).
 
 :- use_module(induction_equivalence).
+:- use_module(s2a2_prover, []).
+:- use_module(s2a2_fold, []).
 
 check_proof(Program, Original, Proof, Result) :-
     (   mnn_program_term(Program)
@@ -356,6 +358,10 @@ check_supported_proof(Program, Original, Proof, Result) :-
     ->  Result = accepted
     ;   valid_induction_equivalence_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_edb_equivalence_proof(Program, Original, Proof)
+    ->  Result = accepted
+    ;   valid_fold_derivation_proof(Program, Original, Proof)
+    ->  Result = accepted
     ;   valid_proof_sequence(Program, Original, Proof)
     ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
@@ -378,6 +384,51 @@ valid_induction_equivalence_proof(Program, Original, Proof) :-
     length(Types, A),
     program_clauses(Program, C1), program_clauses(Original, C2),
     mnn_induction_equivalence:prove_equal(C1, N1, C2, N2, Types, proved(_)).
+
+% edb_equivalence: Program and Original have the same facts, and their rules compute the same
+% Targets relations. With domain(all) the checker requires S2A2's syntactic proof (duplicate
+% or theta-subsumed clauses and literals removed), which holds for every input. With
+% domain(edb(Preds, Consts)) it also accepts agreement on every set of input atoms built from
+% Preds over Consts, as the checker enumerates them (s2a2_prover.pl, a copy of S2A2's prover).
+valid_edb_equivalence_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, edb_equivalence, [],
+                              equivalent(domain(Domain), modes(targets(Targets))))]),
+    integer(Id), Id > 0, is_list(Targets), Targets \== [],
+    program_clauses(Program, C1), program_clauses(Original, C0),
+    facts_and_rules(C1, F1, R1), facts_and_rules(C0, F0, R0),
+    msort(F1, S1), msort(F0, S0), S1 =@= S0,
+    (   Domain == all
+    ->  mnn_edb_prover:equivalent(R0, R1, Targets, edb([], []), proved(syntactic(_)))
+    ;   Domain = edb(Preds, Consts), is_list(Preds), is_list(Consts),
+        mnn_edb_prover:equivalent(R0, R1, Targets, edb(Preds, Consts), proved(_))
+    ).
+
+facts_and_rules(Cs, Fs, Rs) :- partition([C]>>( C \= (_ :- _) ), Cs, Fs, Rs).
+
+% fold_derivation: Program is what S2A2's fold.pl derives from Original, a specification
+% whose exported predicate is the target, and it is equal to it on every input of Mode. The
+% checker repeats the derivation with its own copy (s2a2_fold.pl), requires the same clauses
+% up to renaming and order, and repeats verify/5: the derived program must be total and the
+% specification functional on Mode, which with the derivation's soundness makes them equal
+% there; a bounded check (inputs up to size 3) must agree too.
+valid_fold_derivation_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, fold_derivation, [], equivalent(domain(mode(Mode)), modes(Mode)))]),
+    integer(Id), Id > 0, is_list(Mode),
+    main_predicate(Original, Target), main_predicate(Program, Target),
+    program_clauses(Original, OC), program_clauses(Program, PC),
+    mnn_fold:clauses(OC, Spec),
+    mnn_fold:spec_to_algorithm(Spec, Target, [], P0, _),
+    mnn_fold:verify(Spec, P0, Target, Mode, verdict(total(yes), functional(yes), _, _, Derived)),
+    findall(C, ( member(H-B, Derived), ( B == [] -> C = H ; list_to_conj(B, BC), C = (H :- BC) ) ), DC),
+    same_clauses(DC, PC),
+    mnn_fold:bounded_equal(Spec, Target, Derived, Target, Mode, 3, equal_on(_)).
+
+list_to_conj([G], G) :- !.
+list_to_conj([G|Gs], (G, C)) :- list_to_conj(Gs, C).
+same_clauses([], []).
+same_clauses([C|Cs], Ds) :- select(D, Ds, Rest), C =@= D, !, same_clauses(Cs, Rest).
 
 main_predicate(mnn_program(_, meta(_, Events), _, _, _), Key) :-
     memberchk(directive(_, module(_, [Key])), Events).

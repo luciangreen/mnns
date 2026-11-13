@@ -115,6 +115,15 @@ render_step_summary(Rule) :-
     render_definition_rewrite(Rule).
 render_step_summary(findall_to_fold) :-
     render_findall_to_fold.
+render_step_summary(edb_equivalence) :-
+    format('The rules compute the same target relations as the original''s, with the ', []),
+    format('same facts: for every input when the domain is all (duplicate or subsumed ', []),
+    format('clauses removed), otherwise for every set of input atoms over the stated ', []),
+    format('predicates and constants. The checker repeats the check.~n~n', []).
+render_step_summary(fold_derivation) :-
+    format('The program is the unfold/fold derivation of the original specification, ', []),
+    format('verified total with the specification functional on the stated modes, so ', []),
+    format('they are equal there. The checker repeats the derivation and the verification.~n~n', []).
 render_step_summary(induction_equivalence) :-
     format('The program was proved to have the same answers as the original for ', []),
     format('every input of the declared types: structural induction on lists, ', []),
