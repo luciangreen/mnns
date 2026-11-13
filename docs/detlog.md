@@ -1,5 +1,13 @@
 # Detlog — conservative determinism analysis
 
+> The full Detlog is now [detlog2](https://github.com/luciangreen/detlog2), in
+> Haskell. It provides a choicepointless, cutless interpreter; cut elimination
+> to `if_commit/3`; choicepoint splicing with `splice/2`, `member_cp/2` and
+> choice packets; memo tables; and an independent proof checker for every
+> rewrite (its [proof rules](https://github.com/luciangreen/detlog2/blob/main/docs/proof_rules.md)).
+> detlog2 runs this repository's `optimise.pl` first (`detlog2 mnns`). The
+> slice below is kept because `optimise.pl` uses it.
+
 `mnn_detlog:analyze_determinism/2` reports an initial, bounded analysis for each
 predicate in an MNN program:
 

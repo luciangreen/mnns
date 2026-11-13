@@ -495,6 +495,11 @@ remain unchecked; do not treat them as proof-certified. See [`loop2.md`](loop2.m
 
 ## PLOp pipeline
 
+> Per-character PLOp is [plop2](https://github.com/luciangreen/plop2). It writes
+> one separate program per output character, with checked proofs
+> ([proof rules](https://github.com/luciangreen/plop2/blob/main/docs/proof_rules.md)),
+> and closed forms from `mnn_algebraplop:infer_sequence_formula/2`.
+
 `mnn_plop:optimize_program/3` and `mnn_plop:optimize_predicate/4` share one
 conservative pipeline. It calls the existing loop2 finite-generator conversion,
 then submits the candidate and its sequential `findall_to_fold` proof steps to
