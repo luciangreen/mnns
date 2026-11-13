@@ -354,6 +354,8 @@ loops, deterministic loop conversion, closed-form discovery.
 
 ### 4.7 AlgebraPLOp — positional algebra
 
+Program positions, inverses and loops with checked proofs: [algebraplop2](https://github.com/luciangreen/algebraplop2) (Haskell, proof-checked).
+
 Job: discover positional formulas and inverses, emit splice-index loops and
 `r_spec` provenance.
 
