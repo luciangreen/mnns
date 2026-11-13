@@ -438,7 +438,9 @@ swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
 reference program, the result carries an mnns `induction_equivalence` proof,
 which `check_proof/4` re-proves with `prolog/proof/induction_equivalence.pl`.
 The same module also runs S2A2's optimisation on `mnn_program`s:
-`s2a2_learn/3`, `s2a2_apply/5` and `s2a2_derive/4` (`fold.pl`). It runs
+`s2a2_learn/3`, `s2a2_apply/5` and `s2a2_derive/4` (`fold.pl`). Their results
+carry `edb_equivalence` and `fold_derivation` proofs, which the checker repeats
+with its own copies of S2A2's prover and `fold.pl` (`prolog/proof/`). It runs
 `s2a/4` first. When that returns `no_algorithm`, it asks
 [S2A2](https://github.com/luciangreen/S2A2)'s `io_synth` for a program (maps,
 filters, templates, folds, invented helper predicates, its own projection and

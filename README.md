@@ -171,7 +171,8 @@ feature and its focused test suite.
   a program (lists, recursion, invented helper predicates) and returns it in the
   IR. Given a reference program, it adds an mnns `induction_equivalence` proof
   that the checker re-proves. It also runs S2A2's optimisation (`learn/2`,
-  `apply_algorithm/5`, and `fold.pl`'s derivations) on IR programs. On 12 shared
+  `apply_algorithm/5`, and `fold.pl`'s derivations) on IR programs, with
+  `edb_equivalence` and `fold_derivation` proofs that the checker repeats. On 12 shared
   tasks `s2a/4` solves 4 and S2A2 all 12. See [`docs/s2a2.md`](docs/s2a2.md).
 - **Starlog (initial readable view):** translates declared or module-qualified
   function expressions to predicate calls, and supports string (`:`), list (`&`),

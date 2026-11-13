@@ -42,14 +42,18 @@
           S2A2's apply_algorithm/5 on an mnn_program. Result is an mnn_program whose trace
           holds the steps and S2A2's prover's verdict on the targets (proved(syntactic(_)),
           proved(exhaustive(N)) over every input built from the input predicates, or
-          refuted(...)); the proof field is proof([]).
+          refuted(...)). When it is proved, the proof field is an mnns proof of rule
+          edb_equivalence (domain all for a syntactic proof, else edb(Preds, Consts)), kept
+          only if mnns's checker, repeating the check with its own copy of S2A2's prover,
+          accepts it; otherwise proof([]).
       s2a2_derive(+Spec, +Mode, +Options, -Result)
           fold.pl's spec to algorithm on an mnn_program whose main predicate is the target:
           a faster program (accumulator, tupling, fusion, deforestation). It is returned only
           when fold.pl's verify/5 shows it total and the specification functional, which
           makes them equal on every input of Mode (for example [in(list(int)), out]); the
           trace holds the strategy, the lemmas, the verdict and a bounded check. The proof
-          field is proof([]): mnns does not re-check fold.pl's derivations.
+          field is an mnns proof of rule fold_derivation, kept only if mnns's checker,
+          repeating the derivation and verify/5 with its own copy of fold.pl, accepts it.
 */
 :- module(mnn_s2a2, [s2a2/4, s2a2_available/0, s2a2_learn/3, s2a2_apply/5, s2a2_derive/4]).
 
@@ -180,18 +184,30 @@ s2a2_apply(Algorithm, Program, Targets, Options, Result) :-
     ir_prog(Program, P0),
     s2a2:apply_algorithm(Algorithm, P0, Targets, P1, Steps),
     s2a2:program_to_clauses(P1, Cs),
-    verdict_of(P0, P1, Targets, Verdict),
+    verdict_of(P0, P1, Targets, Verdict, Domain),
     main_key(Program, Name/_),
     atom_concat(Name, '_opt', OptName),
     ir_of(OptName, Cs, s2a2_algorithm(Name), [s2a2_apply(Steps), s2a2_prover(Verdict)], proof([]), R0),
     % the program keeps its predicate names: export the original main predicate
     R0 = mnn_program(_, meta(MT, [directive(I, module(_, _))|Es]), Preds, Pf, Tr),
     main_key(Program, Key), atom_concat(mnn_s2a2_, OptName, Mod),
-    Result = mnn_program(Mod, meta(MT, [directive(I, module(Mod, [Key]))|Es]), Preds, Pf, Tr).
+    R1 = mnn_program(Mod, meta(MT, [directive(I, module(Mod, [Key]))|Es]), Preds, Pf, Tr),
+    with_proof(R1, Program, proof([proof_step(1, edb_equivalence, [],
+                                              equivalent(domain(Domain), modes(targets(Targets))))]),
+               Result).
 
 % S2A2's prover on the rules, over every input built from the input predicates (the facts'
 % predicates that no rule defines) and up to three of the facts' constants, as S2A2 does
-verdict_of(P0, P1, Targets, Verdict) :-
+% with_proof(+Program, +Original, +Proof, -Result): Program with Proof, if mnns's own checker
+% accepts Proof against Original; otherwise Program unchanged (proof([]))
+with_proof(P, _, proof([proof_step(_, _, _, equivalent(domain(none), _))]), P) :- !.
+with_proof(mnn_program(M, Meta, Preds, _, Tr), Original, Proof, Result) :-
+    P1 = mnn_program(M, Meta, Preds, Proof, Tr),
+    (   catch(mnn_proof_checker:check_proof(P1, Original, Proof, accepted), _, fail)
+    ->  Result = P1
+    ;   Result = mnn_program(M, Meta, Preds, proof([]), Tr) ).
+
+verdict_of(P0, P1, Targets, Verdict, Domain) :-
     P0 = prog(F, _),
     findall(N/A, ( member(Fa, F), functor(Fa, N, A) ), E0), sort(E0, Edb),
     findall(X, ( member(Fa, F), Fa =.. [_|As], member(X, As) ), X0), sort(X0, Xs),
@@ -199,7 +215,10 @@ verdict_of(P0, P1, Targets, Verdict) :-
     s2a2:program_to_clauses(P0, C0), s2a2:program_to_clauses(P1, C1),
     include([C]>>(C = (_ :- _)), C0, R0), include([C]>>(C = (_ :- _)), C1, R1),
     (   catch(call_with_time_limit(60, prover:equivalent(R0, R1, Targets, edb(Edb, Consts), V)), _, fail)
-    ->  Verdict = V ; Verdict = unknown ).
+    ->  Verdict = V ; Verdict = unknown ),
+    (   Verdict = proved(syntactic(_)) -> Domain = all
+    ;   Verdict = proved(_) -> Domain = edb(Edb, Consts)
+    ;   Domain = none ).
 
 s2a2_derive(Spec, Mode, Options, Result) :-
     s2a2_available(Options),
@@ -213,7 +232,9 @@ s2a2_derive(Spec, Mode, Options, Result) :-
             findall(C, ( member(H-Bd, PF), ( Bd == [] -> C = H ; list_conj(Bd, BC), C = (H :- BC) ) ), PCs),
             ir_of(Name, PCs, s2a2_fold(Name, St),
                   [s2a2_fold(St, lemmas(Used), total(T), functional(F), typed_answers(Ty), bounded(B))],
-                  proof([]), Result)
+                  proof([]), R0),
+            with_proof(R0, Spec, proof([proof_step(1, fold_derivation, [], equivalent(domain(mode(Mode)), modes(Mode)))]),
+                       Result)
         ;   Result = no_algorithm(not_proved(total(T), functional(F))) )
     ;   Result = no_algorithm(no_derivation) ).
 list_conj([G], G) :- !.
