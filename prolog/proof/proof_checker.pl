@@ -2,6 +2,8 @@
           [ check_proof/4
           ]).
 
+:- use_module(induction_equivalence).
+
 check_proof(Program, Original, Proof, Result) :-
     (   mnn_program_term(Program)
     ->  (   mnn_program_term(Original)
@@ -352,10 +354,36 @@ check_supported_proof(Program, Original, Proof, Result) :-
     ->  Result = accepted
     ;   valid_detlog_proof(Program, Original, Proof)
     ->  Result = accepted
+    ;   valid_induction_equivalence_proof(Program, Original, Proof)
+    ->  Result = accepted
     ;   valid_proof_sequence(Program, Original, Proof)
     ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
     ).
+
+% induction_equivalence: Program and Original each export one predicate Name/N (their main
+% predicates may have different names). The step claims they have the same answers for every
+% input whose arguments have the declared types (Types, one per argument: int, any,
+% list(T)). The checker proves it again with induction_equivalence.pl: structural induction
+% on lists, unfolding of one-clause helpers, polynomial arithmetic, normal forms for integer
+% tests, residues, and invariants from max_list/min_list. It accepts only if that proof is
+% found.
+valid_induction_equivalence_proof(Program, Original, Proof) :-
+    ground(Proof),
+    Proof = proof([proof_step(Id, induction_equivalence, [],
+                              equivalent(domain(types(Types)), modes(all)))]),
+    integer(Id), Id > 0,
+    is_list(Types),
+    main_predicate(Program, N1/A), main_predicate(Original, N2/A),
+    length(Types, A),
+    program_clauses(Program, C1), program_clauses(Original, C2),
+    mnn_induction_equivalence:prove_equal(C1, N1, C2, N2, Types, proved(_)).
+
+main_predicate(mnn_program(_, meta(_, Events), _, _, _), Key) :-
+    memberchk(directive(_, module(_, [Key])), Events).
+program_clauses(mnn_program(_, _, Preds, _, _), Clauses) :-
+    findall(C, ( member(mnn_pred(_, _, _, Cs, _), Preds), member(mnn_clause(_, H, B, _), Cs),
+                 ( B == true -> C = H ; C = (H :- B) ) ), Clauses).
 
 valid_identity_proof(Proof) :-
     ground(Proof),

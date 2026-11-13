@@ -115,6 +115,12 @@ render_step_summary(Rule) :-
     render_definition_rewrite(Rule).
 render_step_summary(findall_to_fold) :-
     render_findall_to_fold.
+render_step_summary(induction_equivalence) :-
+    format('The program was proved to have the same answers as the original for ', []),
+    format('every input of the declared types: structural induction on lists, ', []),
+    format('unfolding of one-clause helpers, polynomial arithmetic, normal forms ', []),
+    format('for integer tests, residues, and invariants from max_list/min_list. ', []),
+    format('The checker repeats the proof.~n~n', []).
 
 render_findall_to_fold :-
     format('One direct findall over a supported finite generator was replaced ', []),

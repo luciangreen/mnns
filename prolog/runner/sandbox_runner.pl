@@ -8,6 +8,12 @@
 :- use_module(library(solution_sequences)).
 :- use_module(library(time)).
 
+% SWI-Prolog 10's library(error) checks types with system:is_address/1, a pure type test
+% that library(sandbox) does not list as safe, so must_be/2 (and nth0/3, nth1/3 through it)
+% was refused. Earlier versions have no is_address/1, and this clause is then never used.
+:- multifile sandbox:safe_primitive/1.
+sandbox:safe_primitive(system:is_address(_)).
+
 run_program(File, Goal, Options, answers(Answers)) :-
     validate_options(Options, MaxAnswers, TimeLimit),
     (   callable(Goal)
