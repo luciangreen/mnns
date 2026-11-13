@@ -166,6 +166,11 @@ feature and its focused test suite.
   candidates reproduce the examples but have no formal proof certificate;
   recursive generalization and broader arithmetic templates remain unsupported.
   See [`docs/current_features.md`](docs/current_features.md#s2a-synthesis).
+- **S2A2 bridge:** `mnn_s2a2:s2a2/4` takes the same spec. When `s2a/4` finds
+  nothing, it asks [S2A2](https://github.com/luciangreen/S2A2)'s `io_synth` for
+  a program (lists, recursion, invented helper predicates) and returns it in the
+  IR. It can also prove the program equal to a reference program. On 12 shared
+  tasks `s2a/4` solves 4 and S2A2 all 12. See [`docs/s2a2.md`](docs/s2a2.md).
 - **Starlog (initial readable view):** translates declared or module-qualified
   function expressions to predicate calls, and supports string (`:`), list (`&`),
   and atom (`•`) concatenation. Type coercion is opt-in; broader Starlog syntax

@@ -434,6 +434,20 @@ Run its focused tests from the repository root:
 swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
 ```
 
+`mnn_s2a2:s2a2/4` (`prolog/s2a/s2a2_bridge.pl`) takes the same specs. It runs
+`s2a/4` first. When that returns `no_algorithm`, it asks
+[S2A2](https://github.com/luciangreen/S2A2)'s `io_synth` for a program (maps,
+filters, templates, folds, invented helper predicates, its own projection and
+exact polynomials, and a genetic algorithm last) and returns it as an
+`mnn_program/5`. With `reference(Clauses, RefName)` the trace also holds S2A2's
+proof that the program equals the reference for every input of its types. It
+needs S2A2 at `$S2A2_HOME` or beside this repository; without it, the results
+are those of `s2a/4`. See [`docs/s2a2.md`](s2a2.md), and run its tests with:
+
+```sh
+swipl -q -g "load_files('tests/s2a2_bridge_tests.pl'), run_tests(mnn_s2a2), halt"
+```
+
 ## Starlog readable view
 
 `mnn_starlog:starlog_to_ir/2` and `ir_to_starlog/2` provide an initial two-way
