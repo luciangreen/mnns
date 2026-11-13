@@ -32,6 +32,8 @@ main :-
     load_files(AlgebraPLOpTests, [silent(true)]),
     directory_file_path(Directory, 's2a_tests.pl', S2ATests),
     load_files(S2ATests, [silent(true)]),
+    directory_file_path(Directory, 's2a2_bridge_tests.pl', S2A2BridgeTests),
+    load_files(S2A2BridgeTests, [silent(true)]),
     directory_file_path(Directory, 'starlog_tests.pl', StarlogTests),
     load_files(StarlogTests, [silent(true)]),
     directory_file_path(Directory, 'aioc_size_tests.pl', AIOCSizeTests),

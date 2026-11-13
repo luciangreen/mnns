@@ -16,5 +16,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes swi-prolog-nox
+      - name: Fetch S2A2 beside this repository (for the s2a2 bridge tests)
+        run: git clone --depth 1 https://github.com/luciangreen/S2A2 ../S2A2
       - name: Run tests
         run: swipl -q -s tests/run.pl
