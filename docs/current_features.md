@@ -434,7 +434,11 @@ Run its focused tests from the repository root:
 swipl -q -g "load_files('tests/s2a_tests.pl'), run_tests(mnn_s2a), halt"
 ```
 
-`mnn_s2a2:s2a2/4` (`prolog/s2a/s2a2_bridge.pl`) takes the same specs. It runs
+`mnn_s2a2:s2a2/4` (`prolog/s2a/s2a2_bridge.pl`) takes the same specs. With a
+reference program, the result carries an mnns `induction_equivalence` proof,
+which `check_proof/4` re-proves with `prolog/proof/induction_equivalence.pl`.
+The same module also runs S2A2's optimisation on `mnn_program`s:
+`s2a2_learn/3`, `s2a2_apply/5` and `s2a2_derive/4` (`fold.pl`). It runs
 `s2a/4` first. When that returns `no_algorithm`, it asks
 [S2A2](https://github.com/luciangreen/S2A2)'s `io_synth` for a program (maps,
 filters, templates, folds, invented helper predicates, its own projection and

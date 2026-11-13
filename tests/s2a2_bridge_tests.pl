@@ -42,18 +42,81 @@ test(nested_predicates_from_s2a2) :-
     run_emitted(P, dropmin_each, [[[4,2,9],[3]], [[]]], Outs),
     assertion(Outs == [[[4,9],[]], [[]]]).
 
-test(proof_against_a_reference_in_the_trace) :-
+test(mnns_proof_against_a_reference) :-
     spec([[1,2,3,4]-[2,4], [5,6]-[6], [7]-[], [-2,1]-[-2]], S),
     Ref = [r([], []), (r([X|Xs], R) :- ( X mod 2 =:= 0 -> R = [X|R1] ; R = R1 ), r(Xs, R1))],
     mnn_s2a2:s2a2(evens, S, [reference(Ref, r)], P),
-    P = mnn_program(_, _, _, proof([]), trace([_, s2a2_proof(r, proved(Steps))])),
-    assertion(memberchk(pair(evens/2, r/2, induction(1), none), Steps)).
+    P = mnn_program(_, _, _, Proof, trace([_, s2a2_reference(RefIR)])),
+    assertion(Proof == proof([proof_step(1, induction_equivalence, [], equivalent(domain(types([list(int), any])), modes(all)))])),
+    mnn_proof_checker:check_proof(P, RefIR, Proof, accepted).
+
+test(the_mnns_checker_refuses_the_proof_for_a_different_program) :-
+    spec([[1,2,3,4]-[2,4], [5,6]-[6], [7]-[], [-2,1]-[-2]], S),
+    Ref = [r([], []), (r([X|Xs], R) :- ( X mod 2 =:= 0 -> R = [X|R1] ; R = R1 ), r(Xs, R1))],
+    mnn_s2a2:s2a2(evens, S, [reference(Ref, r)], mnn_program(_, _, _, Proof, trace([_, s2a2_reference(RefIR)]))),
+    spec([[1,2,3,4]-[1,3], [5,6]-[5], [8]-[], [-1,2]-[-1]], S2),
+    mnn_s2a2:s2a2(odds, S2, [], P2),
+    mnn_proof_checker:check_proof(P2, RefIR, Proof, rejected(_)).
 
 test(wrong_reference_is_not_proved) :-
     spec([[1,2,3,4]-[2,4], [5,6]-[6], [7]-[], [-2,1]-[-2]], S),
     Ref = [r([], []), (r([X|Xs], R) :- ( X mod 2 =:= 1 -> R = [X|R1] ; R = R1 ), r(Xs, R1))],
     mnn_s2a2:s2a2(evens, S, [reference(Ref, r)], P),
-    P = mnn_program(_, _, _, _, trace([_, s2a2_proof(r, not_proved)])).
+    P = mnn_program(_, _, _, proof([]), trace([_, s2a2_proof(r, not_proved)])).
+
+test(invariant_proof_for_drop_the_maximum) :-
+    spec([[3,1,2]-[1,2], [7,9,8]-[7,8], [5,6,4]-[5,4]], S),
+    Ref = [r([], []), (r([X|Xs], R) :- max_list([X|Xs], M), d([X|Xs], M, R)),
+           d([], _, []), (d([X|Xs], M, R) :- ( X == M -> R = R1 ; R = [X|R1] ), d(Xs, M, R1))],
+    mnn_s2a2:s2a2(dropmax, S, [reference(Ref, r)], P),
+    P = mnn_program(_, _, _, proof([_]), trace([_, s2a2_reference(RefIR)])),
+    P = mnn_program(_, _, _, Proof, _),
+    mnn_proof_checker:check_proof(P, RefIR, Proof, accepted).
+
+ir(Name, Clauses, IR) :- mnn_s2a2:ir_of(Name, Clauses, test, [], proof([]), IR).
+
+% the pairs of S2A2's loop2 family: a caller calls a wrapper; after, it calls the generator
+test(learn_and_apply_an_optimisation_algorithm) :-
+    ir(col, [colour(red), colour(blue), (q(X) :- colour(X)), (col(X1) :- q(X1))], B1),
+    ir(col, [colour(red), colour(blue), (q(X2) :- colour(X2)), (col(X3) :- colour(X3))], A1),
+    ir(big, [size(s1), size(s2), size(s3), (s(Y) :- size(Y)), (big(Y1) :- s(Y1))], B2),
+    ir(big, [size(s1), size(s2), size(s3), (s(Y2) :- size(Y2)), (big(Y3) :- size(Y3))], A2),
+    mnn_s2a2:s2a2_learn([pair(B1, A1, [col/1]), pair(B2, A2, [big/1])], [], Alg),
+    assertion(Alg = algorithm([rule(unfold, _)])),
+    ir(conn, [edge(a,b), edge(b,c), (e(U,V) :- edge(U,V)), (conn(U1,V1) :- e(U1,V1))], P),
+    mnn_s2a2:s2a2_apply(Alg, P, [conn/2], [], R),
+    R = mnn_program(_, _, Preds, proof([]), trace([s2a2_apply([step(_)]), s2a2_prover(Verdict)])),
+    memberchk(mnn_pred(conn/2, _, _, [mnn_clause(_, conn(C1, C2), edge(D1, D2), _)], _), Preds),
+    assertion(C1-C2 == D1-D2),
+    assertion(Verdict = proved(_)).
+
+% too few distinctions in the pairs: deleting the wrapper too gives an unconditional
+% del_clause, which S2A2's prover refutes on a new program
+test(an_over_general_algorithm_is_refuted_by_the_prover) :-
+    ir(col, [colour(red), colour(blue), (q(X) :- colour(X)), (col(X1) :- q(X1))], B1),
+    ir(col, [colour(red), colour(blue), (col(X2) :- colour(X2))], A1),
+    ir(big, [size(s1), size(s2), size(s3), (s(Y) :- size(Y)), (big(Y1) :- s(Y1))], B2),
+    ir(big, [size(s1), size(s2), size(s3), (big(Y2) :- size(Y2))], A2),
+    mnn_s2a2:s2a2_learn([pair(B1, A1, [col/1]), pair(B2, A2, [big/1])], [], Alg),
+    ir(conn, [edge(a,b), edge(b,c), (e(U,V) :- edge(U,V)), (conn(U1,V1) :- e(U1,V1))], P),
+    mnn_s2a2:s2a2_apply(Alg, P, [conn/2], [], R),
+    R = mnn_program(_, _, _, _, trace([_, s2a2_prover(refuted(_, _, _))])).
+
+test(derive_an_accumulator_program) :-
+    ir(sum, [sum([], 0), (sum([H|T], S) :- sum(T, S1), S is S1 + H)], Spec),
+    mnn_s2a2:s2a2_derive(Spec, [in(list(int)), out], [], R),
+    R = mnn_program(_, _, Preds, proof([]), trace([s2a2_fold(accumulate, _, total(yes), functional(yes), _, bounded(equal_on(_)))])),
+    assertion(memberchk(mnn_pred(sum_acc/3, _, _, _, _), Preds)),
+    run_emitted(R, sum, [[1,2,3], []], Outs),
+    assertion(Outs == [6, 0]).
+
+test(derive_flatten_by_fusion) :-
+    ir(flat2, [flat2([], []), (flat2([L|Ls], F) :- flat2(Ls, F0), app(L, F0, F)),
+               app([], A, A), (app([X|Xs], B, [X|C]) :- app(Xs, B, C))], Spec),
+    mnn_s2a2:s2a2_derive(Spec, [in(list(list(any))), out], [bound(3)], R),
+    R = mnn_program(_, _, _, _, trace([s2a2_fold(fuse, _, total(yes), functional(yes), _, _)])),
+    run_emitted(R, flat2, [[[1,2],[3]]], Outs),
+    assertion(Outs == [[1,2,3]]).
 
 test(table_only_when_asked_and_nothing_generalises) :-
     spec([a-b, c-d], S),
