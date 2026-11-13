@@ -63,16 +63,20 @@ feature and its focused test suite.
   normalized `once/1`; it also identifies syntactic tail recursion and treats
   calls inside `once/1` as non-tail. These analyses are not proofs of a
   specification or full termination. See [`docs/pid.md`](docs/pid.md).
-- **Detlog2 and PLOp2 (separate repositories):** the full Detlog is now
-  [detlog2](https://github.com/luciangreen/detlog2), and per-character PLOp is
-  [plop2](https://github.com/luciangreen/plop2). Both are written in Haskell and
+- **Detlog2, PLOp2 and AlgebraPLOp2 (separate repositories):** the full Detlog is now
+  [detlog2](https://github.com/luciangreen/detlog2), per-character PLOp is
+  [plop2](https://github.com/luciangreen/plop2), and proof-backed AlgebraPLOp is
+  [algebraplop2](https://github.com/luciangreen/algebraplop2). All are written in Haskell and
   carry checked proofs for every rewrite.
   - detlog2 is a choicepointless, cutless interpreter. Its converter turns cuts
     into `if_commit/3` and choicepoints into `splice/2`/`member_cp/2` packets,
     and it memoises calls into answer tables.
   - plop2 writes one separate, demand-sliced program per output character, with
     closed forms from this repository's AlgebraPLOp.
-  - Both run this repository's `optimise.pl` and AlgebraPLOp as their mnns pass.
+  - algebraplop2 proves program-position formulas by induction (or verifies
+    them on a domain), and writes inverses and splice-index loops.
+  - detlog2 and plop2 run this repository's `optimise.pl` and AlgebraPLOp as
+    their mnns pass; algebraplop2 compares its formulas with this AlgebraPLOp.
   - The Detlog and PLOp slices below remain here because `optimise.pl` uses them.
 - **Detlog analysis:** conservatively classifies success counts for a limited
   set of normalized goals when all predicate arguments are unbound. Unsupported
@@ -151,7 +155,8 @@ feature and its focused test suite.
   formulas. Exact inverse lookup is available for constant, affine, and
   integer-base geometric and polynomial formulas. Supported formulas can also be
   evaluated at exact nonnegative positions; program positions and proof-backed
-  formulas remain unsupported. See
+  formulas remain unsupported here (see
+  [algebraplop2](https://github.com/luciangreen/algebraplop2) for those). See
   [`docs/current_features.md`](docs/current_features.md#algebraplop-sequence-inference).
 - **S2A (initial inference):** for two or more distinct ground examples, a
   unique input subterm address shared with every output generates a generalized
@@ -268,7 +273,7 @@ More detail on current capabilities and limitations is in
 commands for every implemented test group.
 
 
-* Manual Neuronets (MNNs) are Green's invention and a way to represent the hidden workings of black-box neural nets. They combine the [Spec to Algorithm](https://github.com/luciangreen/Philosophy/tree/master/s2a), [Starlog](https://github.com/luciangreen/Starlog), [Prolog Inductive Debugger](https://github.com/luciangreen/Prolog_Inductive_Debugger), [loop2](https://github.com/luciangreen/loop2), [PLOp2](https://github.com/luciangreen/plop2)/[AlgebraPLOp](https://github.com/luciangreen/algebraplop), [Detlog2](https://github.com/luciangreen/detlog2), and [Piglog2](https://github.com/luciangreen/piglog2) repositories. Later, a chatbot incorporating natural language, manual attention, manual time series and other aspects of NNs such as signposting, ranking, analysis, conversations and personality overlays will be added.
+* Manual Neuronets (MNNs) are Green's invention and a way to represent the hidden workings of black-box neural nets. They combine the [Spec to Algorithm](https://github.com/luciangreen/Philosophy/tree/master/s2a), [Starlog](https://github.com/luciangreen/Starlog), [Prolog Inductive Debugger](https://github.com/luciangreen/Prolog_Inductive_Debugger), [loop2](https://github.com/luciangreen/loop2), [PLOp2](https://github.com/luciangreen/plop2)/[AlgebraPLOp2](https://github.com/luciangreen/algebraplop2), [Detlog2](https://github.com/luciangreen/detlog2), and [Piglog2](https://github.com/luciangreen/piglog2) repositories. Later, a chatbot incorporating natural language, manual attention, manual time series and other aspects of NNs such as signposting, ranking, analysis, conversations and personality overlays will be added.
 
 ## Inputs and outputs
 

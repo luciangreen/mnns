@@ -527,6 +527,11 @@ swipl -q -g "load_files('tests/plop_tests.pl'), run_tests(mnn_plop), halt"
 
 ## AlgebraPLOp sequence inference
 
+> Proof-backed AlgebraPLOp is [algebraplop2](https://github.com/luciangreen/algebraplop2).
+> It proves program-position formulas by induction
+> ([proof rules](https://github.com/luciangreen/algebraplop2/blob/main/docs/proof_rules.md)),
+> and writes inverses and splice-index loops.
+
 `mnn_algebraplop:infer_sequence_formula/2` is an initial, conservative sequence
 inference slice. It accepts a proper list of at least three integers, treats the
 first value as position zero, and returns an exact constant, affine
