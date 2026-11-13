@@ -305,6 +305,8 @@ loops.
 
 ### 4.5 Detlog — determinism
 
+Implemented in full in [detlog2](https://github.com/luciangreen/detlog2) (Haskell, proof-checked).
+
 Job: replace choicepoints with splices and choice packets, and cuts with
 explicit decisions, preserving answers, order, duplicates and effects.
 
@@ -323,6 +325,8 @@ explicit decisions, preserving answers, order, duplicates and effects.
   - answer sequences of source and output are identical on the test corpus.
 
 ### 4.6 PLOp — general optimiser
+
+Per-character PLOp: [plop2](https://github.com/luciangreen/plop2) (Haskell, proof-checked).
 
 Job: base-up unfolding, memoisation, common-subgoal hoisting, hierarchical
 splicing, list-to-formula, indexical/sub-term-address indexing, recursive index
