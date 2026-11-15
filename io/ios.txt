@@ -4,399 +4,399 @@ mnns: 200 inputs and outputs, from real runs (swipl io/make_ios.pl writes this f
    => [report("MNN_OPTIMISE ok changed=false size_before=34 size_after=34 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(5)", "val(3)", "val(1)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
 2. s2a(probe_a, [[[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a([5, 6], [6, 5]), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(1))]))
-3. optimise_file("n(7).\nn(4).\nn(2).\nn(9).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
+3. s2a2(reverse, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-2]]]], [output, [['B', [-2]]]]], [[input, [['A', [3, 6]]]], [output, [['B', [6, 3]]]]], [[input, [['A', [4, 7, -3]]]], [output, [['B', [-3, 7, 4]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["reverse(A, B):-lists:reverse(A, B)"]), proof(proof([])), trace([s2a2_io_synth(reverse, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-2], [3, 6], [4, 7, -3], [1, 2, 3, 4, 5, 6]], [[], [-2], [6, 3], [-3, 7, 4], [6, 5, 4, 3, 2, 1]])]
+4. s2a2_learn_apply(keep, [col-colour-q-[blue, green]], [a-b])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b])), modes(targets([conn/2]))))])), check(accepted)]
+5. s2a2_derive(sum, 3, [[], [2], [3, 6], [9, -1, 2, 5]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sum([], 0)", "sum([A|B], C):-sum_acc(B, C, A)", "sum_acc([], A, B):-A is 0+B", "sum_acc([A|B], C, D):-E is A+D, sum_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 2, 9, 15]), derived_gives([0, 2, 9, 15])]
+6. check_proof(fold_changed, 1)
+   => rejected(invalid_or_unsupported_proof)
+7. optimise_file("n(7).\nn(4).\nn(2).\nn(9).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(7)", "n(4)", "n(2)", "n(9)", "doubled(A):-findall(B, (n(C), B is C*2), A)"])]
-4. s2a(probe_b, [[[input, [['A', 7]]], [output, [['B', 8]]]]], [])
+8. s2a(probe_b, [[[input, [['A', 7]]], [output, [['B', 8]]]]], [])
    => no_algorithm(no_generalization_candidate)
-5. optimise_file("num(9).\nnum(5).\nnum(3).\nnum(1).\nnum(7).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
+9. s2a2(evens, [[[input, [['A', [-2]]]], [output, [['B', [-2]]]]], [[input, [['A', [-1, 2]]]], [output, [['B', [2]]]]], [[input, [['A', [4, 7, -3]]]], [output, [['B', [4]]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', [8, -2]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
+   => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4)), s2a2_proof(r, not_proved)]), check(no_reference), runs_on([[-2], [-1, 2], [4, 7, -3], [5, 8, -2, 1], [1, 2, 3, 4, 5, 6]], [[-2], [2], [4], [8, -2], [2, 4, 6]])]
+10. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red], big-size-s-[s2, s3]], [b-c])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(A, [B]), [l(C, [B])]), lr(l(A, [D]), [l(E, [D])]))), [template_matches])])), program(["edge(b, c)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(b, b), edge(b, c), edge(c, b), edge(c, c)]), only_in_a([conn(b, b), conn(b, c), conn(c, b), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+11. s2a2_derive(flat2, 2, [[[[]], [[-2], [3, 6], [4, 7, -3]]], [[[], [-2]], [[3, 6], [4, 7, -3]]]])
+   => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(57)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[], [-2], [3, 6], [4, 7, -3]], [[], [-2], [3, 6], [4, 7, -3]]]), derived_gives([[[], [-2], [3, 6], [4, 7, -3]], [[], [-2], [3, 6], [4, 7, -3]]])]
+12. check_proof(fold_not_derived, 2)
+   => rejected(invalid_or_unsupported_proof)
+13. optimise_file("num(9).\nnum(5).\nnum(3).\nnum(1).\nnum(7).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=38 size_after=38 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(9)", "num(5)", "num(3)", "num(1)", "num(7)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-6. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]]], [allow_table(true)])
+14. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]]], [allow_table(true)])
    => no_algorithm(unsupported_spec_shape)
-7. optimise_file("item(1).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
+15. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-1, 2]]]], [output, [['B', 2]]]], [[input, [['A', [0, 3, 6]]]], [output, [['B', 3]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', 4]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["len(A, B):-length(A, B)"]), proof(proof([])), trace([s2a2_io_synth(len, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-1, 2], [0, 3, 6], [5, 8, -2, 1], [1, 2, 3, 4, 5, 6]], [0, 2, 3, 4, 6])]
+16. s2a2_learn_apply(keep, [col-colour-q-[blue], big-size-s-[s1, s2, s3]], [c-d])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [c, d])), modes(targets([conn/2]))))])), check(accepted)]
+17. s2a2_derive(len, 3, [[-2], [-1, 2], [4, 7, -3], [5, 8, -2, 1]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([1, 2, 3, 4]), derived_gives([1, 2, 3, 4])]
+18. check_proof(edb_changed, 3)
+   => rejected(invalid_or_unsupported_proof)
+19. optimise_file("item(1).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
    => [report("MNN_OPTIMISE ok changed=true size_before=12 size_after=27 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(1)", "values(A):-mnn_loop2_1([1], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-8. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]]], [])
+20. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]]], [])
    => no_algorithm(no_generalization_candidate)
-9. optimise_file("item(2).\nitem(9).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
+21. s2a2(odds, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [0, 3, 6]]]], [output, [['B', [3]]]]], [[input, [['A', [1, 4, 7, -3]]]], [output, [['B', [1, 7, -3]]]]], [[input, [['A', [7]]]], [output, [['B', [7]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=0->C=[A|D];C=D), r(B, D))], r)])
+   => [solved_by(s2a2(filter)), program(["odds([], [])", "odds([A|B], C):-(odds_test(A)->C=[A|D];C=D), odds(B, D)", "odds_test(A):-A mod 2=:=1"]), proof(proof([])), trace([s2a2_io_synth(odds, filter, examples_reproduced(4)), s2a2_proof(r, not_proved)]), check(no_reference), runs_on([[], [0, 3, 6], [1, 4, 7, -3], [7], [1, 2, 3, 4, 5, 6]], [[], [3], [1, 7, -3], [7], [1, 3, 5]])]
+22. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-c])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c])), modes(targets([conn/2]))))])), check(accepted)]
+23. s2a2_derive(rev, 2, [[], [-1, 2], [0, 3, 6], [5, 8, -2, 1]])
+   => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [2, -1], [6, 3, 0], [1, -2, 8, 5]]), derived_gives([[], [2, -1], [6, 3, 0], [1, -2, 8, 5]])]
+24. check_proof(edb_syntactic, 1)
+   => accepted
+25. optimise_file("item(2).\nitem(9).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=21 size_after=21 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(2)", "item(9)", "total(A):-findall(B, item(B), C), sum_list(C, A)"])]
-10. s2a(swap_probe, [[[input, [['A', 4]]], [output, [['B', 4]]]]], [allow_table(true)])
+26. s2a(swap_probe, [[[input, [['A', 4]]], [output, [['B', 4]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(4, 4), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(1))]))
-11. optimise_file("val(3).\nval(1).\nval(7).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+27. s2a2(sum, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [1, 4, 7, -3]]]], [output, [['B', 9]]]], [[input, [['A', [7]]]], [output, [['B', 7]]]], [[input, [['A', [8, -2]]]], [output, [['B', 6]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["sum(A, B):-sum_list(A, B)"]), proof(proof([])), trace([s2a2_io_synth(sum, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [1, 4, 7, -3], [7], [8, -2], [1, 2, 3, 4, 5, 6]], [0, 9, 7, 6, 21])]
+28. s2a2_learn_apply(drop, [col-colour-q-[green]], [d-a])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, d), edge(d, a), edge(d, d)]), only_in_a([conn(a, a), conn(a, d), conn(d, a), conn(d, d)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+29. s2a2_derive(sumsq, 3, [[], [0, 3, 6], [1, 4, 7, -3], [7]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 45, 75, 49]), derived_gives([0, 45, 75, 49])]
+30. check_proof(edb_same, 2)
+   => accepted
+31. optimise_file("val(3).\nval(1).\nval(7).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(3)", "val(1)", "val(7)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-12. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]]], [])
+32. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]]], [])
    => no_algorithm(unsupported_spec_shape)
-13. optimise_file("n(4).\nn(2).\nn(9).\nn(5).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
+33. s2a2(double_each, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [2]]]], [output, [['B', [4]]]]], [[input, [['A', [3, 6, 9, -1]]]], [output, [['B', [6, 12, 18, -2]]]]], [[input, [['A', [8, -2]]]], [output, [['B', [16, -4]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(map)), program(["double_each([], [])", "double_each([A|B], [C|D]):-double_each_el(A, C), double_each(B, D)", "double_each_el(A, B):-B is 2*A"]), proof(proof([])), trace([s2a2_io_synth(double_each, map, examples_reproduced(4))]), check(no_reference), runs_on([[], [2], [3, 6, 9, -1], [8, -2], [1, 2, 3, 4, 5, 6]], [[], [4], [6, 12, 18, -2], [16, -4], [2, 4, 6, 8, 10, 12]])]
+34. s2a2_learn_apply(keep, [col-colour-q-[red], big-size-s-[s1]], [a-c, c-d])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c, d])), modes(targets([conn/2]))))])), check(accepted)]
+35. s2a2_derive(len, 2, [[1, 4, 7], [2], [7, -3, 0, 3], [8, -2]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([3, 1, 4, 2]), derived_gives([3, 1, 4, 2])]
+36. check_proof(fold_changed, 3)
+   => rejected(invalid_or_unsupported_proof)
+37. optimise_file("n(4).\nn(2).\nn(9).\nn(5).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(4)", "n(2)", "n(9)", "n(5)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-14. s2a(swap_probe, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 4]]], [output, [['B', 8]]]], [[input, [['A', 5]]], [output, [['B', 10]]]]], [allow_table(true)])
+38. s2a(swap_probe, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 4]]], [output, [['B', 8]]]], [[input, [['A', 5]]], [output, [['B', 10]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 2, 0), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 2, 0, examples_reproduced(3))]))
-15. optimise_file("num(4).\nnum(3).\nnum(2).\nnum(1).\nnum(9).\nvalues(Xs) :- findall(X, num(X), Xs).\n")
+39. s2a2(dropmax, [[[input, [['A', [-3]]]], [output, [['B', []]]]], [[input, [['A', [3, 6]]]], [output, [['B', [3]]]]], [[input, [['A', [9, -1, 2]]]], [output, [['B', [-1, 2]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
+   => [solved_by(s2a2(filter)), program(["dropmax([], [])", "dropmax([A|B], C):-max_list([A|B], D), dropmax_sel([A|B], D, C)", "dropmax_sel([], A, [])", "dropmax_sel([A|B], C, D):-(dropmax_test(A, C)->D=[A|E];D=E), dropmax_sel(B, C, E)", "dropmax_test(A, B):-A<B"]), proof(proof([proof_step(1, induction_equivalence, [], equivalent(domain(types([list(int), any])), modes(all)))])), trace([s2a2_io_synth(dropmax, filter, examples_reproduced(3))]), check(accepted), runs_on([[-3], [3, 6], [9, -1, 2], [1, 2, 3, 4, 5, 6]], [[], [3], [-1, 2], [1, 2, 3, 4, 5]])]
+40. s2a2_learn_apply(keep, [col-colour-q-[blue, red], big-size-s-[s2]], [a-c])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c])), modes(targets([conn/2]))))])), check(accepted)]
+41. s2a2_derive(rev, 3, [[], [2, 5, 8, -2], [3, 6], [9, -1, 2]])
+   => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [-2, 8, 5, 2], [6, 3], [2, -1, 9]]), derived_gives([[], [-2, 8, 5, 2], [6, 3], [2, -1, 9]])]
+42. check_proof(fold_not_derived, 1)
+   => rejected(invalid_or_unsupported_proof)
+43. optimise_file("num(4).\nnum(3).\nnum(2).\nnum(1).\nnum(9).\nvalues(Xs) :- findall(X, num(X), Xs).\n")
    => [report("MNN_OPTIMISE ok changed=true size_before=32 size_after=55 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(4)", "num(3)", "num(2)", "num(1)", "num(9)", "values(A):-mnn_loop2_1([4, 3, 2, 1, 9], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-16. s2a(probe_a, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [])
+44. s2a(probe_a, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [])
    => no_algorithm(no_generalization_candidate)
-17. optimise_file("num(5).\ntotal(T) :- findall(X, num(X), Xs), sum_list(Xs, T).\n")
+45. s2a2(evens, [[[input, [['A', [-3, 0, 3, 6]]]], [output, [['B', [0, 6]]]]], [[input, [['A', [-2, 1]]]], [output, [['B', [-2]]]]], [[input, [['A', [4, 7, -3]]]], [output, [['B', [4]]]]], [[input, [['A', [5]]]], [output, [['B', []]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4))]), check(no_reference), runs_on([[-3, 0, 3, 6], [-2, 1], [4, 7, -3], [5], [1, 2, 3, 4, 5, 6]], [[0, 6], [-2], [4], [], [2, 4, 6]])]
+46. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red]], [a-b, b-c, c-d, d-a])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, b), edge(a, c), edge(b, a), edge(b, b), edge(b, c), edge(c, a), edge(c, b), edge(c, c)]), only_in_a([conn(a, a), conn(a, b), conn(a, c), conn(b, a), conn(b, b), conn(b, c), conn(c, a), conn(c, b), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+47. s2a2_derive(sumsq, 2, [[], [-3, 0, 3, 6], [4, 7, -3], [9]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(21)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 54, 74, 81]), derived_gives([0, 54, 74, 81])]
+48. check_proof(edb_changed, 2)
+   => rejected(invalid_or_unsupported_proof)
+49. optimise_file("num(5).\ntotal(T) :- findall(X, num(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=16 size_after=16 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(5)", "total(A):-findall(B, num(B), C), sum_list(C, A)"])]
-18. s2a(probe_b, [[[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
+50. s2a(probe_b, [[[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
    => no_algorithm(unsupported_spec_shape)
-19. optimise_file("item(7).\nitem(5).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+51. s2a2(evens, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-1, 2, 5]]]], [output, [['B', [2]]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', [8, -2]]]]], [[input, [['A', [6, 9]]]], [output, [['B', [6]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4))]), check(no_reference), runs_on([[], [-1, 2, 5], [5, 8, -2, 1], [6, 9], [1, 2, 3, 4, 5, 6]], [[], [2], [8, -2], [6], [2, 4, 6]])]
+52. s2a2_learn_apply(keep, [col-colour-q-[green]], [a-b, b-c, c-d])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+53. s2a2_derive(sum, 3, [[], [-3, 0], [4], [5, 8, -2, 1]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sum([], 0)", "sum([A|B], C):-sum_acc(B, C, A)", "sum_acc([], A, B):-A is 0+B", "sum_acc([A|B], C, D):-E is A+D, sum_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, -3, 4, 12]), derived_gives([0, -3, 4, 12])]
+54. check_proof(edb_syntactic, 3)
+   => accepted
+55. optimise_file("item(7).\nitem(5).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=28 size_after=28 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(7)", "item(5)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-20. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [])
+56. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [])
    => mnn_program(mnn_s2a_probe_a, meta(s2a_affine(probe_a, 2, 0), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_a, 2, 0, examples_reproduced(3))]))
-21. optimise_file("val(9).\nval(7).\nval(5).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
+57. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-1]]]], [output, [['B', 1]]]], [[input, [['A', [0, 3, 6, 9]]]], [output, [['B', 4]]]], [[input, [['A', [7, -3, 0]]]], [output, [['B', 3]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["len(A, B):-length(A, B)"]), proof(proof([])), trace([s2a2_io_synth(len, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-1], [0, 3, 6, 9], [7, -3, 0], [1, 2, 3, 4, 5, 6]], [0, 1, 4, 3, 6])]
+58. s2a2_learn_apply(keep, [col-colour-q-[blue, green], big-size-s-[s2]], [b-c, c-d])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(b, c)", "edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [b, c, d])), modes(targets([conn/2]))))])), check(accepted)]
+59. s2a2_derive(flat2, 2, [[[[]], [[-2, 1, 4], [-1], [5, 8]]], [[[], [-2, 1, 4]], [[-1], [5, 8]]]])
+   => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(57)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[], [-2, 1, 4], [-1], [5, 8]], [[], [-2, 1, 4], [-1], [5, 8]]]), derived_gives([[[], [-2, 1, 4], [-1], [5, 8]], [[], [-2, 1, 4], [-1], [5, 8]]])]
+60. check_proof(edb_same, 1)
+   => accepted
+61. optimise_file("val(9).\nval(7).\nval(5).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=34 size_after=34 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(9)", "val(7)", "val(5)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-22. s2a(probe_b, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [allow_table(true)])
+62. s2a(probe_b, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b([4, 4], [4, 4]), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(1))]))
-23. optimise_file("n(1).\nn(9).\nn(7).\nn(5).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
+63. s2a2(odds, [[[input, [['A', [0, 3]]]], [output, [['B', [3]]]]], [[input, [['A', [1, 4]]]], [output, [['B', [1]]]]], [[input, [['A', [7, -3]]]], [output, [['B', [7, -3]]]]], [[input, [['A', [8, -2]]]], [output, [['B', []]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=1->C=[A|D];C=D), r(B, D))], r)])
+   => [solved_by(s2a2(filter)), program(["odds([], [])", "odds([A|B], C):-(odds_test(A)->C=[A|D];C=D), odds(B, D)", "odds_test(A):-A mod 2=:=1"]), proof(proof([proof_step(1, induction_equivalence, [], equivalent(domain(types([list(int), any])), modes(all)))])), trace([s2a2_io_synth(odds, filter, examples_reproduced(4))]), check(accepted), runs_on([[0, 3], [1, 4], [7, -3], [8, -2], [1, 2, 3, 4, 5, 6]], [[3], [1], [7, -3], [], [1, 3, 5]])]
+64. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red], big-size-s-[s2, s3]], [d-a])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(A, [B]), [l(C, [B])]), lr(l(A, [D]), [l(E, [D])]))), [template_matches])])), program(["edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, d), edge(d, a), edge(d, d)]), only_in_a([conn(a, a), conn(a, d), conn(d, a), conn(d, d)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+65. s2a2_derive(sumsq, 3, [[-1, 2], [0, 3], [6, 9], [7, -3]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([5, 9, 117, 58]), derived_gives([5, 9, 117, 58])]
+66. check_proof(fold_changed, 2)
+   => rejected(invalid_or_unsupported_proof)
+67. optimise_file("n(1).\nn(9).\nn(7).\nn(5).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(1)", "n(9)", "n(7)", "n(5)", "doubled(A):-findall(B, (n(C), B is C*2), A)"])]
-24. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [])
+68. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 1, 1), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 1*A+1, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 1, 1, examples_reproduced(2))]))
-25. optimise_file("n(2).\nn(1).\nn(9).\nn(7).\nn(5).\ntotal(T) :- findall(X, n(X), Xs), sum_list(Xs, T).\n")
+69. s2a2(sum, [[[input, [['A', [1, 4, 7]]]], [output, [['B', 12]]]], [[input, [['A', [2, 5, 8]]]], [output, [['B', 15]]]], [[input, [['A', [8, -2, 1]]]], [output, [['B', 7]]]], [[input, [['A', [9, -1, 2]]]], [output, [['B', 10]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["sum(A, B):-sum_list(A, B)"]), proof(proof([])), trace([s2a2_io_synth(sum, expression, examples_reproduced(4))]), check(no_reference), runs_on([[1, 4, 7], [2, 5, 8], [8, -2, 1], [9, -1, 2], [1, 2, 3, 4, 5, 6]], [12, 15, 7, 10, 21])]
+70. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-b, b-c, c-d, d-a])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+71. s2a2_derive(sum, 2, [[0, 3, 6], [1, 4, 7], [7, -3, 0], [8, -2, 1]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(21)), program(["sum([], 0)", "sum([A|B], C):-sum_acc(B, C, A)", "sum_acc([], A, B):-A is 0+B", "sum_acc([A|B], C, D):-E is A+D, sum_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([9, 12, 4, 7]), derived_gives([9, 12, 4, 7])]
+72. check_proof(fold_not_derived, 3)
+   => rejected(invalid_or_unsupported_proof)
+73. optimise_file("n(2).\nn(1).\nn(9).\nn(7).\nn(5).\ntotal(T) :- findall(X, n(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=36 size_after=36 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(2)", "n(1)", "n(9)", "n(7)", "n(5)", "total(A):-findall(B, n(B), C), sum_list(C, A)"])]
-26. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 5]]], [output, [['B', 10]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [allow_table(true)])
+74. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 5]]], [output, [['B', 10]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_b, meta(s2a_affine(probe_b, 2, 0), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_b, 2, 0, examples_reproduced(3))]))
-27. optimise_file("num(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+75. s2a2(double_each, [[[input, [['A', [-3, 0, 3, 6]]]], [output, [['B', [-6, 0, 6, 12]]]]], [[input, [['A', [2, 5, 8, -2]]]], [output, [['B', [4, 10, 16, -4]]]]], [[input, [['A', [3, 6, 9, -1]]]], [output, [['B', [6, 12, 18, -2]]]]], [[input, [['A', [9, -1, 2, 5]]]], [output, [['B', [18, -2, 4, 10]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(map)), program(["double_each([], [])", "double_each([A|B], [C|D]):-double_each_el(A, C), double_each(B, D)", "double_each_el(A, B):-B is 2*A"]), proof(proof([])), trace([s2a2_io_synth(double_each, map, examples_reproduced(4))]), check(no_reference), runs_on([[-3, 0, 3, 6], [2, 5, 8, -2], [3, 6, 9, -1], [9, -1, 2, 5], [1, 2, 3, 4, 5, 6]], [[-6, 0, 6, 12], [4, 10, 16, -4], [6, 12, 18, -2], [18, -2, 4, 10], [2, 4, 6, 8, 10, 12]])]
+76. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-b, a-c, b-c])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(a, c)", "edge(b, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+77. s2a2_derive(flat2, 3, [[[[1, 4, 7, -3]], [[2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]]], [[[1, 4, 7, -3], [2, 5, 8, -2]], [[8, -2, 1, 4], [9, -1, 2, 5]]]])
+   => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(3616)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[1, 4, 7, -3], [2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]], [[1, 4, 7, -3], [2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]]]), derived_gives([[[1, 4, 7, -3], [2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]], [[1, 4, 7, -3], [2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]]])]
+78. check_proof(edb_changed, 1)
+   => accepted
+79. optimise_file("num(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=23 size_after=23 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(3)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-28. s2a(swap_probe, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [])
+80. s2a(swap_probe, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [])
    => no_algorithm(no_generalization_candidate)
-29. optimise_file("item(3).\nitem(3).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
+81. s2a2(dropmax, [], [ga(false), time_limit(8)])
+   => no_algorithm(empty_spec)
+82. s2a2_learn_apply(drop, [col-colour-q-[green], big-size-s-[s3]], [c-d, d-a])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(A, [B]), [l(C, [B])]), lr(l(A, [D]), [l(E, [D])]))), [template_matches])])), program(["edge(c, d)", "edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, c), edge(a, d), edge(c, a), edge(c, c), edge(c, d), edge(d, a), edge(d, c), edge(d, d)]), only_in_a([conn(a, a), conn(a, c), conn(a, d), conn(c, a), conn(c, c), conn(c, d), conn(d, a), conn(d, c), conn(d, d)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+83. s2a2_derive(len, 2, [[]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([0]), derived_gives([0])]
+84. check_proof(edb_syntactic, 2)
+   => accepted
+85. optimise_file("item(3).\nitem(3).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=29 size_after=29 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(3)", "item(3)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-30. s2a(probe_a, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [allow_table(true)])
+86. s2a(probe_a, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2), clause(3)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(3, 9), true, generated(s2a_table, 2)), mnn_clause(3, probe_a(5, 6), true, generated(s2a_table, 3))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(2))]))
-31. optimise_file("val(4).\nval(4).\nval(4).\ndoubled(Ys) :- findall(Y, (val(X), Y is X * 2), Ys).\n")
+87. s2a2(evens, [[[input, [['A', [-1]]]], [output, [['B', []]]]], [[input, [['A', [4]]]], [output, [['B', [4]]]]], [[input, [['A', [7]]]], [output, [['B', []]]]], [[input, [['A', [9]]]], [output, [['B', []]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=0->C=[A|D];C=D), r(B, D))], r)])
+   => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([proof_step(1, induction_equivalence, [], equivalent(domain(types([list(int), any])), modes(all)))])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4))]), check(accepted), runs_on([[-1], [4], [7], [9], [1, 2, 3, 4, 5, 6]], [[], [4], [], [], [2, 4, 6]])]
+88. s2a2_learn_apply(keep, [col-colour-q-[red], big-size-s-[s1]], [a-c])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c])), modes(targets([conn/2]))))])), check(accepted)]
+89. s2a2_derive(rev, 3, [[-3], [-1], [2], [7]])
+   => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[-3], [-1], [2], [7]]), derived_gives([[-3], [-1], [2], [7]])]
+90. check_proof(edb_same, 3)
+   => accepted
+91. optimise_file("val(4).\nval(4).\nval(4).\ndoubled(Ys) :- findall(Y, (val(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=26 size_after=26 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(4)", "val(4)", "val(4)", "doubled(A):-findall(B, (val(C), B is C*2), A)"])]
-32. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [])
+92. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [])
    => no_algorithm(unsupported_spec_shape)
-33. optimise_file("val(5).\nval(5).\nval(5).\nval(5).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
+93. s2a2(reverse, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [0, 4, 8]]]], [output, [['B', [8, 4, 0]]]]], [[input, [['A', [5, 9, 0, 4]]]], [output, [['B', [4, 0, 9, 5]]]]], [[input, [['A', [8, -1]]]], [output, [['B', [-1, 8]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["reverse(A, B):-lists:reverse(A, B)"]), proof(proof([])), trace([s2a2_io_synth(reverse, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [0, 4, 8], [5, 9, 0, 4], [8, -1], [1, 2, 3, 4, 5, 6]], [[], [8, 4, 0], [4, 0, 9, 5], [-1, 8], [6, 5, 4, 3, 2, 1]])]
+94. s2a2_learn_apply(keep, [col-colour-q-[blue, red]], [a-b, b-c, c-d, d-a])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+95. s2a2_derive(flat2, 2, [[[[]], [[0, 4, 8], [3], [8, -1]]], [[[], [0, 4, 8]], [[3], [8, -1]]]])
+   => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(57)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[], [0, 4, 8], [3], [8, -1]], [[], [0, 4, 8], [3], [8, -1]]]), derived_gives([[[], [0, 4, 8], [3], [8, -1]], [[], [0, 4, 8], [3], [8, -1]]])]
+96. check_proof(fold_changed, 1)
+   => rejected(invalid_or_unsupported_proof)
+97. optimise_file("val(5).\nval(5).\nval(5).\nval(5).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(5)", "val(5)", "val(5)", "val(5)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-34. s2a(probe_a, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [allow_table(true)])
+98. s2a(probe_a, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a([1, 2], [2, 1]), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(1))]))
-35. optimise_file("n(7).\nn(7).\nn(7).\nn(7).\nn(7).\nvalues(Xs) :- findall(X, n(X), Xs).\n")
+99. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-2]]]], [output, [['B', 1]]]], [[input, [['A', [1, 5, 9, 0]]]], [output, [['B', 4]]]], [[input, [['A', [9, 0, 4]]]], [output, [['B', 3]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["len(A, B):-length(A, B)"]), proof(proof([])), trace([s2a2_io_synth(len, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-2], [1, 5, 9, 0], [9, 0, 4], [1, 2, 3, 4, 5, 6]], [0, 1, 4, 3, 6])]
+100. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red]], [a-b, a-c, c-d])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(a, b)", "edge(a, c)", "edge(c, d)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, b), edge(a, c), edge(b, a), edge(b, b), edge(b, c), edge(c, a), edge(c, b), edge(c, c)]), only_in_a([conn(a, a), conn(a, b), conn(a, c), conn(b, a), conn(b, b), conn(b, c), conn(c, a), conn(c, b), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+101. s2a2_derive(len, 3, [[-1], [1, 5, 9, 0], [4, 8], [9, 0, 4]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([1, 4, 2, 3]), derived_gives([1, 4, 2, 3])]
+102. check_proof(fold_not_derived, 2)
+   => rejected(invalid_or_unsupported_proof)
+103. optimise_file("n(7).\nn(7).\nn(7).\nn(7).\nn(7).\nvalues(Xs) :- findall(X, n(X), Xs).\n")
    => [report("MNN_OPTIMISE ok changed=true size_before=32 size_after=55 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(7)", "n(7)", "n(7)", "n(7)", "n(7)", "values(A):-mnn_loop2_1([7, 7, 7, 7, 7], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-36. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [])
+104. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [])
    => no_algorithm(no_generalization_candidate)
-37. optimise_file("num(9).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
+105. s2a2(odds, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-3, 1, 5, 9]]]], [output, [['B', [-3, 1, 5, 9]]]]], [[input, [['A', [-1, 3]]]], [output, [['B', [-1, 3]]]]], [[input, [['A', [7]]]], [output, [['B', [7]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
+   => [solved_by(s2a_input_address), program(["odds(A, A)"]), proof(proof([])), trace([s2a_input_address(odds, [], examples_reproduced(4))]), check(no_reference), runs_on([[], [-3, 1, 5, 9], [-1, 3], [7], [1, 2, 3, 4, 5, 6]], [[], [-3, 1, 5, 9], [-1, 3], [7], [1, 2, 3, 4, 5, 6]])]
+106. s2a2_learn_apply(keep, [col-colour-q-[green], big-size-s-[s1, s2, s3]], [a-c, b-c])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "edge(b, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+107. s2a2_derive(rev, 2, [[], [-3, 1, 5, 9], [0, 4], [5, 9, 0]])
+   => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [9, 5, 1, -3], [4, 0], [0, 9, 5]]), derived_gives([[], [9, 5, 1, -3], [4, 0], [0, 9, 5]])]
+108. check_proof(edb_changed, 3)
+   => rejected(invalid_or_unsupported_proof)
+109. optimise_file("num(9).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=24 size_after=24 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(9)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-38. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]]], [allow_table(true)])
+110. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]]], [allow_table(true)])
    => no_algorithm(unsupported_spec_shape)
-39. optimise_file("item(1).\nitem(1).\ndoubled(Ys) :- findall(Y, (item(X), Y is X * 2), Ys).\n")
+111. s2a2(sum, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [0, 4, 8]]]], [output, [['B', 12]]]], [[input, [['A', [3]]]], [output, [['B', 3]]]], [[input, [['A', [8, -1]]]], [output, [['B', 7]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["sum(A, B):-sum_list(A, B)"]), proof(proof([])), trace([s2a2_io_synth(sum, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [0, 4, 8], [3], [8, -1], [1, 2, 3, 4, 5, 6]], [0, 12, 3, 7, 21])]
+112. s2a2_learn_apply(keep, [col-colour-q-[blue, green], big-size-s-[s2]], [d-a])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, d])), modes(targets([conn/2]))))])), check(accepted)]
+113. s2a2_derive(sumsq, 3, [[], [1, 5, 9], [3], [6, -3, 1, 5]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 107, 9, 71]), derived_gives([0, 107, 9, 71])]
+114. check_proof(edb_syntactic, 1)
+   => accepted
+115. optimise_file("item(1).\nitem(1).\ndoubled(Ys) :- findall(Y, (item(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=21 size_after=21 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(1)", "item(1)", "doubled(A):-findall(B, (item(C), B is C*2), A)"])]
-40. s2a(probe_b, [[[input, [['A', 5]]], [output, [['B', 10]]]]], [])
+116. s2a(probe_b, [[[input, [['A', 5]]], [output, [['B', 10]]]]], [])
    => no_algorithm(no_generalization_candidate)
-41. optimise_file("item(2).\nitem(2).\nitem(2).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
+117. s2a2(double_each, [[[input, [['A', [-1]]]], [output, [['B', [-2]]]]], [[input, [['A', [1, 5, 9, 0]]]], [output, [['B', [2, 10, 18, 0]]]]], [[input, [['A', [4, 8]]]], [output, [['B', [8, 16]]]]], [[input, [['A', [9, 0, 4]]]], [output, [['B', [18, 0, 8]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(map)), program(["double_each([], [])", "double_each([A|B], [C|D]):-double_each_el(A, C), double_each(B, D)", "double_each_el(A, B):-B is 2*A"]), proof(proof([])), trace([s2a2_io_synth(double_each, map, examples_reproduced(4))]), check(no_reference), runs_on([[-1], [1, 5, 9, 0], [4, 8], [9, 0, 4], [1, 2, 3, 4, 5, 6]], [[-2], [2, 10, 18, 0], [8, 16], [18, 0, 8], [2, 4, 6, 8, 10, 12]])]
+118. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red]], [a-b, a-c, b-c, d-a])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(a, b)", "edge(a, c)", "edge(b, c)", "edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, b), edge(a, c), edge(b, a), edge(b, b), edge(b, c), edge(c, a), edge(c, b), edge(c, c)]), only_in_a([conn(a, a), conn(a, b), conn(a, c), conn(b, a), conn(b, b), conn(b, c), conn(c, a), conn(c, b), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+119. s2a2_derive(sum, 2, [[], [-1], [2, 6, -3, 1], [4, 8]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(21)), program(["sum([], 0)", "sum([A|B], C):-sum_acc(B, C, A)", "sum_acc([], A, B):-A is 0+B", "sum_acc([A|B], C, D):-E is A+D, sum_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, -1, 6, 12]), derived_gives([0, -1, 6, 12])]
+120. check_proof(edb_same, 2)
+   => accepted
+121. optimise_file("item(2).\nitem(2).\nitem(2).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=28 size_after=28 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(2)", "item(2)", "item(2)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-42. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 9]]]]], [allow_table(true)])
+122. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 9]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2), clause(3)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(1, 2), true, generated(s2a_table, 2)), mnn_clause(3, swap_probe(3, 9), true, generated(s2a_table, 3))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(2))]))
-43. optimise_file("val(2).\nval(3).\nval(4).\nval(5).\nvalues(Xs) :- findall(X, val(X), Xs).\n")
+123. s2a2(dropmax, [[[input, [['A', [-3]]]], [output, [['B', []]]]], [[input, [['A', [0, 4]]]], [output, [['B', [0]]]]], [[input, [['A', [2, 6, -3]]]], [output, [['B', [2, -3]]]]], [[input, [['A', [5, 9, 0, 4]]]], [output, [['B', [5, 0, 4]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=0->C=[A|D];C=D), r(B, D))], r)])
+   => [solved_by(s2a2(filter)), program(["dropmax([], [])", "dropmax([A|B], C):-max_list([A|B], D), dropmax_sel([A|B], D, C)", "dropmax_sel([], A, [])", "dropmax_sel([A|B], C, D):-(dropmax_test(A, C)->D=[A|E];D=E), dropmax_sel(B, C, E)", "dropmax_test(A, B):-A<B"]), proof(proof([])), trace([s2a2_io_synth(dropmax, filter, examples_reproduced(4)), s2a2_proof(r, not_proved)]), check(no_reference), runs_on([[-3], [0, 4], [2, 6, -3], [5, 9, 0, 4], [1, 2, 3, 4, 5, 6]], [[], [0], [2, -3], [5, 0, 4], [1, 2, 3, 4, 5]])]
+124. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-c, b-c, c-d])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "edge(b, c)", "edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+125. s2a2_derive(rev, 3, [[], [0, 4], [3, 7, -2], [5, 9, 0, 4]])
+   => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [4, 0], [-2, 7, 3], [4, 0, 9, 5]]), derived_gives([[], [4, 0], [-2, 7, 3], [4, 0, 9, 5]])]
+126. check_proof(fold_changed, 3)
+   => rejected(invalid_or_unsupported_proof)
+127. optimise_file("val(2).\nval(3).\nval(4).\nval(5).\nvalues(Xs) :- findall(X, val(X), Xs).\n")
    => [report("MNN_OPTIMISE ok changed=true size_before=27 size_after=48 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(2)", "val(3)", "val(4)", "val(5)", "values(A):-mnn_loop2_1([2, 3, 4, 5], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-44. s2a(probe_b, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]]], [])
+128. s2a(probe_b, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]]], [])
    => no_algorithm(unsupported_spec_shape)
-45. optimise_file("n(3).\nn(4).\nn(5).\nn(7).\nn(9).\ntotal(T) :- findall(X, n(X), Xs), sum_list(Xs, T).\n")
+129. s2a2(evens, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-2, 2]]]], [output, [['B', [-2, 2]]]]], [[input, [['A', [1, 5, 9]]]], [output, [['B', []]]]], [[input, [['A', [3, 7, -2, 2]]]], [output, [['B', [-2, 2]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=1->C=[A|D];C=D), r(B, D))], r)])
+   => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4)), s2a2_proof(r, not_proved)]), check(no_reference), runs_on([[], [-2, 2], [1, 5, 9], [3, 7, -2, 2], [1, 2, 3, 4, 5, 6]], [[], [-2, 2], [], [-2, 2], [2, 4, 6]])]
+130. s2a2_learn_apply(keep, [col-colour-q-[blue], big-size-s-[s2]], [a-c, d-a])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c, d])), modes(targets([conn/2]))))])), check(accepted)]
+131. s2a2_derive(sumsq, 2, [[], [1, 5, 9], [4, 8, -1, 3], [9]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(21)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 107, 90, 81]), derived_gives([0, 107, 90, 81])]
+132. check_proof(fold_not_derived, 1)
+   => rejected(invalid_or_unsupported_proof)
+133. optimise_file("n(3).\nn(4).\nn(5).\nn(7).\nn(9).\ntotal(T) :- findall(X, n(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=36 size_after=36 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(3)", "n(4)", "n(5)", "n(7)", "n(9)", "total(A):-findall(B, n(B), C), sum_list(C, A)"])]
-46. s2a(swap_probe, [[[input, [['A', 5]]], [output, [['B', 10]]]]], [allow_table(true)])
+134. s2a(swap_probe, [[[input, [['A', 5]]], [output, [['B', 10]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(5, 10), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(1))]))
-47. optimise_file("num(4).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+135. s2a2(reverse, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-1, 3, 7]]]], [output, [['B', [7, 3, -1]]]]], [[input, [['A', [2, 6, -3, 1]]]], [output, [['B', [1, -3, 6, 2]]]]], [[input, [['A', [7]]]], [output, [['B', [7]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["reverse(A, B):-lists:reverse(A, B)"]), proof(proof([])), trace([s2a2_io_synth(reverse, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-1, 3, 7], [2, 6, -3, 1], [7], [1, 2, 3, 4, 5, 6]], [[], [7, 3, -1], [1, -3, 6, 2], [7], [6, 5, 4, 3, 2, 1]])]
+136. s2a2_learn_apply(drop, [col-colour-q-[green], big-size-s-[s3]], [a-b])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(A, [B]), [l(C, [B])]), lr(l(A, [D]), [l(E, [D])]))), [template_matches])])), program(["edge(a, b)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, b), edge(b, a), edge(b, b)]), only_in_a([conn(a, a), conn(a, b), conn(b, a), conn(b, b)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+137. s2a2_derive(sum, 3, [[], [-3, 1], [2, 6, -3, 1], [7]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sum([], 0)", "sum([A|B], C):-sum_acc(B, C, A)", "sum_acc([], A, B):-A is 0+B", "sum_acc([A|B], C, D):-E is A+D, sum_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, -2, 6, 7]), derived_gives([0, -2, 6, 7])]
+138. check_proof(edb_changed, 2)
+   => rejected(invalid_or_unsupported_proof)
+139. optimise_file("num(4).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=23 size_after=23 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(4)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-48. s2a(probe_a, [[[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]], [[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [])
+140. s2a(probe_a, [[[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]], [[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [])
    => no_algorithm(no_generalization_candidate)
-49. optimise_file("num(5).\nnum(7).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
+141. s2a2(evens, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [0, 4, 8, -1]]]], [output, [['B', [0, 4, 8]]]]], [[input, [['A', [5]]]], [output, [['B', []]]]], [[input, [['A', [8, -1]]]], [output, [['B', [8]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4))]), check(no_reference), runs_on([[], [0, 4, 8, -1], [5], [8, -1], [1, 2, 3, 4, 5, 6]], [[], [0, 4, 8], [], [8], [2, 4, 6]])]
+142. s2a2_learn_apply(keep, [col-colour-q-[red]], [a-b, a-c, b-c, d-a])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(a, c)", "edge(b, c)", "edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+143. s2a2_derive(flat2, 2, [[[[]], [[-2, 2, 6], [6], [8, -1]]], [[[], [-2, 2, 6]], [[6], [8, -1]]]])
+   => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(57)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[], [-2, 2, 6], [6], [8, -1]], [[], [-2, 2, 6], [6], [8, -1]]]), derived_gives([[[], [-2, 2, 6], [6], [8, -1]], [[], [-2, 2, 6], [6], [8, -1]]])]
+144. check_proof(edb_syntactic, 3)
+   => accepted
+145. optimise_file("num(5).\nnum(7).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=23 size_after=23 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(5)", "num(7)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-50. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
+146. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
    => no_algorithm(unsupported_spec_shape)
-51. optimise_file("item(7).\nitem(9).\nitem(1).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
+147. s2a2(odds, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [4]]]], [output, [['B', []]]]], [[input, [['A', [6, -3]]]], [output, [['B', [-3]]]]], [[input, [['A', [9, 0, 4]]]], [output, [['B', [9]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(filter)), program(["odds([], [])", "odds([A|B], C):-(odds_test(A)->C=[A|D];C=D), odds(B, D)", "odds_test(A):-A mod 2=:=1"]), proof(proof([])), trace([s2a2_io_synth(odds, filter, examples_reproduced(4))]), check(no_reference), runs_on([[], [4], [6, -3], [9, 0, 4], [1, 2, 3, 4, 5, 6]], [[], [], [-3], [9], [1, 3, 5]])]
+148. s2a2_learn_apply(keep, [col-colour-q-[blue, red]], [a-b, b-c, c-d])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+149. s2a2_derive(len, 3, [[-1, 3, 7, -2], [4], [7, -2], [9, 0, 4]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([4, 1, 2, 3]), derived_gives([4, 1, 2, 3])]
+150. check_proof(edb_same, 1)
+   => accepted
+151. optimise_file("item(7).\nitem(9).\nitem(1).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
    => [report("MNN_OPTIMISE ok changed=true size_before=22 size_after=41 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(7)", "item(9)", "item(1)", "values(A):-mnn_loop2_1([7, 9, 1], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-52. s2a(probe_a, [[[input, [['A', 5]]], [output, [['B', 10]]]]], [])
+152. s2a(probe_a, [[[input, [['A', 5]]], [output, [['B', 10]]]]], [])
    => no_algorithm(no_generalization_candidate)
-53. optimise_file("val(9).\nval(1).\nval(2).\nval(3).\ntotal(T) :- findall(X, val(X), Xs), sum_list(Xs, T).\n")
+153. s2a2(sum, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [2, 6, -3]]]], [output, [['B', 5]]]], [[input, [['A', [5, 9]]]], [output, [['B', 14]]]], [[input, [['A', [7]]]], [output, [['B', 7]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["sum(A, B):-sum_list(A, B)"]), proof(proof([])), trace([s2a2_io_synth(sum, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [2, 6, -3], [5, 9], [7], [1, 2, 3, 4, 5, 6]], [0, 5, 14, 7, 21])]
+154. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red], big-size-s-[s1, s3]], [a-b])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(A, [B]), [l(C, [B])]), lr(l(A, [D]), [l(E, [D])]))), [template_matches])])), program(["edge(a, b)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, b), edge(b, a), edge(b, b)]), only_in_a([conn(a, a), conn(a, b), conn(b, a), conn(b, b)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+155. s2a2_derive(sum, 2, [[], [0, 4, 8, -1], [5, 9], [8]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(21)), program(["sum([], 0)", "sum([A|B], C):-sum_acc(B, C, A)", "sum_acc([], A, B):-A is 0+B", "sum_acc([A|B], C, D):-E is A+D, sum_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 11, 14, 8]), derived_gives([0, 11, 14, 8])]
+156. check_proof(fold_changed, 2)
+   => rejected(invalid_or_unsupported_proof)
+157. optimise_file("val(9).\nval(1).\nval(2).\nval(3).\ntotal(T) :- findall(X, val(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(9)", "val(1)", "val(2)", "val(3)", "total(A):-findall(B, val(B), C), sum_list(C, A)"])]
-54. s2a(probe_b, [[[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [allow_table(true)])
+158. s2a(probe_b, [[[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b([7, 8], [8, 7]), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(1))]))
-55. optimise_file("n(1).\nn(2).\nn(3).\nn(4).\nn(5).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+159. s2a2(double_each, [[[input, [['A', [-1]]]], [output, [['B', [-2]]]]], [[input, [['A', [2, 7, -1, 4]]]], [output, [['B', [4, 14, -2, 8]]]]], [[input, [['A', [5, -3]]]], [output, [['B', [10, -6]]]]], [[input, [['A', [9, 1, 6]]]], [output, [['B', [18, 2, 12]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(map)), program(["double_each([], [])", "double_each([A|B], [C|D]):-double_each_el(A, C), double_each(B, D)", "double_each_el(A, B):-B is 2*A"]), proof(proof([])), trace([s2a2_io_synth(double_each, map, examples_reproduced(4))]), check(no_reference), runs_on([[-1], [2, 7, -1, 4], [5, -3], [9, 1, 6], [1, 2, 3, 4, 5, 6]], [[-2], [4, 14, -2, 8], [10, -6], [18, 2, 12], [2, 4, 6, 8, 10, 12]])]
+160. s2a2_learn_apply(keep, [col-colour-q-[green], big-size-s-[s1, s2, s3]], [b-c])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(b, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [b, c])), modes(targets([conn/2]))))])), check(accepted)]
+161. s2a2_derive(flat2, 3, [[[[]], [[-1], [3, 8], [9, 1, 6]]], [[[], [-1]], [[3, 8], [9, 1, 6]]]])
+   => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(3616)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[], [-1], [3, 8], [9, 1, 6]], [[], [-1], [3, 8], [9, 1, 6]]]), derived_gives([[[], [-1], [3, 8], [9, 1, 6]], [[], [-1], [3, 8], [9, 1, 6]]])]
+162. check_proof(fold_not_derived, 3)
+   => rejected(invalid_or_unsupported_proof)
+163. optimise_file("n(1).\nn(2).\nn(3).\nn(4).\nn(5).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=43 size_after=43 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(1)", "n(2)", "n(3)", "n(4)", "n(5)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-56. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]]], [])
+164. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]]], [])
    => no_algorithm(no_generalization_candidate)
-57. optimise_file("n(1).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
+165. s2a2(dropmax, [[[input, [['A', [-3, 2, 7, -1]]]], [output, [['B', [-3, 2, -1]]]]], [[input, [['A', [0, 5]]]], [output, [['B', [0]]]]], [[input, [['A', [6, -2, 3]]]], [output, [['B', [-2, 3]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
+   => [solved_by(s2a2(filter)), program(["dropmax([], [])", "dropmax([A|B], C):-(dropmax_test(A)->C=[A|D];C=D), dropmax(B, D)", "dropmax_test(A):-A//2=<1"]), proof(proof([])), trace([s2a2_io_synth(dropmax, filter, examples_reproduced(3)), s2a2_proof(r, not_proved)]), check(no_reference), runs_on([[-3, 2, 7, -1], [0, 5], [6, -2, 3], [1, 2, 3, 4, 5, 6]], [[-3, 2, -1], [0], [-2, 3], [1, 2, 3]])]
+166. s2a2_learn_apply(keep, [col-colour-q-[blue, green]], [c-d])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [c, d])), modes(targets([conn/2]))))])), check(accepted)]
+167. s2a2_derive(len, 2, [[-3, 2, 7, -1], [0, 5], [4, 9, 1], [7]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([4, 2, 3, 1]), derived_gives([4, 2, 3, 1])]
+168. check_proof(edb_changed, 1)
+   => accepted
+169. optimise_file("n(1).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=24 size_after=24 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(1)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-58. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]]], [allow_table(true)])
+170. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(3, 6), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(1))]))
-59. optimise_file("num(2).\nnum(4).\ndoubled(Ys) :- findall(Y, (num(X), Y is X * 2), Ys).\n")
+171. s2a2(evens, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [1, 6, -2]]]], [output, [['B', [6, -2]]]]], [[input, [['A', [4]]]], [output, [['B', [4]]]]], [[input, [['A', [7, -1, 4, 9]]]], [output, [['B', [4]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
+   => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4)), s2a2_proof(r, not_proved)]), check(no_reference), runs_on([[], [1, 6, -2], [4], [7, -1, 4, 9], [1, 2, 3, 4, 5, 6]], [[], [6, -2], [4], [4], [2, 4, 6]])]
+172. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red]], [a-c])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(a, c)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, c), edge(c, a), edge(c, c)]), only_in_a([conn(a, a), conn(a, c), conn(c, a), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+173. s2a2_derive(rev, 3, [[], [1, 6, -2], [5, -3, 2, 7], [8, 0]])
+   => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [-2, 6, 1], [7, 2, -3, 5], [0, 8]]), derived_gives([[], [-2, 6, 1], [7, 2, -3, 5], [0, 8]])]
+174. check_proof(edb_syntactic, 2)
+   => accepted
+175. optimise_file("num(2).\nnum(4).\ndoubled(Ys) :- findall(Y, (num(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=21 size_after=21 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(2)", "num(4)", "doubled(A):-findall(B, (num(C), B is C*2), A)"])]
-60. s2a(swap_probe, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [])
+176. s2a(swap_probe, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [])
    => no_algorithm(no_generalization_candidate)
-61. optimise_file("item(3).\nitem(5).\nitem(9).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
+177. s2a2(reverse, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-1]]]], [output, [['B', [-1]]]]], [[input, [['A', [2, 7, -1, 4]]]], [output, [['B', [4, -1, 7, 2]]]]], [[input, [['A', [5, -3]]]], [output, [['B', [-3, 5]]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["reverse(A, B):-lists:reverse(A, B)"]), proof(proof([])), trace([s2a2_io_synth(reverse, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-1], [2, 7, -1, 4], [5, -3], [1, 2, 3, 4, 5, 6]], [[], [-1], [4, -1, 7, 2], [-3, 5], [6, 5, 4, 3, 2, 1]])]
+178. s2a2_learn_apply(keep, [col-colour-q-[blue], big-size-s-[s1, s2, s3]], [d-a])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, d])), modes(targets([conn/2]))))])), check(accepted)]
+179. s2a2_derive(sumsq, 2, [[], [-1], [2, 7, -1, 4], [9, 1, 6]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(21)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 1, 70, 118]), derived_gives([0, 1, 70, 118])]
+180. check_proof(edb_same, 3)
+   => accepted
+181. optimise_file("item(3).\nitem(5).\nitem(9).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=26 size_after=26 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(3)", "item(5)", "item(9)", "total(A):-findall(B, item(B), C), sum_list(C, A)"])]
-62. s2a(probe_b, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 4]]], [output, [['B', 4]]]]], [allow_table(true)])
+182. s2a(probe_b, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 4]]], [output, [['B', 4]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2), clause(3), clause(4)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(1, 2), true, generated(s2a_table, 2)), mnn_clause(3, probe_b(3, 9), true, generated(s2a_table, 3)), mnn_clause(4, probe_b(4, 4), true, generated(s2a_table, 4))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(3))]))
-63. optimise_file("val(4).\nval(7).\nval(1).\nval(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+183. s2a2(evens, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [0, 5]]]], [output, [['B', [0]]]]], [[input, [['A', [3]]]], [output, [['B', []]]]], [[input, [['A', [9, 1, 6, -2]]]], [output, [['B', [6, -2]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=0->C=[A|D];C=D), r(B, D))], r)])
+   => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([proof_step(1, induction_equivalence, [], equivalent(domain(types([list(int), any])), modes(all)))])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4))]), check(accepted), runs_on([[], [0, 5], [3], [9, 1, 6, -2], [1, 2, 3, 4, 5, 6]], [[], [0], [], [6, -2], [2, 4, 6]])]
+184. s2a2_learn_apply(keep, [col-colour-q-[blue], big-size-s-[s2]], [c-d])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [c, d])), modes(targets([conn/2]))))])), check(accepted)]
+185. s2a2_derive(len, 3, [[-3, 2, 7], [0, 5], [3], [7, -1, 4, 9]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([3, 2, 1, 4]), derived_gives([3, 2, 1, 4])]
+186. check_proof(fold_changed, 1)
+   => rejected(invalid_or_unsupported_proof)
+187. optimise_file("val(4).\nval(7).\nval(1).\nval(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=38 size_after=38 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(4)", "val(7)", "val(1)", "val(3)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-64. s2a(swap_probe, [[[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]]], [])
+188. s2a(swap_probe, [[[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]]], [])
    => no_algorithm(unsupported_spec_shape)
-65. optimise_file("val(5).\nval(9).\nval(2).\nval(4).\nval(7).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
+189. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [1, 6, -2]]]], [output, [['B', 3]]]], [[input, [['A', [4, 9]]]], [output, [['B', 2]]]], [[input, [['A', [7]]]], [output, [['B', 1]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["len(A, B):-length(A, B)"]), proof(proof([])), trace([s2a2_io_synth(len, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [1, 6, -2], [4, 9], [7], [1, 2, 3, 4, 5, 6]], [0, 3, 2, 1, 6])]
+190. s2a2_learn_apply(drop, [col-colour-q-[green]], [a-b, a-c, b-c, d-a])
+   => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(a, b)", "edge(a, c)", "edge(b, c)", "edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, b), edge(a, c), edge(b, a), edge(b, b), edge(b, c), edge(c, a), edge(c, b), edge(c, c)]), only_in_a([conn(a, a), conn(a, b), conn(a, c), conn(b, a), conn(b, b), conn(b, c), conn(c, a), conn(c, b), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
+191. s2a2_derive(rev, 2, [[], [-2, 3, 8, 0], [1, 6, -2], [4, 9]])
+   => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [0, 8, 3, -2], [-2, 6, 1], [9, 4]]), derived_gives([[], [0, 8, 3, -2], [-2, 6, 1], [9, 4]])]
+192. check_proof(fold_not_derived, 2)
+   => rejected(invalid_or_unsupported_proof)
+193. optimise_file("val(5).\nval(9).\nval(2).\nval(4).\nval(7).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=44 size_after=44 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(5)", "val(9)", "val(2)", "val(4)", "val(7)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-66. s2a(probe_a, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]], [[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]]], [allow_table(true)])
+194. s2a(probe_a, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]], [[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2), clause(3)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a([4, 4], [4, 4]), true, generated(s2a_table, 2)), mnn_clause(3, probe_a([5, 6], [6, 5]), true, generated(s2a_table, 3))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(2))]))
-67. optimise_file("n(7).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
+195. s2a2(sum, [[[input, [['A', [-2]]]], [output, [['B', -2]]]], [[input, [['A', [2, 7, -1, 4]]]], [output, [['B', 12]]]], [[input, [['A', [5, -3, 2]]]], [output, [['B', 4]]]], [[input, [['A', [8, 0]]]], [output, [['B', 8]]]]], [ga(false), time_limit(8)])
+   => [solved_by(s2a2(expression)), program(["sum(A, B):-sum_list(A, B)"]), proof(proof([])), trace([s2a2_io_synth(sum, expression, examples_reproduced(4))]), check(no_reference), runs_on([[-2], [2, 7, -1, 4], [5, -3, 2], [8, 0], [1, 2, 3, 4, 5, 6]], [-2, 12, 4, 8, 21])]
+196. s2a2_learn_apply(keep, [col-colour-q-[red]], [a-b, b-c, d-a])
+   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(b, c)", "edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
+197. s2a2_derive(sumsq, 3, [[], [2, 7, -1, 4], [5, -3, 2], [9]])
+   => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 70, 38, 81]), derived_gives([0, 70, 38, 81])]
+198. check_proof(edb_changed, 3)
+   => rejected(invalid_or_unsupported_proof)
+199. optimise_file("n(7).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=16 size_after=16 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(7)", "doubled(A):-findall(B, (n(C), B is C*2), A)"])]
-68. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 6]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [])
+200. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 6]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 1, 1), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 1*A+1, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 1, 1, examples_reproduced(3))]))
-69. optimise_file("num(9).\nnum(2).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=23 size_after=23 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(9)", "num(2)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-70. s2a(probe_a, [[[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-71. optimise_file("item(9).\nitem(3).\nitem(7).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=22 size_after=41 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(9)", "item(3)", "item(7)", "values(A):-mnn_loop2_1([9, 3, 7], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-72. s2a(probe_b, [[[input, [['A', 4]]], [output, [['B', 8]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_affine(probe_b, 2, 0), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_b, 2, 0, examples_reproduced(2))]))
-73. optimise_file("item(1).\nitem(4).\nitem(9).\nitem(3).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=39 size_after=39 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(1)", "item(4)", "item(9)", "item(3)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-74. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 4]]], [output, [['B', 4]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2), clause(3), clause(4)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(1, 2), true, generated(s2a_table, 2)), mnn_clause(3, probe_a(4, 4), true, generated(s2a_table, 3)), mnn_clause(4, probe_a(5, 6), true, generated(s2a_table, 4))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(3))]))
-75. optimise_file("val(2).\nval(5).\nval(1).\nval(4).\nval(9).\ndoubled(Ys) :- findall(Y, (val(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=36 size_after=36 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(2)", "val(5)", "val(1)", "val(4)", "val(9)", "doubled(A):-findall(B, (val(C), B is C*2), A)"])]
-76. s2a(probe_b, [[[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [])
-   => no_algorithm(unsupported_spec_shape)
-77. optimise_file("n(3).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=18 size_after=18 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(3)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-78. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 4]]], [output, [['B', 8]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 2, 0), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 2, 0, examples_reproduced(2))]))
-79. optimise_file("num(4).\nnum(9).\nvalues(Xs) :- findall(X, num(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=17 size_after=34 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(4)", "num(9)", "values(A):-mnn_loop2_1([4, 9], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-80. s2a(probe_b, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]], [[input, [['A', [3, 9]]]], [output, [['B', [9, 3]]]]], [[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-81. optimise_file("num(5).\nnum(1).\nnum(4).\ntotal(T) :- findall(X, num(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=26 size_after=26 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(5)", "num(1)", "num(4)", "total(A):-findall(B, num(B), C), sum_list(C, A)"])]
-82. s2a(swap_probe, [[[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-83. optimise_file("item(7).\nitem(2).\nitem(5).\nitem(1).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=38 size_after=38 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(7)", "item(2)", "item(5)", "item(1)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-84. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 10]]]]], [])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_affine(probe_a, 2, 0), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_a, 2, 0, examples_reproduced(2))]))
-85. optimise_file("val(7).\nval(3).\nval(9).\nval(4).\nval(1).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=38 size_after=38 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(7)", "val(3)", "val(9)", "val(4)", "val(1)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-86. s2a(swap_probe, [[[input, [['A', [3, 9]]]], [output, [['B', [9, 3]]]]], [[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]], [[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2), clause(3), clause(4)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe([3, 9], [9, 3]), true, generated(s2a_table, 2)), mnn_clause(3, swap_probe([4, 4], [4, 4]), true, generated(s2a_table, 3)), mnn_clause(4, swap_probe([7, 8], [8, 7]), true, generated(s2a_table, 4))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(3))]))
-87. optimise_file("n(9).\nvalues(Xs) :- findall(X, n(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=12 size_after=27 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(9)", "values(A):-mnn_loop2_1([9], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-88. s2a(probe_a, [[[input, [['A', 4]]], [output, [['B', 4]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-89. optimise_file("n(1).\nn(5).\ntotal(T) :- findall(X, n(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=21 size_after=21 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(1)", "n(5)", "total(A):-findall(B, n(B), C), sum_list(C, A)"])]
-90. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 5]]], [output, [['B', 10]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_affine(probe_b, 2, 0), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_b, 2, 0, examples_reproduced(2))]))
-91. optimise_file("num(2).\nnum(7).\nnum(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(2)", "num(7)", "num(3)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-92. s2a(probe_a, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]], [[input, [['A', [3, 9]]]], [output, [['B', [9, 3]]]]], [[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-93. optimise_file("item(3).\nitem(9).\nitem(4).\nitem(1).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=39 size_after=39 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(3)", "item(9)", "item(4)", "item(1)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-94. s2a(probe_b, [[[input, [['A', 4]]], [output, [['B', 4]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(4, 4), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(1))]))
-95. optimise_file("val(4).\nval(1).\nval(5).\nval(2).\nval(7).\ndoubled(Ys) :- findall(Y, (val(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=36 size_after=36 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(4)", "val(1)", "val(5)", "val(2)", "val(7)", "doubled(A):-findall(B, (val(C), B is C*2), A)"])]
-96. s2a(swap_probe, [[[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]]], [])
-   => no_algorithm(unsupported_spec_shape)
-97. optimise_file("val(5).\ntotal(T) :- findall(X, val(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=16 size_after=16 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(5)", "total(A):-findall(B, val(B), C), sum_list(C, A)"])]
-98. s2a(probe_b, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]], [[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]], [[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2), clause(3), clause(4)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b([4, 4], [4, 4]), true, generated(s2a_table, 2)), mnn_clause(3, probe_b([5, 6], [6, 5]), true, generated(s2a_table, 3)), mnn_clause(4, probe_b([7, 8], [8, 7]), true, generated(s2a_table, 4))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(3))]))
-99. optimise_file("n(5).\nn(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=28 size_after=28 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(5)", "n(3)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-100. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-101. optimise_file("num(7).\nnum(4).\nnum(2).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=34 size_after=34 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(7)", "num(4)", "num(2)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-102. s2a(probe_a, [[[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-103. optimise_file("item(9).\nitem(5).\nitem(3).\nitem(1).\ndoubled(Ys) :- findall(Y, (item(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(9)", "item(5)", "item(3)", "item(1)", "doubled(A):-findall(B, (item(C), B is C*2), A)"])]
-104. s2a(swap_probe, [[[input, [['A', 7]]], [output, [['B', 14]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-105. optimise_file("item(1).\nitem(7).\nitem(4).\nitem(2).\nitem(9).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=38 size_after=38 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(1)", "item(7)", "item(4)", "item(2)", "item(9)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-106. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(1, 2), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(1))]))
-107. optimise_file("val(2).\nvalues(Xs) :- findall(X, val(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=12 size_after=27 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(2)", "values(A):-mnn_loop2_1([2], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-108. s2a(probe_b, [[[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]]], [])
-   => no_algorithm(unsupported_spec_shape)
-109. optimise_file("n(3).\nn(1).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=29 size_after=29 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(3)", "n(1)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-110. s2a(probe_a, [[[input, [['A', 4]]], [output, [['B', 8]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(4, 8), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(1))]))
-111. optimise_file("num(4).\nnum(2).\nnum(9).\ndoubled(Ys) :- findall(Y, (num(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=26 size_after=26 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(4)", "num(2)", "num(9)", "doubled(A):-findall(B, (num(C), B is C*2), A)"])]
-112. s2a(probe_b, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-113. optimise_file("num(4).\nnum(3).\nnum(2).\nnum(1).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(4)", "num(3)", "num(2)", "num(1)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-114. s2a(swap_probe, [[[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-115. optimise_file("item(5).\nitem(4).\nitem(3).\nitem(2).\nitem(1).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=32 size_after=55 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(5)", "item(4)", "item(3)", "item(2)", "item(1)", "values(A):-mnn_loop2_1([5, 4, 3, 2, 1], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-116. s2a(probe_b, [[[input, [['A', 4]]], [output, [['B', 8]]]], [[input, [['A', 5]]], [output, [['B', 10]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_affine(probe_b, 2, 0), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_b, 2, 0, examples_reproduced(3))]))
-117. optimise_file("val(7).\ntotal(T) :- findall(X, val(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=16 size_after=16 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(7)", "total(A):-findall(B, val(B), C), sum_list(C, A)"])]
-118. s2a(swap_probe, [[[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe([5, 6], [6, 5]), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(1))]))
-119. optimise_file("n(9).\nn(7).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=28 size_after=28 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(9)", "n(7)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-120. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_affine(probe_a, 1, 1), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(A, B), B is 1*A+1, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_a, 1, 1, examples_reproduced(2))]))
-121. optimise_file("n(1).\nn(9).\nn(7).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=28 size_after=28 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(1)", "n(9)", "n(7)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-122. s2a(swap_probe, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 4]]], [output, [['B', 8]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 2, 0), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 2, 0, examples_reproduced(3))]))
-123. optimise_file("num(2).\nnum(1).\nnum(9).\nnum(7).\nvalues(Xs) :- findall(X, num(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=27 size_after=48 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(2)", "num(1)", "num(9)", "num(7)", "values(A):-mnn_loop2_1([2, 1, 9, 7], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-124. s2a(probe_a, [[[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-125. optimise_file("item(3).\nitem(2).\nitem(1).\nitem(9).\nitem(7).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=36 size_after=36 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(3)", "item(2)", "item(1)", "item(9)", "item(7)", "total(A):-findall(B, item(B), C), sum_list(C, A)"])]
-126. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2), clause(3)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(3, 9), true, generated(s2a_table, 2)), mnn_clause(3, probe_b(7, 8), true, generated(s2a_table, 3))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(2))]))
-127. optimise_file("val(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=23 size_after=23 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(3)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-128. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [])
-   => no_algorithm(unsupported_spec_shape)
-129. optimise_file("val(4).\nval(4).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=29 size_after=29 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(4)", "val(4)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-130. s2a(probe_b, [[[input, [['A', [3, 9]]]], [output, [['B', [9, 3]]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b([3, 9], [9, 3]), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(1))]))
-131. optimise_file("n(5).\nn(5).\nn(5).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=26 size_after=26 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(5)", "n(5)", "n(5)", "doubled(A):-findall(B, (n(C), B is C*2), A)"])]
-132. s2a(swap_probe, [[[input, [['A', 4]]], [output, [['B', 4]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-133. optimise_file("num(7).\nnum(7).\nnum(7).\nnum(7).\ntotal(T) :- findall(X, num(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(7)", "num(7)", "num(7)", "num(7)", "total(A):-findall(B, num(B), C), sum_list(C, A)"])]
-134. s2a(probe_b, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-135. optimise_file("item(9).\nitem(9).\nitem(9).\nitem(9).\nitem(9).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=43 size_after=43 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(9)", "item(9)", "item(9)", "item(9)", "item(9)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-136. s2a(swap_probe, [[[input, [['A', 3]]], [output, [['B', 6]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-137. optimise_file("item(1).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=24 size_after=24 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(1)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-138. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 4]]], [output, [['B', 4]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2), clause(3)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(1, 2), true, generated(s2a_table, 2)), mnn_clause(3, probe_a(4, 4), true, generated(s2a_table, 3))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(2))]))
-139. optimise_file("val(2).\nval(2).\ndoubled(Ys) :- findall(Y, (val(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=21 size_after=21 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(2)", "val(2)", "doubled(A):-findall(B, (val(C), B is C*2), A)"])]
-140. s2a(swap_probe, [[[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [])
-   => no_algorithm(unsupported_spec_shape)
-141. optimise_file("n(2).\nn(3).\nn(4).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=28 size_after=28 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(2)", "n(3)", "n(4)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-142. s2a(probe_a, [[[input, [['A', 3]]], [output, [['B', 6]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(3, 6), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(1))]))
-143. optimise_file("num(3).\nnum(4).\nnum(5).\nnum(7).\nvalues(Xs) :- findall(X, num(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=27 size_after=48 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(3)", "num(4)", "num(5)", "num(7)", "values(A):-mnn_loop2_1([3, 4, 5, 7], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-144. s2a(probe_b, [[[input, [['A', [3, 9]]]], [output, [['B', [9, 3]]]]], [[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-145. optimise_file("num(4).\nnum(5).\nnum(7).\nnum(9).\nnum(1).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=44 size_after=44 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(4)", "num(5)", "num(7)", "num(9)", "num(1)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-146. s2a(probe_a, [[[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-147. optimise_file("item(5).\ndoubled(Ys) :- findall(Y, (item(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=16 size_after=16 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(5)", "doubled(A):-findall(B, (item(C), B is C*2), A)"])]
-148. s2a(probe_b, [[[input, [['A', 7]]], [output, [['B', 14]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-149. optimise_file("val(7).\nval(9).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=23 size_after=23 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(7)", "val(9)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-150. s2a(swap_probe, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]], [[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2), clause(3)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe([1, 2], [2, 1]), true, generated(s2a_table, 2)), mnn_clause(3, swap_probe([7, 8], [8, 7]), true, generated(s2a_table, 3))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(2))]))
-151. optimise_file("n(9).\nn(1).\nn(2).\nvalues(Xs) :- findall(X, n(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=22 size_after=41 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(9)", "n(1)", "n(2)", "values(A):-mnn_loop2_1([9, 1, 2], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-152. s2a(probe_b, [[[input, [['A', 5]]], [output, [['B', 6]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-153. optimise_file("n(1).\nn(2).\nn(3).\nn(4).\ntotal(T) :- findall(X, n(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(1)", "n(2)", "n(3)", "n(4)", "total(A):-findall(B, n(B), C), sum_list(C, A)"])]
-154. s2a(swap_probe, [[[input, [['A', 7]]], [output, [['B', 14]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(7, 14), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(1))]))
-155. optimise_file("num(1).\nnum(3).\nnum(5).\nnum(9).\nnum(2).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=43 size_after=43 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(1)", "num(3)", "num(5)", "num(9)", "num(2)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-156. s2a(probe_a, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-157. optimise_file("item(2).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=18 size_after=18 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(2)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-158. s2a(swap_probe, [[[input, [['A', 3]]], [output, [['B', 9]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(3, 9), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(1))]))
-159. optimise_file("val(3).\nval(5).\nvalues(Xs) :- findall(X, val(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=17 size_after=34 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(3)", "val(5)", "values(A):-mnn_loop2_1([3, 5], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-160. s2a(probe_a, [[[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]]], [])
-   => no_algorithm(unsupported_spec_shape)
-161. optimise_file("val(4).\nval(7).\nval(1).\ntotal(T) :- findall(X, val(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=26 size_after=26 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(4)", "val(7)", "val(1)", "total(A):-findall(B, val(B), C), sum_list(C, A)"])]
-162. s2a(probe_b, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]], [[input, [['A', [3, 9]]]], [output, [['B', [9, 3]]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2), clause(3)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b([1, 2], [2, 1]), true, generated(s2a_table, 2)), mnn_clause(3, probe_b([3, 9], [9, 3]), true, generated(s2a_table, 3))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(2))]))
-163. optimise_file("n(5).\nn(9).\nn(2).\nn(4).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=38 size_after=38 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(5)", "n(9)", "n(2)", "n(4)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-164. s2a(probe_a, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 4]]], [output, [['B', 4]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-165. optimise_file("num(7).\nnum(1).\nnum(3).\nnum(5).\nnum(9).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=44 size_after=44 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(7)", "num(1)", "num(3)", "num(5)", "num(9)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-166. s2a(probe_b, [[[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-167. optimise_file("item(9).\ndoubled(Ys) :- findall(Y, (item(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=16 size_after=16 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(9)", "doubled(A):-findall(B, (item(C), B is C*2), A)"])]
-168. s2a(swap_probe, [[[input, [['A', 5]]], [output, [['B', 10]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 2, 0), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 2, 0, examples_reproduced(2))]))
-169. optimise_file("item(9).\nitem(3).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=21 size_after=21 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(9)", "item(3)", "total(A):-findall(B, item(B), C), sum_list(C, A)"])]
-170. s2a(probe_b, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2), clause(3), clause(4)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(1, 2), true, generated(s2a_table, 2)), mnn_clause(3, probe_b(3, 9), true, generated(s2a_table, 3)), mnn_clause(4, probe_b(7, 8), true, generated(s2a_table, 4))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(3))]))
-171. optimise_file("val(1).\nval(4).\nval(9).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(1)", "val(4)", "val(9)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-172. s2a(swap_probe, [[[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]]], [])
-   => no_algorithm(unsupported_spec_shape)
-173. optimise_file("n(2).\nn(5).\nn(1).\nn(4).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=39 size_after=39 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(2)", "n(5)", "n(1)", "n(4)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-174. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 10]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_affine(probe_a, 2, 0), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_a, 2, 0, examples_reproduced(2))]))
-175. optimise_file("num(3).\nnum(7).\nnum(2).\nnum(5).\nnum(1).\ndoubled(Ys) :- findall(Y, (num(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=36 size_after=36 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(3)", "num(7)", "num(2)", "num(5)", "num(1)", "doubled(A):-findall(B, (num(C), B is C*2), A)"])]
-176. s2a(swap_probe, [[[input, [['A', [3, 9]]]], [output, [['B', [9, 3]]]]], [[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]], [[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-177. optimise_file("num(4).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=18 size_after=18 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(4)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-178. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-179. optimise_file("item(5).\nitem(1).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=17 size_after=34 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(5)", "item(1)", "values(A):-mnn_loop2_1([5, 1], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-180. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 5]]], [output, [['B', 10]]]]], [])
-   => mnn_program(mnn_s2a_probe_b, meta(s2a_affine(probe_b, 2, 0), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_b, 2, 0, examples_reproduced(2))]))
-181. optimise_file("val(7).\nval(2).\nval(5).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=34 size_after=34 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(7)", "val(2)", "val(5)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-182. s2a(probe_a, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]], [[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]], [[input, [['A', [7, 8]]]], [output, [['B', [8, 7]]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2), clause(3), clause(4)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a([1, 2], [2, 1]), true, generated(s2a_table, 2)), mnn_clause(3, probe_a([4, 4], [4, 4]), true, generated(s2a_table, 3)), mnn_clause(4, probe_a([7, 8], [8, 7]), true, generated(s2a_table, 4))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(3))]))
-183. optimise_file("n(7).\nn(3).\nn(9).\nn(4).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(7)", "n(3)", "n(9)", "n(4)", "doubled(A):-findall(B, (n(C), B is C*2), A)"])]
-184. s2a(probe_b, [[[input, [['A', 1]]], [output, [['B', 2]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-185. optimise_file("n(9).\nn(4).\nn(1).\nn(5).\nn(2).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=38 size_after=38 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(9)", "n(4)", "n(1)", "n(5)", "n(2)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-186. s2a(swap_probe, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 2, 0), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 2, 0, examples_reproduced(2))]))
-187. optimise_file("num(1).\nvalues(Xs) :- findall(X, num(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=12 size_after=27 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(1)", "values(A):-mnn_loop2_1([1], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-188. s2a(probe_b, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]], [[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]], [[input, [['A', [5, 6]]]], [output, [['B', [6, 5]]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-189. optimise_file("item(2).\nitem(7).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=21 size_after=21 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(2)", "item(7)", "total(A):-findall(B, item(B), C), sum_list(C, A)"])]
-190. s2a(swap_probe, [[[input, [['A', 5]]], [output, [['B', 6]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(5, 6), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(1))]))
-191. optimise_file("val(3).\nval(9).\nval(4).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(3)", "val(9)", "val(4)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-192. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]]], [])
-   => no_algorithm(unsupported_spec_shape)
-193. optimise_file("val(4).\nval(1).\nval(5).\nval(2).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(4)", "val(1)", "val(5)", "val(2)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-194. s2a(swap_probe, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]], [[input, [['A', [3, 9]]]], [output, [['B', [9, 3]]]]], [[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [allow_table(true)])
-   => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2), clause(3), clause(4)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe([1, 2], [2, 1]), true, generated(s2a_table, 2)), mnn_clause(3, swap_probe([3, 9], [9, 3]), true, generated(s2a_table, 3)), mnn_clause(4, swap_probe([4, 4], [4, 4]), true, generated(s2a_table, 4))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(3))]))
-195. optimise_file("n(5).\nn(2).\nn(7).\nn(3).\nn(9).\nvalues(Xs) :- findall(X, n(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=32 size_after=55 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(5)", "n(2)", "n(7)", "n(3)", "n(9)", "values(A):-mnn_loop2_1([5, 2, 7, 3, 9], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-196. s2a(probe_a, [[[input, [['A', 5]]], [output, [['B', 6]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-197. optimise_file("num(5).\ntotal(T) :- findall(X, num(X), Xs), sum_list(Xs, T).\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=16 size_after=16 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(5)", "total(A):-findall(B, num(B), C), sum_list(C, A)"])]
-198. s2a(probe_b, [[[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)
-199. optimise_file("item(7).\nitem(4).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=28 size_after=28 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(7)", "item(4)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-200. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 10]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [])
-   => mnn_program(mnn_s2a_probe_a, meta(s2a_affine(probe_a, 2, 0), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_a, 2, 0, examples_reproduced(3))]))
