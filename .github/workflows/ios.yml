@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch S2A2 beside this repository (for the S2A2 bridge cases)
+        run: git clone --depth 1 https://github.com/luciangreen/S2A2 ../S2A2
       - name: Install SWI-Prolog
         run: |
           sudo apt-get update
