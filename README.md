@@ -285,4 +285,4 @@ commands for every implemented test group.
 
 ## Inputs and outputs
 
-`io/ios.txt` lists 200 inputs and the outputs they give, from real runs of this repo's predicates (which predicates, and how the inputs are made, is in `io/cases.pl`; the inputs are made the same way every time). `swipl io/check_ios.pl` runs them again and fails if any output changed; the "Inputs and outputs" workflow does the same on every push. If a change is meant, run `swipl io/make_ios.pl` and check the diff.
+`io/ios.txt` lists 200 inputs and the outputs they give, from real runs of this repo's predicates (which predicates, and how the inputs are made, is in `io/cases.pl`; the inputs are made the same way every time). They cover optimise_file/3, s2a/4, and the S2A2 bridge: s2a2/4 (with reference proofs), s2a2_learn/3 with s2a2_apply/5, s2a2_derive/4, and mnns's checker on S2A2's proofs; those need S2A2 beside this repository, as the workflow has it. `swipl io/check_ios.pl` runs them again and fails if any output changed; the "Inputs and outputs" workflow does the same on every push. If a change is meant, run `swipl io/make_ios.pl` and check the diff.
