@@ -194,8 +194,8 @@ io_run(s2a2_derive, [Name, Bound, Samples], Result) :-
     ->  clauses_of(R, Cs),
         mnn_proof_checker:check_proof(R, Spec, Proof, Check),
         run_program(Spec, Name, Samples, Want), run_program(R, Name, Samples, Got),
-        length(Lemmas, NL),
-        Result = [strategy(Strategy), lemmas(NL), Total, Functional, Bounded, program(Cs), proof(Proof), check(Check), spec_gives(Want), derived_gives(Got)]
+        ( Lemmas = lemmas(Ls) -> true ; Ls = Lemmas ),
+        Result = [strategy(Strategy), lemmas(Ls), Total, Functional, Bounded, program(Cs), proof(Proof), check(Check), spec_gives(Want), derived_gives(Got)]
     ;   Result = R
     ).
 
