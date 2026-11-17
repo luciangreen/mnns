@@ -10,6 +10,7 @@ permissions:
 jobs:
   regen:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: Install SWI-Prolog
@@ -18,8 +19,14 @@ jobs:
           sudo apt-get install --yes swi-prolog-nox
       - name: Fetch S2A2
         run: git clone --depth 1 https://github.com/luciangreen/S2A2 ../S2A2
-      - name: Thermo tests
-        run: swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt(0)" -t "halt(1)"
+      - name: All tests (failures shown as annotations)
+        run: |
+          set +e
+          timeout 900 swipl -q -s tests/run.pl > test-out.txt 2>&1
+          code=$?
+          grep -iE "fail|error|warning|assert|timeout" test-out.txt | head -40 | while IFS= read -r line; do echo "::error::$line"; done
+          tail -5 test-out.txt | while IFS= read -r line; do echo "::notice::$line"; done
+          exit $code
       - name: Regenerate io
         run: swipl io/make_ios.pl
       - name: Commit io

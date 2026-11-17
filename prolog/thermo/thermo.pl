@@ -289,7 +289,7 @@ multinomial(Counts, M) :-
 factorial(N, F) :-
     factorial(N, 1, F).
 factorial(N, A, F) :-
-    (   N =:= 0
+    (   N =< 0
     ->  F = A
     ;   A1 is A * N,
         N1 is N - 1,
@@ -298,6 +298,11 @@ factorial(N, A, F) :-
 
 % compositions(N, K, C): ways to write N as K counts >= 0, C(N+K-1, K-1).
 compositions(N, K, C) :-
+    (   K =:= 0
+    ->  ( N =:= 0 -> C = 1 ; C = 0 )
+    ;   compositions_(N, K, C)
+    ).
+compositions_(N, K, C) :-
     Top is N + K - 1,
     Bot is K - 1,
     factorial(Top, FT),
