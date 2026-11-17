@@ -63,6 +63,13 @@ feature and its focused test suite.
   normalized `once/1`; it also identifies syntactic tail recursion and treats
   calls inside `once/1` as non-tail. These analyses are not proofs of a
   specification or full termination. See [`docs/pid.md`](docs/pid.md).
+- **Thermodynamic compression MNN:** codes a sequence as its alphabet, symbol
+  counts and rank among all sequences with those counts. The rank is a sum of
+  integer neuron weights and needs ceil(log2 M) bits for a class of M
+  sequences, which no injective code can beat. The coder is a bijection, so it
+  erases no bits; `thermo_report/2` gives the Landauer heat an irreversible
+  coder would give off, and `thermo_prove/3` checks it all on a finite domain.
+  See [`docs/thermo.md`](docs/thermo.md).
 - **Detlog2, PLOp2 and AlgebraPLOp2 (separate repositories):** the full Detlog is now
   [detlog2](https://github.com/luciangreen/detlog2), per-character PLOp is
   [plop2](https://github.com/luciangreen/plop2), and proof-backed AlgebraPLOp is

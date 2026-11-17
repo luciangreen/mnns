@@ -63,5 +63,7 @@ main :-
     directory_file_path(Directory, 'aioc_test_runner_tests.pl',
                         AIOCTestRunnerTests),
     load_files(AIOCTestRunnerTests, [silent(true)]),
+    directory_file_path(Directory, 'thermo_tests.pl', ThermoTests),
+    load_files(ThermoTests, [silent(true)]),
     run_tests,
     halt.

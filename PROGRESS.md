@@ -284,6 +284,14 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   feedback, stopping on consumed resource budgets, benchmark comparisons and
   timing, and actual quantum execution remain unimplemented.
 
+- **Thermodynamic compression MNN: initial.** `prolog/thermo/thermo.pl` codes
+  sequences by enumerative rank (alphabet, counts, rank), shows the rank as a sum
+  of neuron weights from the multinomial Pascal identity, reports raw, rank,
+  composition and entropy bits and the Landauer heat of an irreversible coder,
+  and proves round trip, exact ranks per class, neuron sums and the entropy bound
+  on every sequence of a bounded domain. Unbounded (inductive) proof of the
+  Pascal identity and links to the proof checker and AIOC remain to do.
+
 ## Remaining stages
 
 | Stage | Deliverable | Status |
