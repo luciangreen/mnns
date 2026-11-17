@@ -22,8 +22,9 @@ jobs:
       - name: Thermo tests (failures shown as annotations)
         run: |
           set +e
-          timeout 600 swipl -g "load_files('tests/thermo_tests.pl'), (run_tests(mnn_thermo) -> halt(0) ; halt(1))" > thermo-out.txt 2>&1
+          timeout 600 swipl -g "load_files('tests/thermo_tests.pl'), (run_tests(mnn_thermo) -> halt(0) ; halt(1))" > thermo-raw.txt 2>&1
           code=$?
+          tr "\r" "\n" < thermo-raw.txt > thermo-out.txt
           grep -vE "passed|Singleton|^Warning: /|^\s*$" thermo-out.txt | head -9 | while IFS= read -r line; do echo "::error::$line"; done
           grep -vE "passed|Singleton|^Warning: /|^\s*$" thermo-out.txt | sed -n '10,18p' | while IFS= read -r line; do echo "::warning::$line"; done
           grep -vE "passed|Singleton|^Warning: /|^\s*$" thermo-out.txt | sed -n '19,27p' | while IFS= read -r line; do echo "::notice::$line"; done
