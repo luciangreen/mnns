@@ -70,7 +70,7 @@ thermo_decompress(thermo(Alphabet, Counts, Rank), Seq) :-
     length(Alphabet, K),
     length(Counts, K),
     sort(Alphabet, Alphabet),
-    maplist([C]>>(integer(C), C >= 0), Counts),
+    maplist(nonneg_int, Counts),
     sum_list(Counts, N),
     multinomial(Counts, M),
     Rank >= 0,
@@ -218,7 +218,7 @@ thermo_prove(Alphabet0, MaxLen, Result) :-
     length(Alphabet0, K0),
     (   K =:= K0, K >= 1, K =< 4
     ->  findall(S, ( between(0, MaxLen, L), length(S, L),
-                     maplist([X]>>member(X, Alphabet), S) ), Seqs),
+                     seq_over(S, Alphabet) ), Seqs),
         length(Seqs, Count),
         check_all(Seqs, Classes, Result0),
         (   Result0 == ok
@@ -247,7 +247,7 @@ check_all(Seqs, Classes, Result) :-
     ;   member(S, Seqs),
         thermo_compress(S, thermo(_, _, R)),
         thermo_neurons(S, Ns),
-        foldl([neuron(_, _, W), A0, A]>>(A is A0 + W), Ns, 0, Sum),
+        neuron_sum(Ns, 0, Sum),
         Sum =\= R
     ->  Result = rejected(neuron_sum, S)
     ;   member(S, Seqs),
@@ -283,7 +283,7 @@ numlist_or_empty(Lo, Hi, L) :-
 multinomial(Counts, M) :-
     sum_list(Counts, N),
     factorial(N, FN),
-    foldl([C, D0, D]>>(factorial(C, FC), D is D0 * FC), Counts, 1, Den),
+    factorial_product(Counts, 1, Den),
     M is FN // Den.
 
 factorial(N, F) :-
@@ -320,10 +320,16 @@ bits_for(V, B) :-
 entropy_exact(Counts, N, H) :-
     (   N =:= 0
     ->  H = 0.0
-    ;   foldl([C, H0, H1]>>( C =:= 0 -> H1 = H0
-                           ; H1 is H0 - C * log(C / N) / log(2) ),
-              Counts, 0.0, H)
+    ;   entropy_sum(Counts, N, 0.0, H)
     ).
+
+entropy_sum([], _, H, H).
+entropy_sum([C|Cs], N, H0, H) :-
+    (   C =:= 0
+    ->  H1 = H0
+    ;   H1 is H0 - C * log(C / N) / log(2)
+    ),
+    entropy_sum(Cs, N, H1, H).
 
 entropy_bits(Counts, N, E) :-
     entropy_exact(Counts, N, H),
@@ -332,7 +338,35 @@ entropy_bits(Counts, N, E) :-
 % ---- lists ----
 
 count_in(Seq, X, C) :-
-    foldl([Y, C0, C1]>>( Y == X -> C1 is C0 + 1 ; C1 = C0 ), Seq, 0, C).
+    count_in(Seq, X, 0, C).
+count_in([], _, C, C).
+count_in([Y|Ys], X, C0, C) :-
+    (   Y == X
+    ->  C1 is C0 + 1
+    ;   C1 = C0
+    ),
+    count_in(Ys, X, C1, C).
+
+nonneg_int(C) :-
+    integer(C),
+    C >= 0.
+
+% seq_over(?Seq, +Alphabet): Seq (of fixed length) uses only Alphabet.
+seq_over([], _).
+seq_over([X|Xs], Alphabet) :-
+    member(X, Alphabet),
+    seq_over(Xs, Alphabet).
+
+neuron_sum([], S, S).
+neuron_sum([neuron(_, _, W)|Ns], S0, S) :-
+    S1 is S0 + W,
+    neuron_sum(Ns, S1, S).
+
+factorial_product([], P, P).
+factorial_product([C|Cs], P0, P) :-
+    factorial(C, F),
+    P1 is P0 * F,
+    factorial_product(Cs, P1, P).
 
 index_of([A|As], X, I0, I) :-
     (   A == X
