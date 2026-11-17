@@ -42,6 +42,8 @@ sharing a change.
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
 | Bounded sandboxed candidate-vs-original example verification and verified library-entry tests | `prolog/aioc/test_runner.pl`, `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`; `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC example verification](aioc.md#bounded-example-verification); [proof-checked library](aioc.md#proof-checked-library) |
 | Thermodynamic compression MNN: enumerative coding with neuron weights, Landauer heat report and exhaustive proof | `prolog/thermo/thermo.pl` | `swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt"` | [Thermodynamic compression](thermo.md) |
+| Thermodynamic compression MNN: unbounded induction proof of the bijection, with a checker for its algebra, code and structure | `prolog/thermo/thermo_induction.pl` | `swipl -q -g "load_files('tests/thermo_induction_tests.pl'), run_tests(mnn_thermo_induction), halt"` | [Unbounded proof](thermo.md#unbounded-proof-by-induction) |
+| AIOC proof-checked incorporation of a thermo type class as a reversible table of facts | `prolog/aioc/thermo.pl` | `swipl -q -g "load_files('tests/thermo_induction_tests.pl'), run_tests(mnn_thermo_induction), halt"` | [AIOC incorporation](thermo.md#aioc-incorporation) |
 
 Run the complete suite, including every group above, with:
 

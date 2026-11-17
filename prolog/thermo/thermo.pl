@@ -4,7 +4,8 @@
             thermo_neurons/2,
             thermo_report/2,
             thermo_landauer/3,
-            thermo_prove/3
+            thermo_prove/3,
+            thermo_table_program/4
           ]).
 
 /** <module> Thermodynamic compression MNN
@@ -277,6 +278,43 @@ numlist_or_empty(Lo, Hi, L) :-
     ->  L = []
     ;   numlist(Lo, Hi, L)
     ).
+
+% ---- table program ----
+
+%!  thermo_table_program(+Name, +Alphabet, +Counts, -Program) is semidet.
+%
+%   The whole type class as an MNN program of facts Name(Rank, Sequence),
+%   one per rank 0..M-1 in order. Pure facts run in both directions: with
+%   the rank bound they decode, with the sequence bound they encode.
+%   Fails unless Alphabet is sorted and distinct, Counts fit it, and the
+%   class has 1..5040 members.
+
+thermo_table_program(Name, Alphabet, Counts, Program) :-
+    atom(Name),
+    is_list(Alphabet),
+    ground(Alphabet),
+    sort(Alphabet, Alphabet),
+    is_list(Counts),
+    length(Alphabet, K),
+    length(Counts, K),
+    maplist(nonneg_int, Counts),
+    multinomial(Counts, M),
+    M >= 1,
+    M =< 5040,
+    Top is M - 1,
+    numlist(0, Top, Ranks),
+    maplist(table_clause(Name, Alphabet, Counts), Ranks, Clauses),
+    findall(clause(Id), between(1, M, Id), Ids),
+    Program = mnn_program(
+                  Name, meta(thermo(Name), Ids),
+                  [mnn_pred(Name/2, ['?', '?'], [any, any], Clauses, original)],
+                  proof([]), trace([])).
+
+table_clause(Name, Alphabet, Counts, Rank,
+             mnn_clause(Id, Head, true, source(thermo(Name), Id))) :-
+    thermo_decompress(thermo(Alphabet, Counts, Rank), Seq),
+    Id is Rank + 1,
+    Head =.. [Name, Rank, Seq].
 
 % ---- arithmetic ----
 

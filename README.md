@@ -69,7 +69,10 @@ feature and its focused test suite.
   sequences, which no injective code can beat. The coder is a bijection, so it
   erases no bits; `thermo_report/2` gives the Landauer heat an irreversible
   coder would give off, and `thermo_prove/3` checks it all on a finite domain.
-  See [`docs/thermo.md`](docs/thermo.md).
+  `thermo_induction.pl` proves the bijection for every length by induction,
+  with a checker for each step, and `aioc/thermo.pl` turns a type class into a
+  proof-checked, reversible table of facts that the proof checker and AIOC
+  library accept. See [`docs/thermo.md`](docs/thermo.md).
 - **Detlog2, PLOp2 and AlgebraPLOp2 (separate repositories):** the full Detlog is now
   [detlog2](https://github.com/luciangreen/detlog2), per-character PLOp is
   [plop2](https://github.com/luciangreen/plop2), and proof-backed AlgebraPLOp is

@@ -5,13 +5,14 @@
 :- ios_engine:load_repo('prolog/ir/ir').
 :- ios_engine:load_repo('prolog/proof/proof_checker').
 :- ios_engine:load_repo('prolog/thermo/thermo').
+:- ios_engine:load_repo('prolog/aioc/thermo').
 :- use_module(library(readutil)).
 
 io_title('mnns').
 
 % s2a2, s2a2_learn_apply, s2a2_derive and check_proof need S2A2 (github.com/luciangreen/S2A2)
 % beside this repository or at $S2A2_HOME; CI fetches it.
-io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip]).
+io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip, thermo_incorporate]).
 
 % Small programs to optimise, made from parts.
 program(K, Text) :-
@@ -247,3 +248,18 @@ io_run(thermo_round_trip, [Seq], [code(Code), neurons(Ns), decoded(Back)]) :-
     mnn_thermo:thermo_compress(Seq, Code),
     mnn_thermo:thermo_neurons(Seq, Ns),
     mnn_thermo:thermo_decompress(Code, Back).
+
+% The type class of a short sequence as a proof-checked table of facts:
+% how many facts, the fact for the sequence's own rank, and the check result.
+io_input(thermo_incorporate, K, [Seq]) :-
+    thermo_seq(K, 23, Seq0),
+    ( length(Seq0, L), L > 7 -> length(Seq, 7), append(Seq, _, Seq0) ; Seq = Seq0 ).
+
+io_run(thermo_incorporate, [Seq], [facts(F), fact(Fact), proof(Result)]) :-
+    mnn_thermo:thermo_compress(Seq, thermo(A, C, R)),
+    mnn_aioc_thermo:incorporate_thermo(class, A, C, Program, Proof),
+    Program = mnn_program(_, _, [mnn_pred(_, _, _, Clauses, _)], _, _),
+    length(Clauses, F),
+    Id is R + 1,
+    nth1(Id, Clauses, mnn_clause(_, Fact, _, _)),
+    mnn_proof_checker:check_proof(Program, thermo_source(class, A, C), Proof, Result).

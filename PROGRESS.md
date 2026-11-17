@@ -289,8 +289,16 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   of neuron weights from the multinomial Pascal identity, reports raw, rank,
   composition and entropy bits and the Landauer heat of an irreversible coder,
   and proves round trip, exact ranks per class, neuron sums and the entropy bound
-  on every sequence of a bounded domain. Unbounded (inductive) proof of the
-  Pascal identity and links to the proof checker and AIOC remain to do.
+  on every sequence of a bounded domain.
+- **Thermodynamic compression MNN: unbounded proof and AIOC.**
+  `prolog/thermo/thermo_induction.pl` proves by induction on length that the
+  coder is a bijection from every type class onto its ranks; its checker
+  normalises the algebraic steps symbolically, matches the code steps against
+  the clauses of `mnn_thermo`, and checks the structural steps' citations.
+  `prolog/aioc/thermo.pl` incorporates a type class (up to 5040 sequences) as
+  a table of facts that `check_proof/4` accepts for
+  `thermo_source(Name, Alphabet, Counts)` and the AIOC library can store. The
+  interval-partition and pigeonhole steps are cited rules, not derived.
 
 ## Remaining stages
 

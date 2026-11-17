@@ -5,6 +5,8 @@
 :- use_module(induction_equivalence).
 :- use_module(s2a2_prover, []).
 :- use_module(s2a2_fold, []).
+:- use_module('../thermo/thermo', []).
+:- use_module('../thermo/thermo_induction', []).
 
 check_proof(Program, Original, Proof, Result) :-
     (   mnn_program_term(Program)
@@ -14,6 +16,7 @@ check_proof(Program, Original, Proof, Result) :-
             (   functor(Original, dtree_source, 3)
             ;   functor(Original, cfg_source, 2)
             ;   functor(Original, dcg_source, 2)
+            ;   functor(Original, thermo_source, 3)
             )
         ->  check_source_incorporation(Program, Original, Proof, Result)
         ;   Result = rejected(invalid_program)
@@ -29,6 +32,7 @@ check_source_incorporation(Program, Source, Proof, Result) :-
     (   (   valid_dtree_incorporation(Program, Source, Proof)
         ;   valid_cfg_incorporation(Program, Source, Proof)
         ;   valid_dcg_incorporation(Program, Source, Proof)
+        ;   valid_thermo_incorporation(Program, Source, Proof)
         )
     ->  Result = accepted
     ;   Result = rejected(invalid_or_unsupported_proof)
@@ -44,6 +48,20 @@ valid_dtree_incorporation(Program, Source, Proof) :-
     Id =:= 1,
     valid_dtree_source(Name, Input, Tree),
     expected_dtree_program(Name, Input, Tree, Expected),
+    Program =@= Expected.
+
+% A thermo type class as a table of facts Name(Rank, Sequence): the table
+% must be the one the coder gives, and the coder must be proved a bijection
+% for every length (mnn_thermo_induction).
+valid_thermo_incorporation(Program, Source, Proof) :-
+    ground(Proof),
+    Source = thermo_source(Name, Alphabet, Counts),
+    Proof = proof([proof_step(1, incorporate_thermo, [],
+                              equivalent(domain(type_class(Alphabet, Counts)),
+                                         modes(all))),
+                   proof_step(2, thermo_induction, [], Induction)]),
+    mnn_thermo_induction:thermo_check_induction(Induction, accepted),
+    mnn_thermo:thermo_table_program(Name, Alphabet, Counts, Expected),
     Program =@= Expected.
 
 valid_dtree_source(Name, Input, Tree) :-

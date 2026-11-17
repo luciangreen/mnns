@@ -97,14 +97,88 @@ or `rejected(Check, Witness)` with the first sequence or class that fails:
 4. rank_bits =< ceil(N * H(counts)),
 5. so no bit is erased.
 
-The general argument is the Pascal's-rule identity above; the check confirms
-it, and the code, on the whole finite domain.
+That check covers a finite domain. The next section proves it for every
+length.
+
+## Unbounded proof by induction
+
+`prolog/thermo/thermo_induction.pl` (module `mnn_thermo_induction`) gives a
+9-step proof, `thermo_induction_proof/1`, and a checker,
+`thermo_check_induction(Proof, Result)`, which returns `accepted` or
+`rejected(Step, Reason)` for the first step that fails.
+
+The argument, by induction on the length N:
+
+- **Base (N = 0).** The only count vector is all zeros, m = 0!/(0!...0!) = 1,
+  and the one sequence, [], has rank 0.
+- **Pascal term.** For cj >= 1, m(c - e_j) * N = m(c) * cj. So each weight
+  m(c) * cj / N is the class size of a shorter class, a whole number.
+- **Pascal sum.** The sum over j of m(c) * cj / N is m(c), because the cj add
+  up to N.
+- **Zero block.** A symbol with cj = 0 gets a block of size 0.
+- **Offsets.** The code adds m(c) * (c1 + ... + c(j-1)) / N when the first
+  symbol is the j-th, which is where block j starts.
+- **Step.** A sequence starting with symbol j is that offset plus the rank of
+  its tail, and by the induction hypothesis the tails are a bijection onto
+  [0, m(c - e_j)). The blocks follow each other from 0 with no gaps or
+  overlaps and end at m(c), so the class maps one-to-one onto [0, m(c)).
+- **So** for every N and every count vector the coder is a bijection;
+  decoding (which picks the one block that holds the rank) is its inverse;
+  and ceil(log2 m(c)) bits is the least any code for the class can use.
+
+How each step is checked:
+
+- **Algebra** (Pascal term, Pascal sum, zero block, base): both sides are
+  normalised to a product of powers of symbolic factors (n, cj, rest,
+  fact(n-1), fact(cj-1), ...), using only the rewrite rules the step lists:
+  the definition of m, X! = X * (X-1)! for X >= 1, 0! = 1, linearity of the
+  sum, and the sum of the cj being N. No numbers are substituted, so a step
+  that passes holds for all N and c. Drop a rule it needs, or change either
+  side, and the step is rejected.
+- **Code** (the base, offsets and decoding): the checker reads the clauses of
+  `rank/7`, `choose/10` and `unrank/6` in `mnn_thermo` and checks they are,
+  up to variable names, the clauses the proof is about. Change the coder and
+  the proof stops checking.
+- **Structure** (step, induction, inverse, minimal bits): fixed rule
+  applications. The checker checks each cites accepted earlier steps of the
+  right rules and states the expected conclusion. The interval and
+  pigeonhole reasoning behind them is the argument above; it is not
+  derived by the checker.
+
+## AIOC incorporation
+
+`prolog/aioc/thermo.pl` (module `mnn_aioc_thermo`) turns a whole type class
+into a proof-checked MNN program:
+
+```prolog
+?- incorporate_thermo(banana, [a,b,n], [3,1,2], Program, Proof).
+```
+
+`Program` has 60 facts `banana(Rank, Sequence)`, one per rank in order
+(`banana(34, [b,a,n,a,n,a])` among them). Pure facts run both ways:
+`banana(34, S)` decodes and `banana(R, [b,a,n,a,n,a])` encodes. `Proof` has
+two steps:
+
+```prolog
+proof([ proof_step(1, incorporate_thermo, [],
+                   equivalent(domain(type_class([a,b,n], [3,1,2])), modes(all))),
+        proof_step(2, thermo_induction, [], InductionProof) ])
+```
+
+`mnn_proof_checker:check_proof/4` accepts it for the source term
+`thermo_source(Name, Alphabet, Counts)` only if the induction proof checks and
+the program is exactly the table the coder gives (it builds the table again
+and compares). Swap two facts, or leave out step 2, and it is rejected.
+Classes of up to 5040 sequences can be incorporated. Because the checker
+accepts it, the program can be stored in the AIOC library with
+`store_entry/2`, like any other proved entry.
 
 ## Tests and examples
 
 ```sh
 swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt"
+swipl -q -g "load_files('tests/thermo_induction_tests.pl'), run_tests(mnn_thermo_induction), halt"
 ```
 
-`thermo_report` and `thermo_round_trip` are two of the cases in
+`thermo_report`, `thermo_round_trip` and `thermo_incorporate` are three of the cases in
 `io/ios.txt`, the repository's 200 recorded inputs and outputs.

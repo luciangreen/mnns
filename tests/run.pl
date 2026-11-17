@@ -65,5 +65,7 @@ main :-
     load_files(AIOCTestRunnerTests, [silent(true)]),
     directory_file_path(Directory, 'thermo_tests.pl', ThermoTests),
     load_files(ThermoTests, [silent(true)]),
+    directory_file_path(Directory, 'thermo_induction_tests.pl', ThermoInductionTests),
+    load_files(ThermoInductionTests, [silent(true)]),
     run_tests,
     halt.
