@@ -66,7 +66,7 @@ test(steps_out_of_order_are_rejected) :-
 
 test(proof_missing_its_last_step_is_rejected) :-
     mnn_thermo_induction:thermo_induction_proof(proof(Steps)),
-    append(Front, [_], Steps),
+    once(append(Front, [_], Steps)),
     mnn_thermo_induction:thermo_check_induction(proof(Front), R),
     assertion(R == rejected(end, missing_conclusion)).
 
