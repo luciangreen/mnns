@@ -19,6 +19,9 @@ jobs:
           sudo apt-get install --yes swi-prolog-nox
       - name: Fetch S2A2
         run: git clone --depth 1 https://github.com/luciangreen/S2A2 ../S2A2
+      - name: Show clauses
+        run: |
+          swipl -g "use_module('prolog/thermo/thermo'), forall(member(P, [rank(_,_,_,_,_,_,_), choose(_,_,_,_,_,_,_,_,_,_), unrank(_,_,_,_,_,_)]), forall(clause(mnn_thermo:P, B), (with_output_to(string(S), print((P:-B))), split_string(S, \"\\n\", \"\", Ls), atomic_list_concat(Ls, ' ', A), format('::warning::~w~n', [A])))), halt"
       - name: Thermo tests (output as an annotation)
         run: |
           set +e
