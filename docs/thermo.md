@@ -67,6 +67,11 @@ R = [n(11), alphabet([a,b,c,d,r]), counts([5,2,1,1,2]), rank(21519),
      erased_bits_reversible(0), landauer_joules_300k(1.435e-20)].
 ```
 
+For sequences of a few symbols the counts cost about as many bits as the
+rank saves, so a coder that erases the input needs to erase little or nothing
+(all 25 `thermo_report` cases in `io/ios.txt` give 0.0 J). The bound grows
+with length: abracadabra already erases 5 bits.
+
 `thermo_landauer(Bits, Kelvin, Joules)` gives the bound for any number of bits
 and temperature, to 4 significant figures.
 
