@@ -301,9 +301,28 @@ code_matches(Which) :-
     functor(Head, Name, Arity),
     functor(Probe, Name, Arity),
     findall((Probe :- B), clause(mnn_thermo:Probe, B), Clauses),
-    member(Clause, Clauses),
-    Clause =@= (Head :- Body),
+    canonical((Head :- Body), Want),
+    member(Clause0, Clauses),
+    canonical(Clause0, Clause),
+    Clause =@= Want,
     !.
+
+% SWI-Prolog stores X - 1 as X + -1; write both forms the same way.
+canonical(T, T) :-
+    var(T),
+    !.
+canonical(A - B, A1 + NB) :-
+    integer(B),
+    !,
+    canonical(A, A1),
+    NB is -B.
+canonical(T, C) :-
+    compound(T),
+    !,
+    T =.. [F|As],
+    maplist(canonical, As, Cs),
+    C =.. [F|Cs].
+canonical(T, T).
 
 code_template(rank_nil, rank([], _, _, _, _, Rank, Rank), true).
 code_template(rank_cons,
