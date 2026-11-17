@@ -1,0 +1,31 @@
+name: Regenerate io (temporary)
+
+on:
+  push:
+    branches: [thermo-mnn]
+
+permissions:
+  contents: write
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes swi-prolog-nox
+      - name: Fetch S2A2
+        run: git clone --depth 1 https://github.com/luciangreen/S2A2 ../S2A2
+      - name: Thermo tests
+        run: swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt(0)" -t "halt(1)"
+      - name: Regenerate io
+        run: swipl io/make_ios.pl
+      - name: Commit io
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add io/ios.txt io/ios.pl
+          git diff --cached --quiet || git commit -m "Regenerate io/ios.txt and io/ios.pl with the thermo cases"
+          git push

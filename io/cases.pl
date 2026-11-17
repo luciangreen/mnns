@@ -4,13 +4,14 @@
 :- ios_engine:load_repo('prolog/s2a/s2a2_bridge').
 :- ios_engine:load_repo('prolog/ir/ir').
 :- ios_engine:load_repo('prolog/proof/proof_checker').
+:- ios_engine:load_repo('prolog/thermo/thermo').
 :- use_module(library(readutil)).
 
 io_title('mnns').
 
 % s2a2, s2a2_learn_apply, s2a2_derive and check_proof need S2A2 (github.com/luciangreen/S2A2)
 % beside this repository or at $S2A2_HOME; CI fetches it.
-io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof]).
+io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip]).
 
 % Small programs to optimise, made from parts.
 program(K, Text) :-
@@ -225,3 +226,24 @@ check_case(edb_syntactic, N, Q, P, proof([proof_step(1, edb_equivalence, [], equ
     findall((r(Z) :- a(Z)), between(1, N, _), Extra),
     append([(r(X1) :- a(X1)), (r(Y) :- a(Y), b(Y))], Extra, Cs),
     ir(r, Cs, P), ir(r, [(r(X2) :- a(X2))], Q).
+
+% ---- The thermodynamic compression MNN ----
+
+% Sequences of 0..9 symbols from a small alphabet.
+thermo_seq(K, Salt, Seq) :-
+    pick(K, Salt, [[a, b], [a, b, c], [0, 1, 2, 3], [x], [h, e, l, o]], Alphabet),
+    num(K, Salt, 0, 9, N),
+    length(Seq, N),
+    foldl([X, J0, J]>>(S2 is Salt * 7 + J0, pick(K, S2, Alphabet, X), J is J0 + 1), Seq, 0, _).
+
+io_input(thermo_report, K, [Seq]) :- thermo_seq(K, 21, Seq).
+io_input(thermo_round_trip, K, [Seq]) :- thermo_seq(K, 22, Seq).
+
+% the code, its sizes and the least heat an irreversible coder gives off at 300 K
+io_run(thermo_report, [Seq], Report) :- mnn_thermo:thermo_report(Seq, Report).
+
+% the code, its neurons (their weights add up to the rank), and the sequence decoded again
+io_run(thermo_round_trip, [Seq], [code(Code), neurons(Ns), decoded(Back)]) :-
+    mnn_thermo:thermo_compress(Seq, Code),
+    mnn_thermo:thermo_neurons(Seq, Ns),
+    mnn_thermo:thermo_decompress(Code, Back).
