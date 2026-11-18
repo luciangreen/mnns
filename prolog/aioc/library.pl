@@ -19,6 +19,7 @@
 :- use_module(library(error)).
 :- use_module(library(filesex)).
 :- use_module(library(pairs)).
+:- use_module('../thermo/mdl', []).
 :- use_module('../proof/proof_checker').
 :- use_module('assessment').
 :- use_module('test_runner').
@@ -270,7 +271,8 @@ partition_ranked_entries([rejected_entry(Name, Reason)|Results], Accepted,
 
 library_entry_rank_key(
         ranked_entry(Name, Candidate, Comparison),
-        key(WeightedTotal, Name)-ranked_entry(Name, Candidate, Comparison)) :-
+        key(WeightedTotal, Bits, Name)-ranked_entry(Name, Candidate, Comparison)) :-
+    mnn_mdl:program_bits(Candidate, description_length(Bits, _)),
     Comparison = size_comparison(_, CandidateSize, _, _),
     CandidateSize = program_size(_, _, _, _, weighted_total(WeightedTotal)).
 

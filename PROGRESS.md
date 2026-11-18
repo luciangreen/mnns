@@ -299,6 +299,11 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   a table of facts that `check_proof/4` accepts for
   `thermo_source(Name, Alphabet, Counts)` and the AIOC library can store. The
   interval-partition and pigeonhole steps are cited rules, not derived.
+- **Minimum description length.** `prolog/thermo/mdl.pl` gives the description
+  length of programs and example sets in bits (alphabet, length, composition
+  and rank bits) and the "shorter than its data" verdict. The S2A2 bridge takes
+  `mdl(record)` and `mdl(require)`; AIOC candidate and library ranking break
+  equal weighted sizes by description length.
 
 ## Remaining stages
 

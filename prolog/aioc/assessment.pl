@@ -6,6 +6,7 @@
 :- use_module(library(error)).
 :- use_module(library(lists)).
 :- use_module(library(pairs)).
+:- use_module('../thermo/mdl', []).
 :- use_module('../proof/proof_checker').
 :- use_module('size').
 
@@ -37,9 +38,11 @@ accepted_rank_candidate(ranked_candidate(_, _, _)).
 
 candidate_rank_key(
     ranked_candidate(Name, Candidate, Comparison),
-    key(WeightedTotal, Name)-ranked_candidate(Name, Candidate, Comparison)) :-
+    key(WeightedTotal, Bits, Name)-ranked_candidate(Name, Candidate, Comparison)) :-
     Comparison = size_comparison(_, CandidateSize, _, _),
-    CandidateSize = program_size(_, _, _, _, weighted_total(WeightedTotal)).
+    CandidateSize = program_size(_, _, _, _, weighted_total(WeightedTotal)),
+    % equal sizes go to the shorter description (minimum description length)
+    mnn_mdl:program_bits(Candidate, description_length(Bits, _)).
 
 assess_candidate(Candidate, Original, Proof, Assessment) :-
     mnn_proof_checker:check_proof(Candidate, Original, Proof, ProofResult),

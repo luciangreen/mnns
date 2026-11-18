@@ -44,6 +44,7 @@ sharing a change.
 | Thermodynamic compression MNN: enumerative coding with neuron weights, Landauer heat report and exhaustive proof | `prolog/thermo/thermo.pl` | `swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt"` | [Thermodynamic compression](thermo.md) |
 | Thermodynamic compression MNN: unbounded induction proof of the bijection, with a checker for its algebra, code and structure | `prolog/thermo/thermo_induction.pl` | `swipl -q -g "load_files('tests/thermo_induction_tests.pl'), run_tests(mnn_thermo_induction), halt"` | [Unbounded proof](thermo.md#unbounded-proof-by-induction) |
 | AIOC proof-checked incorporation of a thermo type class as a reversible table of facts | `prolog/aioc/thermo.pl` | `swipl -q -g "load_files('tests/thermo_induction_tests.pl'), run_tests(mnn_thermo_induction), halt"` | [AIOC incorporation](thermo.md#aioc-incorporation) |
+| Minimum description length with the thermo coder: the "shorter than its data" test, used by the S2A2 bridge (`mdl(record)`, `mdl(require)`) and as the AIOC ranking tie-break | `prolog/thermo/mdl.pl` | `swipl -q -g "load_files('tests/mdl_tests.pl'), run_tests(mnn_mdl), halt"` | [Minimum description length](thermo.md#minimum-description-length) |
 
 Run the complete suite, including every group above, with:
 

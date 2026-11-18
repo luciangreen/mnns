@@ -5,7 +5,8 @@
             thermo_report/2,
             thermo_landauer/3,
             thermo_prove/3,
-            thermo_table_program/4
+            thermo_table_program/4,
+            thermo_class_bits/3
           ]).
 
 /** <module> Thermodynamic compression MNN
@@ -315,6 +316,22 @@ table_clause(Name, Alphabet, Counts, Rank,
     thermo_decompress(thermo(Alphabet, Counts, Rank), Seq),
     Id is Rank + 1,
     Head =.. [Name, Rank, Seq].
+
+%!  thermo_class_bits(+Counts, -RankBits, -CompositionBits) is det.
+%
+%   For a sequence with these symbol counts: the bits its rank needs,
+%   ceil(log2 M), and the bits its counts need, ceil(log2 C(N+K-1, K-1)).
+%   Computes M without ranking, so it suits long sequences.
+
+thermo_class_bits(Counts, RankBits, CompositionBits) :-
+    must_be(list, Counts),
+    maplist(nonneg_int, Counts),
+    multinomial(Counts, M),
+    bits_for(M, RankBits),
+    sum_list(Counts, N),
+    length(Counts, K),
+    compositions(N, K, NC),
+    bits_for(NC, CompositionBits).
 
 % ---- arithmetic ----
 

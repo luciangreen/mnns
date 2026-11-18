@@ -27,6 +27,13 @@
         time_limit(Seconds)            for S2A2's search (default 60)
         s2a2_home(Dir)                 where S2A2 is (default: $S2A2_HOME, then ../S2A2 or
                                        ../s2a2 beside this repository)
+        mdl(Mode)                      the "shorter than its data" test (thermo/mdl.pl) on
+                                       the program found: record adds s2a2_mdl(Verdict) to
+                                       the trace, explains(program_bits(P), data_bits(D)) when
+                                       the program's description length P is less than the
+                                       examples' D, else memorises(...); require also returns
+                                       no_algorithm(memorises(...)) for a program that
+                                       memorises (a table always does)
 
     s2a2_available/0 succeeds when S2A2 can be loaded.
 
@@ -63,10 +70,11 @@
 :- use_module(library(time)).
 :- use_module(s2a).
 :- use_module('../proof/proof_checker').
+:- use_module('../thermo/mdl', []).
 
 :- dynamic loaded_home/1.
 
-s2a2(Name, Spec, Options, Result) :-
+s2a2_core(Name, Spec, Options, Result) :-
     (   \+ is_list(Options) -> Result = no_algorithm(invalid_options)
     ;   \+ maplist(valid_option, Options) -> Result = no_algorithm(invalid_options)
     ;   mnn_s2a:s2a(Name, Spec, [], R0),
@@ -78,6 +86,30 @@ s2a2(Name, Spec, Options, Result) :-
             ;   Result = R0 )
         ;   Result = R0 )
     ), !.
+
+s2a2(Name, Spec, Options, Result) :-
+    s2a2_core(Name, Spec, Options, Result0),
+    (   is_list(Options),
+        memberchk(mdl(Mode), Options),
+        Result0 = mnn_program(_, _, _, _, _)
+    ->  with_mdl(Mode, Spec, Result0, Result)
+    ;   Result = Result0
+    ).
+
+% with_mdl(+Mode, +Spec, +Program0, -Result): the "shorter than its data" test.
+% record adds s2a2_mdl(Verdict) to the trace; require also turns a program
+% that memorises its examples into no_algorithm(memorises(...)).
+with_mdl(Mode, Spec, Program0, Result) :-
+    maplist(mnn_s2a:example_pair, Spec, Pairs0),
+    sort(Pairs0, Pairs),
+    mnn_mdl:mdl_verdict(Program0, Pairs, Verdict),
+    Program0 = mnn_program(N, M, Ps, Pr, trace(T0)),
+    append(T0, [s2a2_mdl(Verdict)], T),
+    (   Mode == require,
+        Verdict = memorises(P, D)
+    ->  Result = no_algorithm(memorises(P, D))
+    ;   Result = mnn_program(N, M, Ps, Pr, trace(T))
+    ).
 
 % problems with the spec itself, which S2A2 cannot mend
 fatal(invalid_name).
@@ -93,6 +125,7 @@ valid_option(types(Ts)) :- is_list(Ts).
 valid_option(ga(B)) :- memberchk(B, [true, false]).
 valid_option(time_limit(S)) :- number(S), S > 0.
 valid_option(s2a2_home(D)) :- atom(D).
+valid_option(mdl(M)) :- memberchk(M, [record, require]).
 
 % ---------------------------------------------------------------- loading S2A2
 s2a2_available :- s2a2_available([]).

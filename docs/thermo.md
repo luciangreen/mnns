@@ -173,12 +173,48 @@ Classes of up to 5040 sequences can be incorporated. Because the checker
 accepts it, the program can be stored in the AIOC library with
 `store_entry/2`, like any other proved entry.
 
+## Minimum description length
+
+`prolog/thermo/mdl.pl` (module `mnn_mdl`) uses the coder to measure how many
+bits a program, or a set of examples, takes to describe:
+
+- **alphabet bits:** each distinct token spelled out, 8 bits a character plus
+  an 8-bit terminator,
+- **length bits:** the number of tokens, in Elias gamma code,
+- **composition bits:** how often each token occurs,
+- **rank bits:** which sequence with those counts.
+
+Tokens are the terms in prefix order (`Name/Arity`, atoms, numbers, and one
+token per distinct variable of a clause), so renaming variables changes
+nothing. `term_bits/2`, `program_bits/2` and `data_bits/2` return
+`description_length(Total, parts(Alphabet, Length, Composition, Rank))`.
+
+`mdl_verdict(Program, Pairs, Verdict)` is the "shorter than its data" test:
+`explains(program_bits(P), data_bits(D))` when the program is shorter than the
+pairs it reproduces, else `memorises(...)`. A table of the pairs always
+memorises. A rule needs enough examples to pay for itself: f(X) = 3X + 2
+memorises 2 examples and explains 24.
+
+It is used in two places:
+
+- **S2A2 bridge.** `s2a2/4` takes `mdl(record)`, which adds
+  `s2a2_mdl(Verdict)` to the program's trace, or `mdl(require)`, which also
+  returns `no_algorithm(memorises(...))` instead of a program that memorises
+  its examples. Without the option nothing changes.
+- **AIOC ranking.** `rank_candidates/3` and `rank_library/2` rank by weighted
+  size as before, and break ties by description length, so of two proved
+  candidates of equal size the shorter description comes first.
+
+The `mdl` case in `io/ios.txt` runs s2a on affine and scrambled examples of 2
+to 24 pairs and records what it found and the verdict.
+
 ## Tests and examples
 
 ```sh
 swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt"
 swipl -q -g "load_files('tests/thermo_induction_tests.pl'), run_tests(mnn_thermo_induction), halt"
+swipl -q -g "load_files('tests/mdl_tests.pl'), run_tests(mnn_mdl), halt"
 ```
 
-`thermo_report`, `thermo_round_trip` and `thermo_incorporate` are three of the cases in
+`thermo_report`, `thermo_round_trip`, `thermo_incorporate` and `mdl` are four of the cases in
 `io/ios.txt`, the repository's 200 recorded inputs and outputs.

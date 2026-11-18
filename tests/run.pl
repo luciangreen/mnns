@@ -67,5 +67,7 @@ main :-
     load_files(ThermoTests, [silent(true)]),
     directory_file_path(Directory, 'thermo_induction_tests.pl', ThermoInductionTests),
     load_files(ThermoInductionTests, [silent(true)]),
+    directory_file_path(Directory, 'mdl_tests.pl', MdlTests),
+    load_files(MdlTests, [silent(true)]),
     run_tests,
     halt.

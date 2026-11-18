@@ -6,13 +6,14 @@
 :- ios_engine:load_repo('prolog/proof/proof_checker').
 :- ios_engine:load_repo('prolog/thermo/thermo').
 :- ios_engine:load_repo('prolog/aioc/thermo').
+:- ios_engine:load_repo('prolog/thermo/mdl').
 :- use_module(library(readutil)).
 
 io_title('mnns').
 
 % s2a2, s2a2_learn_apply, s2a2_derive and check_proof need S2A2 (github.com/luciangreen/S2A2)
 % beside this repository or at $S2A2_HOME; CI fetches it.
-io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip, thermo_incorporate]).
+io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip, thermo_incorporate, mdl]).
 
 % Small programs to optimise, made from parts.
 program(K, Text) :-
@@ -263,3 +264,27 @@ io_run(thermo_incorporate, [Seq], [facts(F), fact(Fact), proof(Result)]) :-
     Id is R + 1,
     nth1(Id, Clauses, mnn_clause(_, Fact, _, _)),
     mnn_proof_checker:check_proof(Program, thermo_source(class, A, C), Proof, Result).
+
+% ---- Minimum description length: does the program explain its examples? ----
+
+% f(X) = 3X + 2 has a rule s2a finds; the scrambled outputs have none, so
+% s2a builds a table. With few examples even the rule is longer than the data.
+mdl_spec(affine, N, Spec) :-
+    numlist(1, N, Xs),
+    maplist([X, [[input, [['A', X]]], [output, [['B', Y]]]]]>>(Y is 3 * X + 2), Xs, Spec).
+mdl_spec(scrambled, N, Spec) :-
+    numlist(1, N, Xs),
+    maplist([X, [[input, [['A', X]]], [output, [['B', Y]]]]]>>(Y is (X * 7919 + 13) mod 101), Xs, Spec).
+
+io_input(mdl, K, [Kind, N]) :-
+    pick(K, 24, [affine, scrambled], Kind),
+    num(K, 25, 2, 24, N).
+
+% what s2a found, the program's and the examples' description lengths and the verdict
+io_run(mdl, [Kind, N], [found(By), Verdict]) :-
+    mdl_spec(Kind, N, Spec),
+    with_output_to(string(_), mnn_s2a:s2a(f, Spec, [allow_table(true)], P)),
+    P = mnn_program(_, meta(Meta, _), _, _, _),
+    functor(Meta, By, _),
+    maplist(mnn_s2a:example_pair, Spec, Pairs),
+    mnn_mdl:mdl_verdict(P, Pairs, Verdict).
