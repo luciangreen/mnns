@@ -206,7 +206,11 @@ It is used in two places:
   candidates of equal size the shorter description comes first.
 
 The `mdl` case in `io/ios.txt` runs s2a on affine and scrambled examples of 2
-to 24 pairs and records what it found and the verdict.
+to 24 pairs and records what it found and the verdict. The affine rule (633
+bits) starts to explain its examples at 11 pairs (658 bits). Every table
+memorises. Two scrambled points are fitted by a line, which s2a returns, and
+the test calls it memorising: two points always fit a line, so they are no
+evidence for one.
 
 ## Tests and examples
 
