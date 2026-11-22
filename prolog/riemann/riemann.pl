@@ -122,8 +122,12 @@ mobius_sum([K | Ks], [Mu | Mus], M, S0, S) :-
 vasyunin(H, K, V) :-
     K1 is K - 1,
     numlist_or_empty(1, K1, Ms),
-    foldl(f(H, K)/[M, A0, A]>>(A is A0 + ((M * H) mod K) / K / tan(pi * M / K)),
-          Ms, 0.0, V).
+    vas_sum(Ms, H, K, 0.0, V).
+
+vas_sum([], _, _, V, V).
+vas_sum([M | Ms], H, K, A0, V) :-
+    A is A0 + ((M * H) mod K) / K / tan(pi * M / K),
+    vas_sum(Ms, H, K, A, V).
 
 numlist_or_empty(L, H, []) :- H < L, !.
 numlist_or_empty(L, H, Xs) :- numlist(L, H, Xs).
@@ -145,7 +149,15 @@ rh_target(K, B) :- euler_gamma(G), B is (1 - G + log(K)) / K.
 
 gram_matrix(N, Rows) :-
     numlist(1, N, Ks),
-    maplist(f(Ks)/[J, Row]>>maplist(f(J)/[K, X]>>rh_gram(J, K, X), Ks, Row), Ks, Rows).
+    gram_rows(Ks, Ks, Rows).
+
+gram_rows([], _, []).
+gram_rows([J | Js], Ks, [Row | Rows]) :-
+    gram_row(Ks, J, Row),
+    gram_rows(Js, Ks, Rows).
+
+gram_row([], _, []).
+gram_row([K | Ks], J, [X | Xs]) :- rh_gram(J, K, X), gram_row(Ks, J, Xs).
 
 target_vector(N, Bs) :- numlist(1, N, Ks), maplist(rh_target, Ks, Bs).
 
@@ -153,13 +165,15 @@ target_vector(N, Bs) :- numlist(1, N, Ks), maplist(rh_target, Ks, Bs).
 
 dot(Xs, Ys, D) :- foldl([X, Y, A0, A]>>(A is A0 + X * Y), Xs, Ys, 0.0, D).
 
-mat_vec(Rows, Xs, Ys) :- maplist(f(Xs)/[Row, Y]>>dot(Row, Xs, Y), Rows, Ys).
+mat_vec([], _, []).
+mat_vec([Row | Rows], Xs, [Y | Ys]) :- dot(Row, Xs, Y), mat_vec(Rows, Xs, Ys).
 
 quad(G, Xs, Q) :- mat_vec(G, Xs, Ys), dot(Xs, Ys, Q).
 
 vsub(Xs, Ys, Zs) :- maplist([X, Y, Z]>>(Z is X - Y), Xs, Ys, Zs).
 
-vscale_sub(Xs, A, Ys, Zs) :- maplist(f(A)/[X, Y, Z]>>(Z is X - A * Y), Xs, Ys, Zs).
+vscale_sub([], _, [], []).
+vscale_sub([X | Xs], A, [Y | Ys], [Z | Zs]) :- Z is X - A * Y, vscale_sub(Xs, A, Ys, Zs).
 
 % cholesky(+A, -L, -Pivots): A = L L^T; row I of L has I entries.
 % Fails if a pivot is not positive (A is not positive definite).
@@ -215,9 +229,11 @@ backward(L, Y, X) :-
     forward(Rev, RY, RX),
     reverse(RX, X).
 
-pad_rows(L, N, Full) :-
-    maplist(f(N)/[Row, F]>>(length(Row, K), Z is N - K, length(Zs, Z),
-                       maplist(=(0.0), Zs), append(Row, Zs, F)), L, Full).
+pad_rows([], _, []).
+pad_rows([Row | Rows], N, [F | Fs]) :-
+    length(Row, K), Z is N - K, length(Zs, Z),
+    maplist(=(0.0), Zs), append(Row, Zs, F),
+    pad_rows(Rows, N, Fs).
 
 transpose_([], []).
 transpose_([[] | _], []) :- !.
