@@ -122,7 +122,7 @@ mobius_sum([K | Ks], [Mu | Mus], M, S0, S) :-
 vasyunin(H, K, V) :-
     K1 is K - 1,
     numlist_or_empty(1, K1, Ms),
-    foldl([M, A0, A]>>(A is A0 + ((M * H) mod K) / K / tan(pi * M / K)),
+    foldl(f(H, K)/[M, A0, A]>>(A is A0 + ((M * H) mod K) / K / tan(pi * M / K)),
           Ms, 0.0, V).
 
 numlist_or_empty(L, H, []) :- H < L, !.
@@ -145,7 +145,7 @@ rh_target(K, B) :- euler_gamma(G), B is (1 - G + log(K)) / K.
 
 gram_matrix(N, Rows) :-
     numlist(1, N, Ks),
-    maplist([J, Row]>>maplist([K, X]>>rh_gram(J, K, X), Ks, Row), Ks, Rows).
+    maplist(f(Ks)/[J, Row]>>maplist(f(J)/[K, X]>>rh_gram(J, K, X), Ks, Row), Ks, Rows).
 
 target_vector(N, Bs) :- numlist(1, N, Ks), maplist(rh_target, Ks, Bs).
 
@@ -153,13 +153,13 @@ target_vector(N, Bs) :- numlist(1, N, Ks), maplist(rh_target, Ks, Bs).
 
 dot(Xs, Ys, D) :- foldl([X, Y, A0, A]>>(A is A0 + X * Y), Xs, Ys, 0.0, D).
 
-mat_vec(Rows, Xs, Ys) :- maplist([Row, Y]>>dot(Row, Xs, Y), Rows, Ys).
+mat_vec(Rows, Xs, Ys) :- maplist(f(Xs)/[Row, Y]>>dot(Row, Xs, Y), Rows, Ys).
 
 quad(G, Xs, Q) :- mat_vec(G, Xs, Ys), dot(Xs, Ys, Q).
 
 vsub(Xs, Ys, Zs) :- maplist([X, Y, Z]>>(Z is X - Y), Xs, Ys, Zs).
 
-vscale_sub(Xs, A, Ys, Zs) :- maplist([X, Y, Z]>>(Z is X - A * Y), Xs, Ys, Zs).
+vscale_sub(Xs, A, Ys, Zs) :- maplist(f(A)/[X, Y, Z]>>(Z is X - A * Y), Xs, Ys, Zs).
 
 % cholesky(+A, -L, -Pivots): A = L L^T; row I of L has I entries.
 % Fails if a pivot is not positive (A is not positive definite).
@@ -216,7 +216,7 @@ backward(L, Y, X) :-
     reverse(RX, X).
 
 pad_rows(L, N, Full) :-
-    maplist([Row, F]>>(length(Row, K), Z is N - K, length(Zs, Z),
+    maplist(f(N)/[Row, F]>>(length(Row, K), Z is N - K, length(Zs, Z),
                        maplist(=(0.0), Zs), append(Row, Zs, F)), L, Full).
 
 transpose_([], []).
