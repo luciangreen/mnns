@@ -7,13 +7,15 @@
 :- ios_engine:load_repo('prolog/thermo/thermo').
 :- ios_engine:load_repo('prolog/riemann/riemann').
 :- ios_engine:load_repo('prolog/riemann/riemann_hp').
+:- ios_engine:load_repo('prolog/complexity/complexity').
+:- ios_engine:load_repo('prolog/complexity/advantage').
 :- use_module(library(readutil)).
 
 io_title('mnns').
 
 % s2a2, s2a2_learn_apply, s2a2_derive and check_proof need S2A2 (github.com/luciangreen/S2A2)
 % beside this repository or at $S2A2_HOME; CI fetches it.
-io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip, riemann_report, riemann_train, riemann_robin, riemann_hp_report]).
+io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip, riemann_report, riemann_train, riemann_robin, riemann_hp_report, pnp_report, advantage_report]).
 
 % Small programs to optimise, made from parts.
 program(K, Text) :-
@@ -271,3 +273,19 @@ io_input(riemann_hp_report, K, [N, P]) :- num(K, 36, 1, 60, N), num(K, 37, 20, 4
 
 % the same report with fixed-point big integers at P digits, with a float cross-check
 io_run(riemann_hp_report, [N, P], Report) :- mnn_riemann_hp:rh_hp_report(N, P, Report).
+
+% ---- Human and robot intelligence: P vs NP and comparative advantage ----
+
+io_input(pnp_report, K, [N, M, Seed, Planted, Hint]) :-
+    num(K, 41, 2, 12, N), num(K, 42, 30, 50, R), M is (R * N + 5) // 10,
+    num(K, 43, 1, 97, Seed), pick(K, 44, [true, false], Planted),
+    num(K, 45, 0, 12, H0), Hint is H0 mod (N + 1).
+
+io_input(advantage_report, K, [T, Seed, Mode]) :-
+    num(K, 46, 1, 10, T), num(K, 47, 1, 97, Seed), pick(K, 48, [random, robot_better], Mode).
+
+% robot search (brute force and MNN/DPLL), human verification, team, proof
+io_run(pnp_report, [N, M, Seed, Planted, Hint], R) :- mnn_complexity:cx_report(N, M, Seed, Planted, Hint, R).
+
+% solo, absolute, comparative and optimal allocations with the duality proof
+io_run(advantage_report, [T, Seed, Mode], R) :- mnn_advantage:ca_report(T, Seed, Mode, R).

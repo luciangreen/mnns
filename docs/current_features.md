@@ -44,6 +44,8 @@ sharing a change.
 | Thermodynamic compression MNN: enumerative coding with neuron weights, Landauer heat report and exhaustive proof | `prolog/thermo/thermo.pl` | `swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt"` | [Thermodynamic compression](thermo.md) |
 | Riemann ceiling: Báez-Duarte sawtooth net, Möbius vs trained vs optimal weights, C0/ln N bound, proof and Robin checks | `prolog/riemann/riemann.pl` | `swipl -q -g "load_files('tests/riemann_tests.pl'), run_tests(mnn_riemann), halt"` | [Riemann ceiling](riemann.md) |
 | Riemann ceiling in arbitrary precision: fixed-point π, ln, γ, cot, Gram, Cholesky and proofs at P digits | `prolog/riemann/riemann_hp.pl` | `swipl -q -g "load_files('tests/riemann_hp_tests.pl'), run_tests(mnn_riemann_hp), halt"` | [Riemann ceiling](riemann.md#arbitrary-precision-riemann_hppl) |
+| P vs NP model of human and robot intelligence on 3-SAT, with proofs | `prolog/complexity/complexity.pl` | `swipl -q -g "load_files('tests/complexity_tests.pl'), run_tests(mnn_complexity), halt"` | [Human and robot intelligence](human_robot.md) |
+| Comparative-advantage MNN with an exact duality certificate | `prolog/complexity/advantage.pl` | `swipl -q -g "load_files('tests/advantage_tests.pl'), run_tests(mnn_advantage), halt"` | [Human and robot intelligence](human_robot.md#comparative-advantage-prologcomplexityadvantagepl) |
 
 Run the complete suite, including every group above, with:
 

@@ -76,6 +76,11 @@ feature and its focused test suite.
   Cholesky optimum against Burnol's C0/ln N bound, with checked proofs that no
   weights beat the optimum, plus exhaustive Robin's-inequality checks. See
   [`docs/riemann.md`](docs/riemann.md).
+- **Human and robot intelligence:** a P vs NP model on 3-SAT (robot brute
+  force and DPLL search, human insight as a certificate checked in linear
+  time, and human-plus-robot teams) and a comparative-advantage scheduler with
+  an exact LP duality certificate and Ricardo's gains from trade. See
+  [`docs/human_robot.md`](docs/human_robot.md).
 - **Detlog2, PLOp2 and AlgebraPLOp2 (separate repositories):** the full Detlog is now
   [detlog2](https://github.com/luciangreen/detlog2), per-character PLOp is
   [plop2](https://github.com/luciangreen/plop2), and proof-backed AlgebraPLOp is
