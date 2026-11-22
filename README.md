@@ -70,6 +70,12 @@ feature and its focused test suite.
   erases no bits; `thermo_report/2` gives the Landauer heat an irreversible
   coder would give off, and `thermo_prove/3` checks it all on a finite domain.
   See [`docs/thermo.md`](docs/thermo.md).
+- **The Riemann ceiling:** the sawtooth neuronet of the Nyman–Beurling–Báez-Duarte
+  criterion (RH holds iff it can learn 1 on (0, 1) with error tending to 0). It
+  compares hand-written Möbius weights, steepest-descent training and the
+  Cholesky optimum against Burnol's C0/ln N bound, with checked proofs that no
+  weights beat the optimum, plus exhaustive Robin's-inequality checks. See
+  [`docs/riemann.md`](docs/riemann.md).
 - **Detlog2, PLOp2 and AlgebraPLOp2 (separate repositories):** the full Detlog is now
   [detlog2](https://github.com/luciangreen/detlog2), per-character PLOp is
   [plop2](https://github.com/luciangreen/plop2), and proof-backed AlgebraPLOp is

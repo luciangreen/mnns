@@ -5,13 +5,14 @@
 :- ios_engine:load_repo('prolog/ir/ir').
 :- ios_engine:load_repo('prolog/proof/proof_checker').
 :- ios_engine:load_repo('prolog/thermo/thermo').
+:- ios_engine:load_repo('prolog/riemann/riemann').
 :- use_module(library(readutil)).
 
 io_title('mnns').
 
 % s2a2, s2a2_learn_apply, s2a2_derive and check_proof need S2A2 (github.com/luciangreen/S2A2)
 % beside this repository or at $S2A2_HOME; CI fetches it.
-io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip]).
+io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip, riemann_report, riemann_train, riemann_robin]).
 
 % Small programs to optimise, made from parts.
 program(K, Text) :-
@@ -247,3 +248,20 @@ io_run(thermo_round_trip, [Seq], [code(Code), neurons(Ns), decoded(Back)]) :-
     mnn_thermo:thermo_compress(Seq, Code),
     mnn_thermo:thermo_neurons(Seq, Ns),
     mnn_thermo:thermo_decompress(Code, Back).
+
+% ---- The Riemann ceiling (sawtooth neuronets of the Baez-Duarte criterion) ----
+
+io_input(riemann_report, K, [N]) :- num(K, 31, 1, 30, N).
+io_input(riemann_train, K, [N, Steps]) :- num(K, 32, 1, 16, N), num(K, 33, 0, 8, Steps).
+io_input(riemann_robin, K, [Lo, Hi]) :-
+    num(K, 34, 0, 60, A), Lo is A * 100,
+    num(K, 35, 0, 40, W), Hi is Lo + W * 5.
+
+% optimal, Mobius and trained errors, the C0 / ln N ceiling and the proof
+io_run(riemann_report, [N], Report) :- mnn_riemann:rh_report(N, Report).
+
+% the error after each steepest-descent step from the Mobius weights
+io_run(riemann_train, [N, Steps], Result) :- mnn_riemann:rh_train(N, Steps, Result).
+
+% Robin's inequality checked on a range (RH iff no exception above 5040)
+io_run(riemann_robin, [Lo, Hi], Result) :- mnn_riemann:rh_robin(Lo, Hi, Result).

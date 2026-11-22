@@ -292,6 +292,14 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   on every sequence of a bounded domain. Unbounded (inductive) proof of the
   Pascal identity and links to the proof checker and AIOC remain to do.
 
+- **Riemann ceiling: initial.** `prolog/riemann/riemann.pl` builds the
+  Báez-Duarte sawtooth net with Vasyunin's exact Gram matrix, solves it by
+  Cholesky, and compares Möbius, trained and optimal weights against C0/ln N,
+  with a checked proof (positive definiteness, normal equations, Pythagoras
+  bound, descent, Möbius identity) and Robin's-inequality checks. RH and the
+  Báez-Duarte conjecture are not proved; arbitrary-precision arithmetic for
+  large N remains to do.
+
 ## Remaining stages
 
 | Stage | Deliverable | Status |
