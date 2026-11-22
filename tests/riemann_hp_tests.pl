@@ -50,12 +50,18 @@ test(hundred_neurons) :-
 
 test(check_rejects_tampered) :-
     mnn_riemann_hp:rh_hp_report(6, 20, R),
-    select(optimal_d2_digits(_), R, optimal_d2_digits('0.5'), R1),
+    once(select(optimal_d2_digits(_), R, optimal_d2_digits('0.5'), R1)),
     mnn_riemann_hp:rh_hp_check_proof(R1, V),
     assertion(V == rejected).
 
 test(series) :-
     mnn_riemann_hp:rh_hp_series([10], 30, Rows),
     assertion(Rows == [row(10, 0.023772, 0.137186, 0.036493, 0.020061, 1.184998)]).
+
+test(two_hundred_neurons) :-
+    mnn_riemann_hp:rh_hp_report(200, 30, R),
+    assertion(memberchk(optimal_d2_digits('0.008920725383469965072537411844'), R)),
+    assertion(memberchk(proof(proof([_, _, _, _, _, _,
+                                     step(7, float_cross_check, not_applicable(n_above_120))])), R)).
 
 :- end_tests(mnn_riemann_hp).

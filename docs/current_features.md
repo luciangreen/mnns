@@ -43,6 +43,7 @@ sharing a change.
 | Bounded sandboxed candidate-vs-original example verification and verified library-entry tests | `prolog/aioc/test_runner.pl`, `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`; `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC example verification](aioc.md#bounded-example-verification); [proof-checked library](aioc.md#proof-checked-library) |
 | Thermodynamic compression MNN: enumerative coding with neuron weights, Landauer heat report and exhaustive proof | `prolog/thermo/thermo.pl` | `swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt"` | [Thermodynamic compression](thermo.md) |
 | Riemann ceiling: Báez-Duarte sawtooth net, Möbius vs trained vs optimal weights, C0/ln N bound, proof and Robin checks | `prolog/riemann/riemann.pl` | `swipl -q -g "load_files('tests/riemann_tests.pl'), run_tests(mnn_riemann), halt"` | [Riemann ceiling](riemann.md) |
+| Riemann ceiling in arbitrary precision: fixed-point π, ln, γ, cot, Gram, Cholesky and proofs at P digits | `prolog/riemann/riemann_hp.pl` | `swipl -q -g "load_files('tests/riemann_hp_tests.pl'), run_tests(mnn_riemann_hp), halt"` | [Riemann ceiling](riemann.md#arbitrary-precision-riemann_hppl) |
 
 Run the complete suite, including every group above, with:
 

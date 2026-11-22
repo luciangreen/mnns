@@ -162,7 +162,7 @@ cots([K | Ks], S, Pi, [T | Ts]) :- cot_table(K, S, Pi, T), cots(Ks, S, Pi, Ts).
 %! rh_hp_constant(+Name, +P, -Digits) is det.
 %  pi, gamma, ln2, log2pi or c0 to P decimal places, as an atom.
 rh_hp_constant(Name, P, Digits) :-
-    ctx(1, P, Ctx), Ctx = ctx(W, S, Ln2, Pi, Gamma, Log2Pi, _, _),
+    ctx(1, P, Ctx), Ctx = ctx(W, _, Ln2, Pi, Gamma, Log2Pi, _, _),
     (   Name == pi -> X = Pi
     ;   Name == gamma -> X = Gamma
     ;   Name == ln2 -> X = Ln2

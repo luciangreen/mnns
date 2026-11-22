@@ -71,10 +71,50 @@ and the conjecture. The Möbius weights a number theorist would write down
 stay well above the optimum. Ten steps of descent close most of the gap but
 not all of it, because G is badly conditioned.
 
+## Arbitrary precision (`riemann_hp.pl`)
+
+`rh_hp_report(N, P, R)` is the same report computed with fixed-point big
+integers at P decimal digits, with 10 guard digits. The constants are
+computed rather than looked up: π by Machin's formula, ln by atanh
+series, γ by Brent–McMillan, and cot by Taylor series. The result adds
+`optimal_d2_digits` and `ratio_digits` atoms and a seventh proof step: for
+N ≤ 120 it must agree with the float computation to 1e-9.
+`rh_hp_check_proof/2` recomputes the report and compares.
+`rh_hp_series/3` gives one row per N. `rh_hp_constant/3` gives π, γ, ln 2,
+ln 2π or C0 to P digits.
+
+The tests check the N = 10, 100 and 200 results digit for digit against an
+independent Python mirror of the same algorithm. N = 100 at 40 digits takes
+about 0.9 s. The work grows like N³.
+
+Running it at 40 digits gives the same first 40 digits as running it at
+60, and doubles agree with it to about 1e-14 up to N = 500. So floats were
+not the bottleneck, and the big integers serve as a certificate.
+
+| N | optimal d_N² | manual | trained | C0/ln N | ratio |
+| --- | --- | --- | --- | --- | --- |
+| 50 | 0.011869 | 0.058864 | 0.034913 | 0.011808 | 1.0052 |
+| 100 | 0.010189 | 0.147298 | 0.043852 | 0.010030 | 1.0158 |
+| 200 | 0.008921 | 0.262160 | 0.062677 | 0.008718 | 1.0232 |
+| 250 | 0.008243 | 0.041788 | 0.035995 | 0.008366 | 0.9853 |
+| 300 | 0.007995 | 0.073869 | 0.038857 | 0.008098 | 0.9872 |
+| 500 | 0.007420 | 0.075856 | 0.038318 | 0.007433 | 0.9983 |
+
+d_300² = 0.007994899430921907469365107625 and
+d_500² = 0.007419858011602131374781595266 (30 digits).
+
+From N = 40 on, the ratio stays between 0.976 (its lowest, at N = 231) and
+1.045 (at N = 94). It first drops below 1 at N = 41, and is below 1 for 260 of
+N = 2..500. Burnol's bound is asymptotic, so values below 1 at finite N do
+not contradict it. A ratio hovering near 1 is what the Báez-Duarte
+conjecture predicts.
+
 ## What is not proved
 
 This module does not prove RH or the conjecture. Its checks run on finite
 ranges, and the numbers are floats, rounded to 6 places in reports. The
 claim about people and AI is a reading of the conjecture, not a theorem.
+
+An illustration brief for the graphs is in [`riemann_illustration.md`](riemann_illustration.md).
 
 Tests: `swipl -q -g "load_files('tests/riemann_tests.pl'), run_tests(mnn_riemann), halt"`

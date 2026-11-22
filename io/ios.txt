@@ -22,381 +22,381 @@ mnns: 200 inputs and outputs, from real runs (swipl io/make_ios.pl writes this f
    => [errors([3.10623]), final(3.10623), optimal(0.858212), descent(proved(monotone(0)))]
 11. riemann_robin(4100, 4215)
    => [checked(116), exceptions([]), above_5040(none)]
-12. optimise_file("n(7).\nn(4).\nn(2).\nn(9).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
+12. riemann_hp_report(49, 26)
+   => [n(49), digits(26), optimal_d2(0.011873), optimal_d2_digits('0.01187261466930430438833032'), manual_d2(0.058864), trained_d2(0.035034), c0(0.046191), d2_times_ln_n(0.046206), c0_over_ln_n(0.011869), ratio_to_ceiling(1.000317), ratio_digits('1.00031747952452814070373987'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(49))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+13. optimise_file("n(7).\nn(4).\nn(2).\nn(9).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(7)", "n(4)", "n(2)", "n(9)", "doubled(A):-findall(B, (n(C), B is C*2), A)"])]
-13. s2a(probe_b, [[[input, [['A', 7]]], [output, [['B', 8]]]]], [])
+14. s2a(probe_b, [[[input, [['A', 7]]], [output, [['B', 8]]]]], [])
    => no_algorithm(no_generalization_candidate)
-14. s2a2(evens, [[[input, [['A', [-2]]]], [output, [['B', [-2]]]]], [[input, [['A', [-1, 2]]]], [output, [['B', [2]]]]], [[input, [['A', [4, 7, -3]]]], [output, [['B', [4]]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', [8, -2]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
+15. s2a2(evens, [[[input, [['A', [-2]]]], [output, [['B', [-2]]]]], [[input, [['A', [-1, 2]]]], [output, [['B', [2]]]]], [[input, [['A', [4, 7, -3]]]], [output, [['B', [4]]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', [8, -2]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
    => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4)), s2a2_proof(r, not_proved)]), check(no_reference), runs_on([[-2], [-1, 2], [4, 7, -3], [5, 8, -2, 1], [1, 2, 3, 4, 5, 6]], [[-2], [2], [4], [8, -2], [2, 4, 6]])]
-15. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red], big-size-s-[s2, s3]], [b-c])
+16. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red], big-size-s-[s2, s3]], [b-c])
    => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(A, [B]), [l(C, [B])]), lr(l(A, [D]), [l(E, [D])]))), [template_matches])])), program(["edge(b, c)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(b, b), edge(b, c), edge(c, b), edge(c, c)]), only_in_a([conn(b, b), conn(b, c), conn(c, b), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
-16. s2a2_derive(flat2, 2, [[[[]], [[-2], [3, 6], [4, 7, -3]]], [[[], [-2]], [[3, 6], [4, 7, -3]]]])
+17. s2a2_derive(flat2, 2, [[[[]], [[-2], [3, 6], [4, 7, -3]]], [[[], [-2]], [[3, 6], [4, 7, -3]]]])
    => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(57)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[], [-2], [3, 6], [4, 7, -3]], [[], [-2], [3, 6], [4, 7, -3]]]), derived_gives([[[], [-2], [3, 6], [4, 7, -3]], [[], [-2], [3, 6], [4, 7, -3]]])]
-17. check_proof(fold_not_derived, 2)
+18. check_proof(fold_not_derived, 2)
    => rejected(invalid_or_unsupported_proof)
-18. thermo_report([b, a, c, b])
+19. thermo_report([b, a, c, b])
    => [n(4), alphabet([a, b, c]), counts([1, 2, 1]), rank(4), class_size(12), rank_bits(4), composition_bits(4), raw_bits(8), entropy_bits(6.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-19. thermo_round_trip([a, c, b, a, c, b, a])
+20. thermo_round_trip([a, c, b, a, c, b, a])
    => [code(thermo([a, b, c], [3, 2, 2], 77)), neurons([neuron(1, a, 0), neuron(2, c, 60), neuron(3, b, 12), neuron(4, a, 0), neuron(5, c, 4), neuron(6, b, 1), neuron(7, a, 0)]), decoded([a, c, b, a, c, b, a])]
-20. riemann_report(5)
+21. riemann_report(5)
    => [n(5), optimal_d2(0.036102), manual_d2(0.048576), trained_d2(0.037655), c0(0.046191), d2_times_ln_n(0.058103), c0_over_ln_n(0.0287), ratio_to_ceiling(1.25788), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(5)))]))]
-21. riemann_train(2, 1)
+22. riemann_train(2, 1)
    => [errors([1.076211, 0.331581]), final(0.331581), optimal(0.289965), descent(proved(monotone(1)))]
-22. riemann_robin(4200, 4320)
+23. riemann_robin(4200, 4320)
    => [checked(121), exceptions([]), above_5040(none)]
-23. optimise_file("num(9).\nnum(5).\nnum(3).\nnum(1).\nnum(7).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
+24. riemann_hp_report(50, 27)
+   => [n(50), digits(27), optimal_d2(0.011869), optimal_d2_digits('0.011869048866095566110378908'), manual_d2(0.058864), trained_d2(0.034913), c0(0.046191), d2_times_ln_n(0.046432), c0_over_ln_n(0.011808), ratio_to_ceiling(1.005208), ratio_digits('1.005208203065503100301902466'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(50))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+25. optimise_file("num(9).\nnum(5).\nnum(3).\nnum(1).\nnum(7).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=38 size_after=38 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(9)", "num(5)", "num(3)", "num(1)", "num(7)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-24. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]]], [allow_table(true)])
+26. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]]], [allow_table(true)])
    => no_algorithm(unsupported_spec_shape)
-25. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-1, 2]]]], [output, [['B', 2]]]], [[input, [['A', [0, 3, 6]]]], [output, [['B', 3]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', 4]]]]], [ga(false), time_limit(8)])
+27. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-1, 2]]]], [output, [['B', 2]]]], [[input, [['A', [0, 3, 6]]]], [output, [['B', 3]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', 4]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(expression)), program(["len(A, B):-length(A, B)"]), proof(proof([])), trace([s2a2_io_synth(len, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-1, 2], [0, 3, 6], [5, 8, -2, 1], [1, 2, 3, 4, 5, 6]], [0, 2, 3, 4, 6])]
-26. s2a2_learn_apply(keep, [col-colour-q-[blue], big-size-s-[s1, s2, s3]], [c-d])
+28. s2a2_learn_apply(keep, [col-colour-q-[blue], big-size-s-[s1, s2, s3]], [c-d])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [c, d])), modes(targets([conn/2]))))])), check(accepted)]
-27. s2a2_derive(len, 3, [[-2], [-1, 2], [4, 7, -3], [5, 8, -2, 1]])
+29. s2a2_derive(len, 3, [[-2], [-1, 2], [4, 7, -3], [5, 8, -2, 1]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([1, 2, 3, 4]), derived_gives([1, 2, 3, 4])]
-28. check_proof(edb_changed, 3)
+30. check_proof(edb_changed, 3)
    => rejected(invalid_or_unsupported_proof)
-29. thermo_report([1, 2, 3, 0, 1])
+31. thermo_report([1, 2, 3, 0, 1])
    => [n(5), alphabet([0, 1, 2, 3]), counts([1, 2, 1, 1]), rank(28), class_size(60), rank_bits(6), composition_bits(6), raw_bits(10), entropy_bits(9.61), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-30. thermo_round_trip([0, 1, 2, 3, 0, 1, 2, 3])
+32. thermo_round_trip([0, 1, 2, 3, 0, 1, 2, 3])
    => [code(thermo([0, 1, 2, 3], [2, 2, 2, 2], 186)), neurons([neuron(1, 0, 0), neuron(2, 1, 90), neuron(3, 2, 60), neuron(4, 3, 36), neuron(5, 0, 0), neuron(6, 1, 0), neuron(7, 2, 0), neuron(8, 3, 0)]), decoded([0, 1, 2, 3, 0, 1, 2, 3])]
-31. riemann_report(6)
+33. riemann_report(6)
    => [n(6), optimal_d2(0.035986), manual_d2(0.181685), trained_d2(0.04333), c0(0.046191), d2_times_ln_n(0.064479), c0_over_ln_n(0.02578), ratio_to_ceiling(1.395905), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(6)))]))]
-32. riemann_train(3, 2)
+34. riemann_train(3, 2)
    => [errors([0.214367, 0.104281, 0.095031]), final(0.095031), optimal(0.093837), descent(proved(monotone(2)))]
-33. riemann_robin(4300, 4425)
+35. riemann_robin(4300, 4425)
    => [checked(126), exceptions([]), above_5040(none)]
-34. optimise_file("item(1).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
+36. riemann_hp_report(51, 28)
+   => [n(51), digits(28), optimal_d2(0.011832), optimal_d2_digits('0.0118323329930703888992683025'), manual_d2(0.036186), trained_d2(0.035155), c0(0.046191), d2_times_ln_n(0.046523), c0_over_ln_n(0.011748), ratio_to_ceiling(1.007171), ratio_digits('1.0071712937093150417132820470'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(51))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+37. optimise_file("item(1).\nvalues(Xs) :- findall(X, item(X), Xs).\n")
    => [report("MNN_OPTIMISE ok changed=true size_before=12 size_after=27 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(1)", "values(A):-mnn_loop2_1([1], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-35. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]]], [])
+38. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]]], [])
    => no_algorithm(no_generalization_candidate)
-36. s2a2(odds, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [0, 3, 6]]]], [output, [['B', [3]]]]], [[input, [['A', [1, 4, 7, -3]]]], [output, [['B', [1, 7, -3]]]]], [[input, [['A', [7]]]], [output, [['B', [7]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=0->C=[A|D];C=D), r(B, D))], r)])
+39. s2a2(odds, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [0, 3, 6]]]], [output, [['B', [3]]]]], [[input, [['A', [1, 4, 7, -3]]]], [output, [['B', [1, 7, -3]]]]], [[input, [['A', [7]]]], [output, [['B', [7]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=0->C=[A|D];C=D), r(B, D))], r)])
    => [solved_by(s2a2(filter)), program(["odds([], [])", "odds([A|B], C):-(odds_test(A)->C=[A|D];C=D), odds(B, D)", "odds_test(A):-A mod 2=:=1"]), proof(proof([])), trace([s2a2_io_synth(odds, filter, examples_reproduced(4)), s2a2_proof(r, not_proved)]), check(no_reference), runs_on([[], [0, 3, 6], [1, 4, 7, -3], [7], [1, 2, 3, 4, 5, 6]], [[], [3], [1, 7, -3], [7], [1, 3, 5]])]
-37. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-c])
+40. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-c])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c])), modes(targets([conn/2]))))])), check(accepted)]
-38. s2a2_derive(rev, 2, [[], [-1, 2], [0, 3, 6], [5, 8, -2, 1]])
+41. s2a2_derive(rev, 2, [[], [-1, 2], [0, 3, 6], [5, 8, -2, 1]])
    => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [2, -1], [6, 3, 0], [1, -2, 8, 5]]), derived_gives([[], [2, -1], [6, 3, 0], [1, -2, 8, 5]])]
-39. check_proof(edb_syntactic, 1)
+42. check_proof(edb_syntactic, 1)
    => accepted
-40. thermo_report([x, x, x, x, x, x])
+43. thermo_report([x, x, x, x, x, x])
    => [n(6), alphabet([x]), counts([6]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-41. thermo_round_trip([x, x, x, x, x, x, x, x, x])
+44. thermo_round_trip([x, x, x, x, x, x, x, x, x])
    => [code(thermo([x], [9], 0)), neurons([neuron(1, x, 0), neuron(2, x, 0), neuron(3, x, 0), neuron(4, x, 0), neuron(5, x, 0), neuron(6, x, 0), neuron(7, x, 0), neuron(8, x, 0), neuron(9, x, 0)]), decoded([x, x, x, x, x, x, x, x, x])]
-42. riemann_report(7)
+45. riemann_report(7)
    => [n(7), optimal_d2(0.024302), manual_d2(0.037394), trained_d2(0.03237), c0(0.046191), d2_times_ln_n(0.04729), c0_over_ln_n(0.023738), ratio_to_ceiling(1.023777), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(7)))]))]
-43. riemann_train(4, 3)
+46. riemann_train(4, 3)
    => [errors([0.214367, 0.094311, 0.077091, 0.074332]), final(0.074332), optimal(0.065129), descent(proved(monotone(3)))]
-44. riemann_robin(4400, 4530)
+47. riemann_robin(4400, 4530)
    => [checked(131), exceptions([]), above_5040(none)]
-45. optimise_file("item(2).\nitem(9).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
+48. riemann_hp_report(52, 29)
+   => [n(52), digits(29), optimal_d2(0.011829), optimal_d2_digits('0.01182867531441986997080140932'), manual_d2(0.036186), trained_d2(0.035123), c0(0.046191), d2_times_ln_n(0.046738), c0_over_ln_n(0.01169), ratio_to_ceiling(1.011833), ratio_digits('1.01183252490322728845329038916'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(52))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+49. optimise_file("item(2).\nitem(9).\ntotal(T) :- findall(X, item(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=21 size_after=21 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(2)", "item(9)", "total(A):-findall(B, item(B), C), sum_list(C, A)"])]
-46. s2a(swap_probe, [[[input, [['A', 4]]], [output, [['B', 4]]]]], [allow_table(true)])
+50. s2a(swap_probe, [[[input, [['A', 4]]], [output, [['B', 4]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_table(swap_probe), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(4, 4), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(swap_probe, examples_reproduced(1))]))
-47. s2a2(sum, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [1, 4, 7, -3]]]], [output, [['B', 9]]]], [[input, [['A', [7]]]], [output, [['B', 7]]]], [[input, [['A', [8, -2]]]], [output, [['B', 6]]]]], [ga(false), time_limit(8)])
+51. s2a2(sum, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [1, 4, 7, -3]]]], [output, [['B', 9]]]], [[input, [['A', [7]]]], [output, [['B', 7]]]], [[input, [['A', [8, -2]]]], [output, [['B', 6]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(expression)), program(["sum(A, B):-sum_list(A, B)"]), proof(proof([])), trace([s2a2_io_synth(sum, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [1, 4, 7, -3], [7], [8, -2], [1, 2, 3, 4, 5, 6]], [0, 9, 7, 6, 21])]
-48. s2a2_learn_apply(drop, [col-colour-q-[green]], [d-a])
+52. s2a2_learn_apply(drop, [col-colour-q-[green]], [d-a])
    => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, d), edge(d, a), edge(d, d)]), only_in_a([conn(a, a), conn(a, d), conn(d, a), conn(d, d)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
-49. s2a2_derive(sumsq, 3, [[], [0, 3, 6], [1, 4, 7, -3], [7]])
+53. s2a2_derive(sumsq, 3, [[], [0, 3, 6], [1, 4, 7, -3], [7]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 45, 75, 49]), derived_gives([0, 45, 75, 49])]
-50. check_proof(edb_same, 2)
+54. check_proof(edb_same, 2)
    => accepted
-51. thermo_report([o, e, o, e, o, e, o])
+55. thermo_report([o, e, o, e, o, e, o])
    => [n(7), alphabet([e, o]), counts([3, 4]), rank(20), class_size(35), rank_bits(6), composition_bits(3), raw_bits(7), entropy_bits(6.897), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-52. thermo_round_trip([])
+56. thermo_round_trip([])
    => [code(thermo([], [], 0)), neurons([]), decoded([])]
-53. riemann_report(8)
+57. riemann_report(8)
    => [n(8), optimal_d2(0.024161), manual_d2(0.037394), trained_d2(0.032372), c0(0.046191), d2_times_ln_n(0.050242), c0_over_ln_n(0.022213), ratio_to_ceiling(1.087697), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(8)))]))]
-54. riemann_train(5, 4)
+58. riemann_train(5, 4)
    => [errors([0.048576, 0.043423, 0.041367, 0.040496, 0.039834]), final(0.039834), optimal(0.036102), descent(proved(monotone(4)))]
-55. riemann_robin(4500, 4635)
+59. riemann_robin(4500, 4635)
    => [checked(136), exceptions([]), above_5040(none)]
-56. optimise_file("val(3).\nval(1).\nval(7).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+60. riemann_hp_report(53, 30)
+   => [n(53), digits(30), optimal_d2(0.0118), optimal_d2_digits('0.011799959254998045874390961140'), manual_d2(0.058826), trained_d2(0.035863), c0(0.046191), d2_times_ln_n(0.046849), c0_over_ln_n(0.011634), ratio_to_ceiling(1.014242), ratio_digits('1.014242145133674229069290443381'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(53))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+61. optimise_file("val(3).\nval(1).\nval(7).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(3)", "val(1)", "val(7)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-57. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]]], [])
+62. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 3], ['B', 9]]], [output, [['C', 12]]]]], [])
    => no_algorithm(unsupported_spec_shape)
-58. s2a2(double_each, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [2]]]], [output, [['B', [4]]]]], [[input, [['A', [3, 6, 9, -1]]]], [output, [['B', [6, 12, 18, -2]]]]], [[input, [['A', [8, -2]]]], [output, [['B', [16, -4]]]]]], [ga(false), time_limit(8)])
+63. s2a2(double_each, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [2]]]], [output, [['B', [4]]]]], [[input, [['A', [3, 6, 9, -1]]]], [output, [['B', [6, 12, 18, -2]]]]], [[input, [['A', [8, -2]]]], [output, [['B', [16, -4]]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(map)), program(["double_each([], [])", "double_each([A|B], [C|D]):-double_each_el(A, C), double_each(B, D)", "double_each_el(A, B):-B is 2*A"]), proof(proof([])), trace([s2a2_io_synth(double_each, map, examples_reproduced(4))]), check(no_reference), runs_on([[], [2], [3, 6, 9, -1], [8, -2], [1, 2, 3, 4, 5, 6]], [[], [4], [6, 12, 18, -2], [16, -4], [2, 4, 6, 8, 10, 12]])]
-59. s2a2_learn_apply(keep, [col-colour-q-[red], big-size-s-[s1]], [a-c, c-d])
+64. s2a2_learn_apply(keep, [col-colour-q-[red], big-size-s-[s1]], [a-c, c-d])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c, d])), modes(targets([conn/2]))))])), check(accepted)]
-60. s2a2_derive(len, 2, [[1, 4, 7], [2], [7, -3, 0, 3], [8, -2]])
+65. s2a2_derive(len, 2, [[1, 4, 7], [2], [7, -3, 0, 3], [8, -2]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([3, 1, 4, 2]), derived_gives([3, 1, 4, 2])]
-61. check_proof(fold_changed, 3)
+66. check_proof(fold_changed, 3)
    => rejected(invalid_or_unsupported_proof)
-62. thermo_report([0, 2, 0, 2, 0, 2, 0, 2])
+67. thermo_report([0, 2, 0, 2, 0, 2, 0, 2])
    => [n(8), alphabet([0, 2]), counts([4, 4]), rank(20), class_size(70), rank_bits(7), composition_bits(4), raw_bits(8), entropy_bits(8.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-63. thermo_round_trip([x])
+68. thermo_round_trip([x])
    => [code(thermo([x], [1], 0)), neurons([neuron(1, x, 0)]), decoded([x])]
-64. riemann_report(9)
+69. riemann_report(9)
    => [n(9), optimal_d2(0.024015), manual_d2(0.037394), trained_d2(0.032361), c0(0.046191), d2_times_ln_n(0.052766), c0_over_ln_n(0.021023), ratio_to_ceiling(1.142339), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(9)))]))]
-65. riemann_train(6, 5)
+70. riemann_train(6, 5)
    => [errors([0.181685, 0.078003, 0.058725, 0.054843, 0.052027, 0.049935]), final(0.049935), optimal(0.035986), descent(proved(monotone(5)))]
-66. riemann_robin(4600, 4740)
+71. riemann_robin(4600, 4740)
    => [checked(141), exceptions([]), above_5040(none)]
-67. optimise_file("n(4).\nn(2).\nn(9).\nn(5).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
+72. riemann_hp_report(54, 31)
+   => [n(54), digits(31), optimal_d2(0.011739), optimal_d2_digits('0.0117392769581998633969061859325'), manual_d2(0.058826), trained_d2(0.035696), c0(0.046191), d2_times_ln_n(0.046828), c0_over_ln_n(0.01158), ratio_to_ceiling(1.013777), ratio_digits('1.0137768139776583182690266168461'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(54))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+73. optimise_file("n(4).\nn(2).\nn(9).\nn(5).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(4)", "n(2)", "n(9)", "n(5)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-68. s2a(swap_probe, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 4]]], [output, [['B', 8]]]], [[input, [['A', 5]]], [output, [['B', 10]]]]], [allow_table(true)])
+74. s2a(swap_probe, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 4]]], [output, [['B', 8]]]], [[input, [['A', 5]]], [output, [['B', 10]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 2, 0), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 2, 0, examples_reproduced(3))]))
-69. s2a2(dropmax, [[[input, [['A', [-3]]]], [output, [['B', []]]]], [[input, [['A', [3, 6]]]], [output, [['B', [3]]]]], [[input, [['A', [9, -1, 2]]]], [output, [['B', [-1, 2]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
+75. s2a2(dropmax, [[[input, [['A', [-3]]]], [output, [['B', []]]]], [[input, [['A', [3, 6]]]], [output, [['B', [3]]]]], [[input, [['A', [9, -1, 2]]]], [output, [['B', [-1, 2]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
    => [solved_by(s2a2(filter)), program(["dropmax([], [])", "dropmax([A|B], C):-max_list([A|B], D), dropmax_sel([A|B], D, C)", "dropmax_sel([], A, [])", "dropmax_sel([A|B], C, D):-(dropmax_test(A, C)->D=[A|E];D=E), dropmax_sel(B, C, E)", "dropmax_test(A, B):-A<B"]), proof(proof([proof_step(1, induction_equivalence, [], equivalent(domain(types([list(int), any])), modes(all)))])), trace([s2a2_io_synth(dropmax, filter, examples_reproduced(3))]), check(accepted), runs_on([[-3], [3, 6], [9, -1, 2], [1, 2, 3, 4, 5, 6]], [[], [3], [-1, 2], [1, 2, 3, 4, 5]])]
-70. s2a2_learn_apply(keep, [col-colour-q-[blue, red], big-size-s-[s2]], [a-c])
+76. s2a2_learn_apply(keep, [col-colour-q-[blue, red], big-size-s-[s2]], [a-c])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c])), modes(targets([conn/2]))))])), check(accepted)]
-71. s2a2_derive(rev, 3, [[], [2, 5, 8, -2], [3, 6], [9, -1, 2]])
+77. s2a2_derive(rev, 3, [[], [2, 5, 8, -2], [3, 6], [9, -1, 2]])
    => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [-2, 8, 5, 2], [6, 3], [2, -1, 9]]), derived_gives([[], [-2, 8, 5, 2], [6, 3], [2, -1, 9]])]
-72. check_proof(fold_not_derived, 1)
+78. check_proof(fold_not_derived, 1)
    => rejected(invalid_or_unsupported_proof)
-73. thermo_report([x, x, x, x, x, x, x, x, x])
+79. thermo_report([x, x, x, x, x, x, x, x, x])
    => [n(9), alphabet([x]), counts([9]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-74. thermo_round_trip([o, e])
+80. thermo_round_trip([o, e])
    => [code(thermo([e, o], [1, 1], 1)), neurons([neuron(1, o, 1), neuron(2, e, 0)]), decoded([o, e])]
-75. riemann_report(10)
+81. riemann_report(10)
    => [n(10), optimal_d2(0.023772), manual_d2(0.137186), trained_d2(0.036493), c0(0.046191), d2_times_ln_n(0.054737), c0_over_ln_n(0.020061), ratio_to_ceiling(1.184998), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(10)))]))]
-76. riemann_train(7, 6)
+82. riemann_train(7, 6)
    => [errors([0.037394, 0.036562, 0.035896, 0.035347, 0.034842, 0.034375, 0.033932]), final(0.033932), optimal(0.024302), descent(proved(monotone(6)))]
-77. riemann_robin(4700, 4845)
+83. riemann_robin(4700, 4845)
    => [checked(146), exceptions([]), above_5040(none)]
-78. optimise_file("num(4).\nnum(3).\nnum(2).\nnum(1).\nnum(9).\nvalues(Xs) :- findall(X, num(X), Xs).\n")
+84. riemann_hp_report(55, 32)
+   => [n(55), digits(32), optimal_d2(0.011623), optimal_d2_digits('0.01162280793135768629410578264636'), manual_d2(0.034992), trained_d2(0.034014), c0(0.046191), d2_times_ln_n(0.046576), c0_over_ln_n(0.011527), ratio_to_ceiling(1.008336), ratio_digits('1.00833587739687007263395510539732'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(55))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+85. optimise_file("num(4).\nnum(3).\nnum(2).\nnum(1).\nnum(9).\nvalues(Xs) :- findall(X, num(X), Xs).\n")
    => [report("MNN_OPTIMISE ok changed=true size_before=32 size_after=55 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(4)", "num(3)", "num(2)", "num(1)", "num(9)", "values(A):-mnn_loop2_1([4, 3, 2, 1, 9], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-79. s2a(probe_a, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [])
+86. s2a(probe_a, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [])
    => no_algorithm(no_generalization_candidate)
-80. s2a2(evens, [[[input, [['A', [-3, 0, 3, 6]]]], [output, [['B', [0, 6]]]]], [[input, [['A', [-2, 1]]]], [output, [['B', [-2]]]]], [[input, [['A', [4, 7, -3]]]], [output, [['B', [4]]]]], [[input, [['A', [5]]]], [output, [['B', []]]]]], [ga(false), time_limit(8)])
+87. s2a2(evens, [[[input, [['A', [-3, 0, 3, 6]]]], [output, [['B', [0, 6]]]]], [[input, [['A', [-2, 1]]]], [output, [['B', [-2]]]]], [[input, [['A', [4, 7, -3]]]], [output, [['B', [4]]]]], [[input, [['A', [5]]]], [output, [['B', []]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4))]), check(no_reference), runs_on([[-3, 0, 3, 6], [-2, 1], [4, 7, -3], [5], [1, 2, 3, 4, 5, 6]], [[0, 6], [-2], [4], [], [2, 4, 6]])]
-81. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red]], [a-b, b-c, c-d, d-a])
+88. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red]], [a-b, b-c, c-d, d-a])
    => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, b), edge(a, c), edge(b, a), edge(b, b), edge(b, c), edge(c, a), edge(c, b), edge(c, c)]), only_in_a([conn(a, a), conn(a, b), conn(a, c), conn(b, a), conn(b, b), conn(b, c), conn(c, a), conn(c, b), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
-82. s2a2_derive(sumsq, 2, [[], [-3, 0, 3, 6], [4, 7, -3], [9]])
+89. s2a2_derive(sumsq, 2, [[], [-3, 0, 3, 6], [4, 7, -3], [9]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(21)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, 54, 74, 81]), derived_gives([0, 54, 74, 81])]
-83. check_proof(edb_changed, 2)
+90. check_proof(edb_changed, 2)
    => rejected(invalid_or_unsupported_proof)
-84. thermo_report([])
+91. thermo_report([])
    => [n(0), alphabet([]), counts([]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-85. thermo_round_trip([a, a, a])
+92. thermo_round_trip([a, a, a])
    => [code(thermo([a], [3], 0)), neurons([neuron(1, a, 0), neuron(2, a, 0), neuron(3, a, 0)]), decoded([a, a, a])]
-86. riemann_report(11)
+93. riemann_report(11)
    => [n(11), optimal_d2(0.020444), manual_d2(0.03416), trained_d2(0.031336), c0(0.046191), d2_times_ln_n(0.049024), c0_over_ln_n(0.019263), ratio_to_ceiling(1.061315), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(11)))]))]
-87. riemann_train(8, 7)
+94. riemann_train(8, 7)
    => [errors([0.037394, 0.036563, 0.035905, 0.035363, 0.034861, 0.034393, 0.033949, 0.033526]), final(0.033526), optimal(0.024161), descent(proved(monotone(7)))]
-88. riemann_robin(4800, 4950)
+95. riemann_robin(4800, 4950)
    => [checked(151), exceptions([]), above_5040(none)]
-89. optimise_file("num(5).\ntotal(T) :- findall(X, num(X), Xs), sum_list(Xs, T).\n")
+96. riemann_hp_report(56, 33)
+   => [n(56), digits(33), optimal_d2(0.011612), optimal_d2_digits('0.011611728723177804485629432837274'), manual_d2(0.034992), trained_d2(0.034015), c0(0.046191), d2_times_ln_n(0.046741), c0_over_ln_n(0.011475), ratio_to_ceiling(1.011904), ratio_digits('1.011904244133969004065940885277445'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(56))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+97. optimise_file("num(5).\ntotal(T) :- findall(X, num(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=16 size_after=16 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(5)", "total(A):-findall(B, num(B), C), sum_list(C, A)"])]
-90. s2a(probe_b, [[[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
+98. s2a(probe_b, [[[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [allow_table(true)])
    => no_algorithm(unsupported_spec_shape)
-91. s2a2(evens, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-1, 2, 5]]]], [output, [['B', [2]]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', [8, -2]]]]], [[input, [['A', [6, 9]]]], [output, [['B', [6]]]]]], [ga(false), time_limit(8)])
+99. s2a2(evens, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-1, 2, 5]]]], [output, [['B', [2]]]]], [[input, [['A', [5, 8, -2, 1]]]], [output, [['B', [8, -2]]]]], [[input, [['A', [6, 9]]]], [output, [['B', [6]]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4))]), check(no_reference), runs_on([[], [-1, 2, 5], [5, 8, -2, 1], [6, 9], [1, 2, 3, 4, 5, 6]], [[], [2], [8, -2], [6], [2, 4, 6]])]
-92. s2a2_learn_apply(keep, [col-colour-q-[green]], [a-b, b-c, c-d])
+100. s2a2_learn_apply(keep, [col-colour-q-[green]], [a-b, b-c, c-d])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
-93. s2a2_derive(sum, 3, [[], [-3, 0], [4], [5, 8, -2, 1]])
+101. s2a2_derive(sum, 3, [[], [-3, 0], [4], [5, 8, -2, 1]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sum([], 0)", "sum([A|B], C):-sum_acc(B, C, A)", "sum_acc([], A, B):-A is 0+B", "sum_acc([A|B], C, D):-E is A+D, sum_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([0, -3, 4, 12]), derived_gives([0, -3, 4, 12])]
-94. check_proof(edb_syntactic, 3)
+102. check_proof(edb_syntactic, 3)
    => accepted
-95. thermo_report([b])
+103. thermo_report([b])
    => [n(1), alphabet([b]), counts([1]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-96. thermo_round_trip([c, a, b, c])
+104. thermo_round_trip([c, a, b, c])
    => [code(thermo([a, b, c], [1, 1, 2], 6)), neurons([neuron(1, c, 6), neuron(2, a, 0), neuron(3, b, 0), neuron(4, c, 0)]), decoded([c, a, b, c])]
-97. riemann_report(12)
+105. riemann_report(12)
    => [n(12), optimal_d2(0.020443), manual_d2(0.03416), trained_d2(0.031294), c0(0.046191), d2_times_ln_n(0.050799), c0_over_ln_n(0.018589), ratio_to_ceiling(1.099752), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(12)))]))]
-98. riemann_train(9, 8)
+106. riemann_train(9, 8)
    => [errors([0.037394, 0.036566, 0.035912, 0.035375, 0.034873, 0.034402, 0.033954, 0.033527, 0.03312]), final(0.03312), optimal(0.024015), descent(proved(monotone(8)))]
-99. riemann_robin(4900, 5055)
+107. riemann_robin(4900, 5055)
    => [checked(156), exceptions([5040]), above_5040(none)]
-100. optimise_file("item(7).\nitem(5).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+108. riemann_hp_report(57, 34)
+   => [n(57), digits(34), optimal_d2(0.011565), optimal_d2_digits('0.0115649323181864648648421659108997'), manual_d2(0.053624), trained_d2(0.035735), c0(0.046191), d2_times_ln_n(0.046758), c0_over_ln_n(0.011425), ratio_to_ceiling(1.012258), ratio_digits('1.0122576089795085429683418935804870'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(57))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+109. optimise_file("item(7).\nitem(5).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=28 size_after=28 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(7)", "item(5)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-101. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [])
+110. s2a(probe_a, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [])
    => mnn_program(mnn_s2a_probe_a, meta(s2a_affine(probe_a, 2, 0), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_a, 2, 0, examples_reproduced(3))]))
-102. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-1]]]], [output, [['B', 1]]]], [[input, [['A', [0, 3, 6, 9]]]], [output, [['B', 4]]]], [[input, [['A', [7, -3, 0]]]], [output, [['B', 3]]]]], [ga(false), time_limit(8)])
+111. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-1]]]], [output, [['B', 1]]]], [[input, [['A', [0, 3, 6, 9]]]], [output, [['B', 4]]]], [[input, [['A', [7, -3, 0]]]], [output, [['B', 3]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(expression)), program(["len(A, B):-length(A, B)"]), proof(proof([])), trace([s2a2_io_synth(len, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-1], [0, 3, 6, 9], [7, -3, 0], [1, 2, 3, 4, 5, 6]], [0, 1, 4, 3, 6])]
-103. s2a2_learn_apply(keep, [col-colour-q-[blue, green], big-size-s-[s2]], [b-c, c-d])
+112. s2a2_learn_apply(keep, [col-colour-q-[blue, green], big-size-s-[s2]], [b-c, c-d])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(b, c)", "edge(c, d)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [b, c, d])), modes(targets([conn/2]))))])), check(accepted)]
-104. s2a2_derive(flat2, 2, [[[[]], [[-2, 1, 4], [-1], [5, 8]]], [[[], [-2, 1, 4]], [[-1], [5, 8]]]])
+113. s2a2_derive(flat2, 2, [[[[]], [[-2, 1, 4], [-1], [5, 8]]], [[[], [-2, 1, 4]], [[-1], [5, 8]]]])
    => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(57)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[], [-2, 1, 4], [-1], [5, 8]], [[], [-2, 1, 4], [-1], [5, 8]]]), derived_gives([[[], [-2, 1, 4], [-1], [5, 8]], [[], [-2, 1, 4], [-1], [5, 8]]])]
-105. check_proof(edb_same, 1)
+114. check_proof(edb_same, 1)
    => accepted
-106. thermo_report([a, c])
+115. thermo_report([a, c])
    => [n(2), alphabet([a, c]), counts([1, 1]), rank(0), class_size(2), rank_bits(1), composition_bits(2), raw_bits(2), entropy_bits(2.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-107. thermo_round_trip([1, 0, 3, 2, 1])
+116. thermo_round_trip([1, 0, 3, 2, 1])
    => [code(thermo([0, 1, 2, 3], [1, 2, 1, 1], 17)), neurons([neuron(1, 1, 12), neuron(2, 0, 0), neuron(3, 3, 4), neuron(4, 2, 1), neuron(5, 1, 0)]), decoded([1, 0, 3, 2, 1])]
-108. riemann_report(13)
+117. riemann_report(13)
    => [n(13), optimal_d2(0.019824), manual_d2(0.130757), trained_d2(0.036708), c0(0.046191), d2_times_ln_n(0.050849), c0_over_ln_n(0.018009), ratio_to_ceiling(1.100824), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(13)))]))]
-109. riemann_train(10, 7)
+118. riemann_train(10, 7)
    => [errors([0.137186, 0.065539, 0.049866, 0.046162, 0.043751, 0.04209, 0.040662, 0.03943]), final(0.03943), optimal(0.023772), descent(proved(monotone(7)))]
-110. riemann_robin(5000, 5160)
+119. riemann_robin(5000, 5160)
    => [checked(161), exceptions([5040]), above_5040(none)]
-111. optimise_file("val(9).\nval(7).\nval(5).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
+120. riemann_hp_report(58, 35)
+   => [n(58), digits(35), optimal_d2(0.011565), optimal_d2_digits('0.01156477580820639820157560283198039'), manual_d2(0.114125), trained_d2(0.041931), c0(0.046191), d2_times_ln_n(0.046958), c0_over_ln_n(0.011376), ratio_to_ceiling(1.016598), ratio_digits('1.01659821674776428294922537346696183'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(58))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+121. optimise_file("val(9).\nval(7).\nval(5).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=34 size_after=34 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(9)", "val(7)", "val(5)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-112. s2a(probe_b, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [allow_table(true)])
+122. s2a(probe_b, [[[input, [['A', [4, 4]]]], [output, [['B', [4, 4]]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_b, meta(s2a_table(probe_b), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b([4, 4], [4, 4]), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_b, examples_reproduced(1))]))
-113. s2a2(odds, [[[input, [['A', [0, 3]]]], [output, [['B', [3]]]]], [[input, [['A', [1, 4]]]], [output, [['B', [1]]]]], [[input, [['A', [7, -3]]]], [output, [['B', [7, -3]]]]], [[input, [['A', [8, -2]]]], [output, [['B', []]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=1->C=[A|D];C=D), r(B, D))], r)])
+123. s2a2(odds, [[[input, [['A', [0, 3]]]], [output, [['B', [3]]]]], [[input, [['A', [1, 4]]]], [output, [['B', [1]]]]], [[input, [['A', [7, -3]]]], [output, [['B', [7, -3]]]]], [[input, [['A', [8, -2]]]], [output, [['B', []]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=1->C=[A|D];C=D), r(B, D))], r)])
    => [solved_by(s2a2(filter)), program(["odds([], [])", "odds([A|B], C):-(odds_test(A)->C=[A|D];C=D), odds(B, D)", "odds_test(A):-A mod 2=:=1"]), proof(proof([proof_step(1, induction_equivalence, [], equivalent(domain(types([list(int), any])), modes(all)))])), trace([s2a2_io_synth(odds, filter, examples_reproduced(4))]), check(accepted), runs_on([[0, 3], [1, 4], [7, -3], [8, -2], [1, 2, 3, 4, 5, 6]], [[3], [1], [7, -3], [], [1, 3, 5]])]
-114. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red], big-size-s-[s2, s3]], [d-a])
+124. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red], big-size-s-[s2, s3]], [d-a])
    => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(A, [B]), [l(C, [B])]), lr(l(A, [D]), [l(E, [D])]))), [template_matches])])), program(["edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, d), edge(d, a), edge(d, d)]), only_in_a([conn(a, a), conn(a, d), conn(d, a), conn(d, d)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
-115. s2a2_derive(sumsq, 3, [[-1, 2], [0, 3], [6, 9], [7, -3]])
+125. s2a2_derive(sumsq, 3, [[-1, 2], [0, 3], [6, 9], [7, -3]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(85)), program(["sumsq([], 0)", "sumsq([A|B], C):-D is A*A, sumsq_acc(B, C, D)", "sumsq_acc([], A, B):-A is 0+B", "sumsq_acc([A|B], C, D):-E is A*A+D, sumsq_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([5, 9, 117, 58]), derived_gives([5, 9, 117, 58])]
-116. check_proof(fold_changed, 2)
+126. check_proof(fold_changed, 2)
    => rejected(invalid_or_unsupported_proof)
-117. thermo_report([e, h, o, l, e])
+127. thermo_report([e, h, o, l, e])
    => [n(5), alphabet([e, h, l, o]), counts([2, 1, 1, 1]), rank(11), class_size(60), rank_bits(6), composition_bits(6), raw_bits(10), entropy_bits(9.61), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-118. thermo_round_trip([a, c, b, a, c, b, a, c, b])
+128. thermo_round_trip([a, c, b, a, c, b, a, c, b])
    => [code(thermo([a, b, c], [3, 3, 3], 432)), neurons([neuron(1, a, 0), neuron(2, c, 350), neuron(3, b, 60), neuron(4, a, 0), neuron(5, c, 18), neuron(6, b, 3), neuron(7, a, 0), neuron(8, c, 1), neuron(9, b, 0)]), decoded([a, c, b, a, c, b, a, c, b])]
-119. riemann_report(14)
+129. riemann_report(14)
    => [n(14), optimal_d2(0.018486), manual_d2(0.033034), trained_d2(0.030369), c0(0.046191), d2_times_ln_n(0.048787), c0_over_ln_n(0.017503), ratio_to_ceiling(1.056186), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(14)))]))]
-120. riemann_train(11, 8)
+130. riemann_train(11, 8)
    => [errors([0.03416, 0.033832, 0.033522, 0.033221, 0.03293, 0.032646, 0.03237, 0.032102, 0.03184]), final(0.03184), optimal(0.020444), descent(proved(monotone(8)))]
-121. riemann_robin(5100, 5265)
+131. riemann_robin(5100, 5265)
    => [checked(166), exceptions([]), above_5040(none)]
-122. optimise_file("n(1).\nn(9).\nn(7).\nn(5).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
+132. riemann_hp_report(59, 36)
+   => [n(59), digits(36), optimal_d2(0.011484), optimal_d2_digits('0.011483523341443782223846885867676872'), manual_d2(0.054658), trained_d2(0.036056), c0(0.046191), d2_times_ln_n(0.046824), c0_over_ln_n(0.011328), ratio_to_ceiling(1.013706), ratio_digits('1.013705543341166486801202158445056441'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(59))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+133. optimise_file("n(1).\nn(9).\nn(7).\nn(5).\ndoubled(Ys) :- findall(Y, (n(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=31 size_after=31 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(1)", "n(9)", "n(7)", "n(5)", "doubled(A):-findall(B, (n(C), B is C*2), A)"])]
-123. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [])
+134. s2a(swap_probe, [[[input, [['A', 1]]], [output, [['B', 2]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [])
    => mnn_program(mnn_s2a_swap_probe, meta(s2a_affine(swap_probe, 1, 1), [directive(1, module(mnn_s2a_swap_probe, [swap_probe/2])), clause(2)]), [mnn_pred(swap_probe/2, [?, ?], [any, any], [mnn_clause(2, swap_probe(A, B), B is 1*A+1, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(swap_probe, 1, 1, examples_reproduced(2))]))
-124. s2a2(sum, [[[input, [['A', [1, 4, 7]]]], [output, [['B', 12]]]], [[input, [['A', [2, 5, 8]]]], [output, [['B', 15]]]], [[input, [['A', [8, -2, 1]]]], [output, [['B', 7]]]], [[input, [['A', [9, -1, 2]]]], [output, [['B', 10]]]]], [ga(false), time_limit(8)])
+135. s2a2(sum, [[[input, [['A', [1, 4, 7]]]], [output, [['B', 12]]]], [[input, [['A', [2, 5, 8]]]], [output, [['B', 15]]]], [[input, [['A', [8, -2, 1]]]], [output, [['B', 7]]]], [[input, [['A', [9, -1, 2]]]], [output, [['B', 10]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(expression)), program(["sum(A, B):-sum_list(A, B)"]), proof(proof([])), trace([s2a2_io_synth(sum, expression, examples_reproduced(4))]), check(no_reference), runs_on([[1, 4, 7], [2, 5, 8], [8, -2, 1], [9, -1, 2], [1, 2, 3, 4, 5, 6]], [12, 15, 7, 10, 21])]
-125. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-b, b-c, c-d, d-a])
+136. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-b, b-c, c-d, d-a])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
-126. s2a2_derive(sum, 2, [[0, 3, 6], [1, 4, 7], [7, -3, 0], [8, -2, 1]])
+137. s2a2_derive(sum, 2, [[0, 3, 6], [1, 4, 7], [7, -3, 0], [8, -2, 1]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(21)), program(["sum([], 0)", "sum([A|B], C):-sum_acc(B, C, A)", "sum_acc([], A, B):-A is 0+B", "sum_acc([A|B], C, D):-E is A+D, sum_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(int)), out])), modes([in(list(int)), out])))])), check(accepted), spec_gives([9, 12, 4, 7]), derived_gives([9, 12, 4, 7])]
-127. check_proof(fold_not_derived, 3)
+138. check_proof(fold_not_derived, 3)
    => rejected(invalid_or_unsupported_proof)
-128. thermo_report([a, a, a, a, a, a])
+139. thermo_report([a, a, a, a, a, a])
    => [n(6), alphabet([a]), counts([6]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-129. thermo_round_trip([])
+140. thermo_round_trip([])
    => [code(thermo([], [], 0)), neurons([]), decoded([])]
-130. riemann_report(15)
+141. riemann_report(15)
    => [n(15), optimal_d2(0.018335), manual_d2(0.10647), trained_d2(0.038051), c0(0.046191), d2_times_ln_n(0.049652), c0_over_ln_n(0.017057), ratio_to_ceiling(1.074922), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(15)))]))]
-131. riemann_train(12, 0)
+142. riemann_train(12, 0)
    => [errors([0.03416]), final(0.03416), optimal(0.020443), descent(proved(monotone(0)))]
-132. riemann_robin(5200, 5370)
+143. riemann_robin(5200, 5370)
    => [checked(171), exceptions([]), above_5040(none)]
-133. optimise_file("n(2).\nn(1).\nn(9).\nn(7).\nn(5).\ntotal(T) :- findall(X, n(X), Xs), sum_list(Xs, T).\n")
+144. riemann_hp_report(60, 37)
+   => [n(60), digits(37), optimal_d2(0.011471), optimal_d2_digits('0.0114707264412820420576709503362989156'), manual_d2(0.054658), trained_d2(0.035991), c0(0.046191), d2_times_ln_n(0.046965), c0_over_ln_n(0.011282), ratio_to_ceiling(1.01675), ratio_digits('1.0167496156643913616595616678816534108'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(60))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+145. optimise_file("n(2).\nn(1).\nn(9).\nn(7).\nn(5).\ntotal(T) :- findall(X, n(X), Xs), sum_list(Xs, T).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=36 size_after=36 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(2)", "n(1)", "n(9)", "n(7)", "n(5)", "total(A):-findall(B, n(B), C), sum_list(C, A)"])]
-134. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 5]]], [output, [['B', 10]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [allow_table(true)])
+146. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 6]]]], [[input, [['A', 5]]], [output, [['B', 10]]]], [[input, [['A', 7]]], [output, [['B', 14]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_b, meta(s2a_affine(probe_b, 2, 0), [directive(1, module(mnn_s2a_probe_b, [probe_b/2])), clause(2)]), [mnn_pred(probe_b/2, [?, ?], [any, any], [mnn_clause(2, probe_b(A, B), B is 2*A+0, generated(s2a_affine, 2))], original)], proof([]), trace([s2a_affine(probe_b, 2, 0, examples_reproduced(3))]))
-135. s2a2(double_each, [[[input, [['A', [-3, 0, 3, 6]]]], [output, [['B', [-6, 0, 6, 12]]]]], [[input, [['A', [2, 5, 8, -2]]]], [output, [['B', [4, 10, 16, -4]]]]], [[input, [['A', [3, 6, 9, -1]]]], [output, [['B', [6, 12, 18, -2]]]]], [[input, [['A', [9, -1, 2, 5]]]], [output, [['B', [18, -2, 4, 10]]]]]], [ga(false), time_limit(8)])
+147. s2a2(double_each, [[[input, [['A', [-3, 0, 3, 6]]]], [output, [['B', [-6, 0, 6, 12]]]]], [[input, [['A', [2, 5, 8, -2]]]], [output, [['B', [4, 10, 16, -4]]]]], [[input, [['A', [3, 6, 9, -1]]]], [output, [['B', [6, 12, 18, -2]]]]], [[input, [['A', [9, -1, 2, 5]]]], [output, [['B', [18, -2, 4, 10]]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(map)), program(["double_each([], [])", "double_each([A|B], [C|D]):-double_each_el(A, C), double_each(B, D)", "double_each_el(A, B):-B is 2*A"]), proof(proof([])), trace([s2a2_io_synth(double_each, map, examples_reproduced(4))]), check(no_reference), runs_on([[-3, 0, 3, 6], [2, 5, 8, -2], [3, 6, 9, -1], [9, -1, 2, 5], [1, 2, 3, 4, 5, 6]], [[-6, 0, 6, 12], [4, 10, 16, -4], [6, 12, 18, -2], [18, -2, 4, 10], [2, 4, 6, 8, 10, 12]])]
-136. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-b, a-c, b-c])
+148. s2a2_learn_apply(keep, [col-colour-q-[blue]], [a-b, a-c, b-c])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(a, c)", "edge(b, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
-137. s2a2_derive(flat2, 3, [[[[1, 4, 7, -3]], [[2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]]], [[[1, 4, 7, -3], [2, 5, 8, -2]], [[8, -2, 1, 4], [9, -1, 2, 5]]]])
+149. s2a2_derive(flat2, 3, [[[[1, 4, 7, -3]], [[2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]]], [[[1, 4, 7, -3], [2, 5, 8, -2]], [[8, -2, 1, 4], [9, -1, 2, 5]]]])
    => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(3616)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[1, 4, 7, -3], [2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]], [[1, 4, 7, -3], [2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]]]), derived_gives([[[1, 4, 7, -3], [2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]], [[1, 4, 7, -3], [2, 5, 8, -2], [8, -2, 1, 4], [9, -1, 2, 5]]])]
-138. check_proof(edb_changed, 1)
+150. check_proof(edb_changed, 1)
    => accepted
-139. thermo_report([b, b, b, b, b, b, b])
+151. thermo_report([b, b, b, b, b, b, b])
    => [n(7), alphabet([b]), counts([7]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-140. thermo_round_trip([x])
+152. thermo_round_trip([x])
    => [code(thermo([x], [1], 0)), neurons([neuron(1, x, 0)]), decoded([x])]
-141. riemann_report(16)
+153. riemann_report(16)
    => [n(16), optimal_d2(0.017894), manual_d2(0.10647), trained_d2(0.036077), c0(0.046191), d2_times_ln_n(0.049613), c0_over_ln_n(0.01666), ratio_to_ceiling(1.074069), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(16)))]))]
-142. riemann_train(13, 1)
+154. riemann_train(13, 1)
    => [errors([0.130757, 0.064652]), final(0.064652), optimal(0.019824), descent(proved(monotone(1)))]
-143. riemann_robin(5300, 5475)
+155. riemann_robin(5300, 5475)
    => [checked(176), exceptions([]), above_5040(none)]
-144. optimise_file("num(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
+156. riemann_hp_report(1, 38)
+   => [n(1), digits(38), optimal_d2(0.858212), optimal_d2_digits('0.85821205139551088466996024295601644833'), manual_d2(3.10623), trained_d2(0.858212), c0(0.046191), d2_times_ln_n(undefined), c0_over_ln_n(undefined), ratio_to_ceiling(undefined), ratio_digits(undefined), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(1))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+157. optimise_file("num(3).\nsum([], 0).\nsum([X|Xs], S) :- sum(Xs, S0), S is S0 + X.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=23 size_after=23 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(3)", "sum([], 0)", "sum([A|B], C):-sum(B, D), C is D+A"])]
-145. s2a(swap_probe, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [])
+158. s2a(swap_probe, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [])
    => no_algorithm(no_generalization_candidate)
-146. s2a2(dropmax, [], [ga(false), time_limit(8)])
+159. s2a2(dropmax, [], [ga(false), time_limit(8)])
    => no_algorithm(empty_spec)
-147. s2a2_learn_apply(drop, [col-colour-q-[green], big-size-s-[s3]], [c-d, d-a])
+160. s2a2_learn_apply(drop, [col-colour-q-[green], big-size-s-[s3]], [c-d, d-a])
    => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(A, [B]), [l(C, [B])]), lr(l(A, [D]), [l(E, [D])]))), [template_matches])])), program(["edge(c, d)", "edge(d, a)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, c), edge(a, d), edge(c, a), edge(c, c), edge(c, d), edge(d, a), edge(d, c), edge(d, d)]), only_in_a([conn(a, a), conn(a, c), conn(a, d), conn(c, a), conn(c, c), conn(c, d), conn(d, a), conn(d, c), conn(d, d)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
-148. s2a2_derive(len, 2, [[]])
+161. s2a2_derive(len, 2, [[]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([0]), derived_gives([0])]
-149. check_proof(edb_syntactic, 2)
+162. check_proof(edb_syntactic, 2)
    => accepted
-150. thermo_report([0, 0, 0, 0, 0, 0, 0, 0])
+163. thermo_report([0, 0, 0, 0, 0, 0, 0, 0])
    => [n(8), alphabet([0]), counts([8]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-151. thermo_round_trip([h, h])
+164. thermo_round_trip([h, h])
    => [code(thermo([h], [2], 0)), neurons([neuron(1, h, 0), neuron(2, h, 0)]), decoded([h, h])]
-152. riemann_report(17)
+165. riemann_report(17)
    => [n(17), optimal_d2(0.017069), manual_d2(0.037345), trained_d2(0.035104), c0(0.046191), d2_times_ln_n(0.048361), c0_over_ln_n(0.016304), ratio_to_ceiling(1.046965), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(17)))]))]
-153. riemann_train(14, 2)
+166. riemann_train(14, 2)
    => [errors([0.033034, 0.03265, 0.032334]), final(0.032334), optimal(0.018486), descent(proved(monotone(2)))]
-154. riemann_robin(5400, 5580)
+167. riemann_robin(5400, 5580)
    => [checked(181), exceptions([]), above_5040(none)]
-155. optimise_file("item(3).\nitem(3).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
+168. riemann_hp_report(2, 39)
+   => [n(2), digits(39), optimal_d2(0.289965), optimal_d2_digits('0.289964573742202731811200583416046611205'), manual_d2(1.076211), trained_d2(0.289965), c0(0.046191), d2_times_ln_n(0.200988), c0_over_ln_n(0.06664), ratio_to_ceiling(4.351201), ratio_digits('4.351200628794347284326600743879831209022'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(2))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+169. optimise_file("item(3).\nitem(3).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=29 size_after=29 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["item(3)", "item(3)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-156. s2a(probe_a, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [allow_table(true)])
+170. s2a(probe_a, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 5]]], [output, [['B', 6]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2), clause(3)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a(3, 9), true, generated(s2a_table, 2)), mnn_clause(3, probe_a(5, 6), true, generated(s2a_table, 3))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(2))]))
-157. s2a2(evens, [[[input, [['A', [-1]]]], [output, [['B', []]]]], [[input, [['A', [4]]]], [output, [['B', [4]]]]], [[input, [['A', [7]]]], [output, [['B', []]]]], [[input, [['A', [9]]]], [output, [['B', []]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=0->C=[A|D];C=D), r(B, D))], r)])
+171. s2a2(evens, [[[input, [['A', [-1]]]], [output, [['B', []]]]], [[input, [['A', [4]]]], [output, [['B', [4]]]]], [[input, [['A', [7]]]], [output, [['B', []]]]], [[input, [['A', [9]]]], [output, [['B', []]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-(A mod 2=:=0->C=[A|D];C=D), r(B, D))], r)])
    => [solved_by(s2a2(filter)), program(["evens([], [])", "evens([A|B], C):-(evens_test(A)->C=[A|D];C=D), evens(B, D)", "evens_test(A):-A mod 2<1"]), proof(proof([proof_step(1, induction_equivalence, [], equivalent(domain(types([list(int), any])), modes(all)))])), trace([s2a2_io_synth(evens, filter, examples_reproduced(4))]), check(accepted), runs_on([[-1], [4], [7], [9], [1, 2, 3, 4, 5, 6]], [[], [4], [], [], [2, 4, 6]])]
-158. s2a2_learn_apply(keep, [col-colour-q-[red], big-size-s-[s1]], [a-c])
+172. s2a2_learn_apply(keep, [col-colour-q-[red], big-size-s-[s1]], [a-c])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(16)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, c])), modes(targets([conn/2]))))])), check(accepted)]
-159. s2a2_derive(rev, 3, [[-3], [-1], [2], [7]])
+173. s2a2_derive(rev, 3, [[-3], [-1], [2], [7]])
    => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[-3], [-1], [2], [7]]), derived_gives([[-3], [-1], [2], [7]])]
-160. check_proof(edb_same, 3)
+174. check_proof(edb_same, 3)
    => accepted
-161. thermo_report([x, x, x, x, x, x, x, x, x])
+175. thermo_report([x, x, x, x, x, x, x, x, x])
    => [n(9), alphabet([x]), counts([9]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-162. thermo_round_trip([b, b, b])
+176. thermo_round_trip([b, b, b])
    => [code(thermo([b], [3], 0)), neurons([neuron(1, b, 0), neuron(2, b, 0), neuron(3, b, 0)]), decoded([b, b, b])]
-163. riemann_report(18)
+177. riemann_report(18)
    => [n(18), optimal_d2(0.017059), manual_d2(0.037345), trained_d2(0.035145), c0(0.046191), d2_times_ln_n(0.049308), c0_over_ln_n(0.015981), ratio_to_ceiling(1.067461), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(18)))]))]
-164. riemann_train(15, 3)
+178. riemann_train(15, 3)
    => [errors([0.10647, 0.059087, 0.047801, 0.044906]), final(0.044906), optimal(0.018335), descent(proved(monotone(3)))]
-165. riemann_robin(5500, 5685)
+179. riemann_robin(5500, 5685)
    => [checked(186), exceptions([]), above_5040(none)]
-166. optimise_file("val(4).\nval(4).\nval(4).\ndoubled(Ys) :- findall(Y, (val(X), Y is X * 2), Ys).\n")
+180. riemann_hp_report(3, 40)
+   => [n(3), digits(40), optimal_d2(0.093837), optimal_d2_digits('0.0938372284969832919042828065306439172913'), manual_d2(0.214367), trained_d2(0.093839), c0(0.046191), d2_times_ln_n(0.103091), c0_over_ln_n(0.042045), ratio_to_ceiling(2.231816), ratio_digits('2.2318157133120787795954342005814927066505'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(3))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+181. optimise_file("val(4).\nval(4).\nval(4).\ndoubled(Ys) :- findall(Y, (val(X), Y is X * 2), Ys).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=26 size_after=26 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(4)", "val(4)", "val(4)", "doubled(A):-findall(B, (val(C), B is C*2), A)"])]
-167. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [])
+182. s2a(swap_probe, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 7], ['B', 8]]], [output, [['C', 15]]]]], [])
    => no_algorithm(unsupported_spec_shape)
-168. s2a2(reverse, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [0, 4, 8]]]], [output, [['B', [8, 4, 0]]]]], [[input, [['A', [5, 9, 0, 4]]]], [output, [['B', [4, 0, 9, 5]]]]], [[input, [['A', [8, -1]]]], [output, [['B', [-1, 8]]]]]], [ga(false), time_limit(8)])
+183. s2a2(reverse, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [0, 4, 8]]]], [output, [['B', [8, 4, 0]]]]], [[input, [['A', [5, 9, 0, 4]]]], [output, [['B', [4, 0, 9, 5]]]]], [[input, [['A', [8, -1]]]], [output, [['B', [-1, 8]]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(expression)), program(["reverse(A, B):-lists:reverse(A, B)"]), proof(proof([])), trace([s2a2_io_synth(reverse, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [0, 4, 8], [5, 9, 0, 4], [8, -1], [1, 2, 3, 4, 5, 6]], [[], [8, 4, 0], [4, 0, 9, 5], [-1, 8], [6, 5, 4, 3, 2, 1]])]
-169. s2a2_learn_apply(keep, [col-colour-q-[blue, red]], [a-b, b-c, c-d, d-a])
+184. s2a2_learn_apply(keep, [col-colour-q-[blue, red]], [a-b, b-c, c-d, d-a])
    => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, b)", "edge(b, c)", "edge(c, d)", "edge(d, a)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
-170. s2a2_derive(flat2, 2, [[[[]], [[0, 4, 8], [3], [8, -1]]], [[[], [0, 4, 8]], [[3], [8, -1]]]])
+185. s2a2_derive(flat2, 2, [[[[]], [[0, 4, 8], [3], [8, -1]]], [[[], [0, 4, 8]], [[3], [8, -1]]]])
    => [strategy(fuse), lemmas([]), total(yes), functional(yes), bounded(equal_on(57)), program(["flat2([], [])", "flat2([A|B], C):-flat2_fuse(A, B, C)", "flat2_fuse([], A, B):-flat2(A, B)", "flat2_fuse([A|B], C, [A|D]):-flat2_fuse(B, C, D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(list(any))), out])), modes([in(list(list(any))), out])))])), check(accepted), spec_gives([[[], [0, 4, 8], [3], [8, -1]], [[], [0, 4, 8], [3], [8, -1]]]), derived_gives([[[], [0, 4, 8], [3], [8, -1]], [[], [0, 4, 8], [3], [8, -1]]])]
-171. check_proof(fold_changed, 1)
+186. check_proof(fold_changed, 1)
    => rejected(invalid_or_unsupported_proof)
-172. thermo_report([])
+187. thermo_report([])
    => [n(0), alphabet([]), counts([]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-173. thermo_round_trip([l, l, l, l])
+188. thermo_round_trip([l, l, l, l])
    => [code(thermo([l], [4], 0)), neurons([neuron(1, l, 0), neuron(2, l, 0), neuron(3, l, 0), neuron(4, l, 0)]), decoded([l, l, l, l])]
-174. riemann_report(19)
+189. riemann_report(19)
    => [n(19), optimal_d2(0.016817), manual_d2(0.09989), trained_d2(0.040193), c0(0.046191), d2_times_ln_n(0.049518), c0_over_ln_n(0.015688), ratio_to_ceiling(1.072008), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(19)))]))]
-175. riemann_train(16, 4)
+190. riemann_train(16, 4)
    => [errors([0.10647, 0.057934, 0.046318, 0.043308, 0.041487]), final(0.041487), optimal(0.017894), descent(proved(monotone(4)))]
-176. riemann_robin(5600, 5790)
+191. riemann_robin(5600, 5790)
    => [checked(191), exceptions([]), above_5040(none)]
-177. optimise_file("val(5).\nval(5).\nval(5).\nval(5).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
+192. riemann_hp_report(4, 20)
+   => [n(4), digits(20), optimal_d2(0.065129), optimal_d2_digits('0.06512886865990024957'), manual_d2(0.214367), trained_d2(0.066642), c0(0.046191), d2_times_ln_n(0.090288), c0_over_ln_n(0.03332), ratio_to_ceiling(1.954644), ratio_digits('1.95464411812991597566'), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(4))), step(7, float_cross_check, proved(agrees(1.0e-9)))]))]
+193. optimise_file("val(5).\nval(5).\nval(5).\nval(5).\napp([], L, L).\napp([H|T], L, [H|R]) :- app(T, L, R).\n")
    => [report("MNN_OPTIMISE ok changed=false size_before=33 size_after=33 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["val(5)", "val(5)", "val(5)", "val(5)", "app([], A, A)", "app([A|B], C, [A|D]):-app(B, C, D)"])]
-178. s2a(probe_a, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [allow_table(true)])
+194. s2a(probe_a, [[[input, [['A', [1, 2]]]], [output, [['B', [2, 1]]]]]], [allow_table(true)])
    => mnn_program(mnn_s2a_probe_a, meta(s2a_table(probe_a), [directive(1, module(mnn_s2a_probe_a, [probe_a/2])), clause(2)]), [mnn_pred(probe_a/2, [?, ?], [any, any], [mnn_clause(2, probe_a([1, 2], [2, 1]), true, generated(s2a_table, 2))], original)], proof([]), trace([s2a_table(probe_a, examples_reproduced(1))]))
-179. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-2]]]], [output, [['B', 1]]]], [[input, [['A', [1, 5, 9, 0]]]], [output, [['B', 4]]]], [[input, [['A', [9, 0, 4]]]], [output, [['B', 3]]]]], [ga(false), time_limit(8)])
+195. s2a2(len, [[[input, [['A', []]]], [output, [['B', 0]]]], [[input, [['A', [-2]]]], [output, [['B', 1]]]], [[input, [['A', [1, 5, 9, 0]]]], [output, [['B', 4]]]], [[input, [['A', [9, 0, 4]]]], [output, [['B', 3]]]]], [ga(false), time_limit(8)])
    => [solved_by(s2a2(expression)), program(["len(A, B):-length(A, B)"]), proof(proof([])), trace([s2a2_io_synth(len, expression, examples_reproduced(4))]), check(no_reference), runs_on([[], [-2], [1, 5, 9, 0], [9, 0, 4], [1, 2, 3, 4, 5, 6]], [0, 1, 4, 3, 6])]
-180. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red]], [a-b, a-c, c-d])
+196. s2a2_learn_apply(drop, [col-colour-q-[blue, green, red]], [a-b, a-c, c-d])
    => [algorithm(algorithm([rule(del_clause, []), rule(replace(tmpl(lr(l(col, [A]), [l(q, [A])]), lr(l(col, [B]), [l(colour, [B])]))), [template_matches])])), program(["edge(a, b)", "edge(a, c)", "edge(c, d)"]), trace([s2a2_apply([step(del_clause(1)), step(del_clause(1))]), s2a2_prover(refuted(input([edge(a, a), edge(a, b), edge(a, c), edge(b, a), edge(b, b), edge(b, c), edge(c, a), edge(c, b), edge(c, c)]), only_in_a([conn(a, a), conn(a, b), conn(a, c), conn(b, a), conn(b, b), conn(b, c), conn(c, a), conn(c, b), conn(c, c)]), only_in_b([])))]), proof(proof([])), check(no_proof)]
-181. s2a2_derive(len, 3, [[-1], [1, 5, 9, 0], [4, 8], [9, 0, 4]])
+197. s2a2_derive(len, 3, [[-1], [1, 5, 9, 0], [4, 8], [9, 0, 4]])
    => [strategy(accumulate), lemmas([plus_assoc]), total(yes), functional(yes), bounded(equal_on(15)), program(["len([], 0)", "len([A|B], C):-len_acc(B, C, 1)", "len_acc([], A, B):-A is 0+B", "len_acc([A|B], C, D):-E is 1+D, len_acc(B, C, E)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([1, 4, 2, 3]), derived_gives([1, 4, 2, 3])]
-182. check_proof(fold_not_derived, 2)
+198. check_proof(fold_not_derived, 2)
    => rejected(invalid_or_unsupported_proof)
-183. thermo_report([3])
+199. thermo_report([3])
    => [n(1), alphabet([3]), counts([1]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-184. thermo_round_trip([a, b, a, b, a])
+200. thermo_round_trip([a, b, a, b, a])
    => [code(thermo([a, b], [3, 2], 4)), neurons([neuron(1, a, 0), neuron(2, b, 3), neuron(3, a, 0), neuron(4, b, 1), neuron(5, a, 0)]), decoded([a, b, a, b, a])]
-185. riemann_report(20)
-   => [n(20), optimal_d2(0.016504), manual_d2(0.09989), trained_d2(0.039277), c0(0.046191), d2_times_ln_n(0.04944), c0_over_ln_n(0.015419), ratio_to_ceiling(1.070336), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(20)))]))]
-186. riemann_train(2, 5)
-   => [errors([1.076211, 0.331581, 0.292167, 0.290081, 0.289971, 0.289965]), final(0.289965), optimal(0.289965), descent(proved(monotone(5)))]
-187. riemann_robin(5700, 5895)
-   => [checked(196), exceptions([]), above_5040(none)]
-188. optimise_file("n(7).\nn(7).\nn(7).\nn(7).\nn(7).\nvalues(Xs) :- findall(X, n(X), Xs).\n")
-   => [report("MNN_OPTIMISE ok changed=true size_before=32 size_after=55 plop=accepted simplify=0 detlog=unchanged detlog_steps=0"), emitted(["n(7)", "n(7)", "n(7)", "n(7)", "n(7)", "values(A):-mnn_loop2_1([7, 7, 7, 7, 7], A)", "mnn_loop2_1([], [])", "mnn_loop2_1([A|B], [A|C]):-mnn_loop2_1(B, C)"])]
-189. s2a(probe_b, [[[input, [['A', 3]]], [output, [['B', 9]]]], [[input, [['A', 7]]], [output, [['B', 8]]]]], [])
-   => no_algorithm(no_generalization_candidate)
-190. s2a2(odds, [[[input, [['A', []]]], [output, [['B', []]]]], [[input, [['A', [-3, 1, 5, 9]]]], [output, [['B', [-3, 1, 5, 9]]]]], [[input, [['A', [-1, 3]]]], [output, [['B', [-1, 3]]]]], [[input, [['A', [7]]]], [output, [['B', [7]]]]]], [ga(false), time_limit(8), reference([r([], []), (r([A|B], C):-max_list([A|B], D), dd([A|B], D, C)), dd([], E, []), (dd([A|B], D, C):-(A==D->C=F;C=[A|F]), dd(B, D, F))], r)])
-   => [solved_by(s2a_input_address), program(["odds(A, A)"]), proof(proof([])), trace([s2a_input_address(odds, [], examples_reproduced(4))]), check(no_reference), runs_on([[], [-3, 1, 5, 9], [-1, 3], [7], [1, 2, 3, 4, 5, 6]], [[], [-3, 1, 5, 9], [-1, 3], [7], [1, 2, 3, 4, 5, 6]])]
-191. s2a2_learn_apply(keep, [col-colour-q-[green], big-size-s-[s1, s2, s3]], [a-c, b-c])
-   => [algorithm(algorithm([rule(unfold, [])])), program(["edge(a, c)", "edge(b, c)", "e(A, B):-edge(A, B)", "conn(A, B):-edge(A, B)"]), trace([s2a2_apply([step(unfold(2, 1))]), s2a2_prover(proved(exhaustive(512)))]), proof(proof([proof_step(1, edb_equivalence, [], equivalent(domain(edb([edge/2], [a, b, c])), modes(targets([conn/2]))))])), check(accepted)]
-192. s2a2_derive(rev, 2, [[], [-3, 1, 5, 9], [0, 4], [5, 9, 0]])
-   => [strategy(accumulate), lemmas([app_assoc]), total(yes), functional(yes), bounded(equal_on(7)), program(["rev([], [])", "rev([A|B], C):-rev_acc(B, [A], C)", "rev_acc([], A, A)", "rev_acc([A|B], C, D):-rev_acc(B, [A|C], D)"]), proof(proof([proof_step(1, fold_derivation, [], equivalent(domain(mode([in(list(any)), out])), modes([in(list(any)), out])))])), check(accepted), spec_gives([[], [9, 5, 1, -3], [4, 0], [0, 9, 5]]), derived_gives([[], [9, 5, 1, -3], [4, 0], [0, 9, 5]])]
-193. check_proof(edb_changed, 3)
-   => rejected(invalid_or_unsupported_proof)
-194. thermo_report([x, x])
-   => [n(2), alphabet([x]), counts([2]), rank(0), class_size(1), rank_bits(0), composition_bits(0), raw_bits(0), entropy_bits(0.0), erased_bits_irreversible(0), erased_bits_reversible(0), landauer_joules_300k(0.0)]
-195. thermo_round_trip([c, a, b, c, a, b])
-   => [code(thermo([a, b, c], [2, 2, 2], 67)), neurons([neuron(1, c, 60), neuron(2, a, 0), neuron(3, b, 3), neuron(4, c, 4), neuron(5, a, 0), neuron(6, b, 0)]), decoded([c, a, b, c, a, b])]
-196. riemann_report(21)
-   => [n(21), optimal_d2(0.016091), manual_d2(0.039757), trained_d2(0.037777), c0(0.046191), d2_times_ln_n(0.048989), c0_over_ln_n(0.015172), ratio_to_ceiling(1.060558), proof(proof([step(1, gram_positive_definite, proved), step(2, normal_equations, proved), step(3, pythagoras(manual), proved(not_below_optimum)), step(4, pythagoras(trained), proved(not_below_optimum)), step(5, descent, proved(monotone(10))), step(6, mobius_identity, proved(exhaustive(21)))]))]
-197. riemann_train(3, 6)
-   => [errors([0.214367, 0.104281, 0.095031, 0.094235, 0.093985, 0.093905, 0.093869]), final(0.093869), optimal(0.093837), descent(proved(monotone(6)))]
-198. riemann_robin(5800, 6000)
-   => [checked(201), exceptions([]), above_5040(none)]
-199. optimise_file("num(9).\nlen([], 0).\nlen([_|T], N) :- len(T, N0), N is N0 + 1.\n")
-   => [report("MNN_OPTIMISE ok changed=false size_before=24 size_after=24 plop=unchanged simplify=0 detlog=unchanged detlog_steps=0"), emitted(["num(9)", "len([], 0)", "len([A|B], C):-len(B, D), C is D+1"])]
-200. s2a(probe_a, [[[input, [['A', 1], ['B', 2]]], [output, [['C', 3]]]], [[input, [['A', 4], ['B', 4]]], [output, [['C', 8]]]], [[input, [['A', 5], ['B', 6]]], [output, [['C', 11]]]]], [allow_table(true)])
-   => no_algorithm(unsupported_spec_shape)

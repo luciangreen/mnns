@@ -297,8 +297,9 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   Cholesky, and compares Möbius, trained and optimal weights against C0/ln N,
   with a checked proof (positive definiteness, normal equations, Pythagoras
   bound, descent, Möbius identity) and Robin's-inequality checks. RH and the
-  Báez-Duarte conjecture are not proved; arbitrary-precision arithmetic for
-  large N remains to do.
+  Báez-Duarte conjecture are not proved. `riemann_hp.pl` adds
+  arbitrary-precision fixed-point arithmetic (tested to N = 200; run to
+  N = 500).
 
 ## Remaining stages
 
