@@ -67,5 +67,7 @@ main :-
     load_files(ThermoTests, [silent(true)]),
     directory_file_path(Directory, 'riemann_tests.pl', RiemannTests),
     load_files(RiemannTests, [silent(true)]),
+    directory_file_path(Directory, 'riemann_hp_tests.pl', RiemannHPTests),
+    load_files(RiemannHPTests, [silent(true)]),
     run_tests,
     halt.

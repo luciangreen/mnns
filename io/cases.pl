@@ -6,13 +6,14 @@
 :- ios_engine:load_repo('prolog/proof/proof_checker').
 :- ios_engine:load_repo('prolog/thermo/thermo').
 :- ios_engine:load_repo('prolog/riemann/riemann').
+:- ios_engine:load_repo('prolog/riemann/riemann_hp').
 :- use_module(library(readutil)).
 
 io_title('mnns').
 
 % s2a2, s2a2_learn_apply, s2a2_derive and check_proof need S2A2 (github.com/luciangreen/S2A2)
 % beside this repository or at $S2A2_HOME; CI fetches it.
-io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip, riemann_report, riemann_train, riemann_robin]).
+io_cases([optimise_file, s2a, s2a2, s2a2_learn_apply, s2a2_derive, check_proof, thermo_report, thermo_round_trip, riemann_report, riemann_train, riemann_robin, riemann_hp_report]).
 
 % Small programs to optimise, made from parts.
 program(K, Text) :-
@@ -265,3 +266,8 @@ io_run(riemann_train, [N, Steps], Result) :- mnn_riemann:rh_train(N, Steps, Resu
 
 % Robin's inequality checked on a range (RH iff no exception above 5040)
 io_run(riemann_robin, [Lo, Hi], Result) :- mnn_riemann:rh_robin(Lo, Hi, Result).
+
+io_input(riemann_hp_report, K, [N, P]) :- num(K, 36, 1, 60, N), num(K, 37, 20, 40, P).
+
+% the same report with fixed-point big integers at P digits, with a float cross-check
+io_run(riemann_hp_report, [N, P], Report) :- mnn_riemann_hp:rh_hp_report(N, P, Report).
