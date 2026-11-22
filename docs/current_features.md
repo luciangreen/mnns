@@ -42,6 +42,7 @@ sharing a change.
 | Proof-checked MNN bundle writer and verifier (initial) | `prolog/aioc/bundle.pl` | `swipl -q -g "load_files('tests/bundle_tests.pl'), run_tests(mnn_aioc_bundle), halt"` | [MNN bundles](bundle.md) |
 | Bounded sandboxed candidate-vs-original example verification and verified library-entry tests | `prolog/aioc/test_runner.pl`, `prolog/aioc/library.pl` | `swipl -q -g "load_files('tests/aioc_test_runner_tests.pl'), run_tests(mnn_aioc_test_runner), halt"`; `swipl -q -g "load_files('tests/aioc_library_tests.pl'), run_tests(mnn_aioc_library), halt"` | [AIOC example verification](aioc.md#bounded-example-verification); [proof-checked library](aioc.md#proof-checked-library) |
 | Thermodynamic compression MNN: enumerative coding with neuron weights, Landauer heat report and exhaustive proof | `prolog/thermo/thermo.pl` | `swipl -q -g "load_files('tests/thermo_tests.pl'), run_tests(mnn_thermo), halt"` | [Thermodynamic compression](thermo.md) |
+| Riemann ceiling: Báez-Duarte sawtooth net, Möbius vs trained vs optimal weights, C0/ln N bound, proof and Robin checks | `prolog/riemann/riemann.pl` | `swipl -q -g "load_files('tests/riemann_tests.pl'), run_tests(mnn_riemann), halt"` | [Riemann ceiling](riemann.md) |
 
 Run the complete suite, including every group above, with:
 

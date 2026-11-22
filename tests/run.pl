@@ -65,5 +65,7 @@ main :-
     load_files(AIOCTestRunnerTests, [silent(true)]),
     directory_file_path(Directory, 'thermo_tests.pl', ThermoTests),
     load_files(ThermoTests, [silent(true)]),
+    directory_file_path(Directory, 'riemann_tests.pl', RiemannTests),
+    load_files(RiemannTests, [silent(true)]),
     run_tests,
     halt.
