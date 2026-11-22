@@ -16,7 +16,7 @@ test(planted_ten) :-
     mnn_complexity:cx_report(10, 43, 1, true, 5, R),
     assertion(R = [n(10), m(43), planted(true), sat(yes), robot_brute(45), robot_mnn(10),
                    human_verify(71), team(5, 2, solved), proof(_)]),
-    memberchk(proof(proof(Steps)), R),
+    memberchk(proof(Steps), R),
     assertion(Steps == [ step(1, planted_ok, proved), step(2, soundness, proved),
                          step(3, agreement, proved),
                          step(4, completeness, not_applicable(satisfiable)),
@@ -30,7 +30,7 @@ test(unsat_needs_everything) :-
     assertion(memberchk(robot_brute(256), R)),
     assertion(memberchk(robot_mnn(13), R)),
     assertion(memberchk(team(4, 16, failed), R)),
-    memberchk(proof(proof(Steps)), R),
+    memberchk(proof(Steps), R),
     assertion(memberchk(step(4, completeness, proved(tried_all(256))), Steps)).
 
 test(wrong_guess) :-

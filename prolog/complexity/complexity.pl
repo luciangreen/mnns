@@ -224,7 +224,7 @@ proof_(N, M, Planted, Cs, A0, Hint, FB, SB, FD, FT, ST, K, proof(Steps)) :-
     ;   P1 = not_applicable(unplanted)
     ),
     (   sound(Cs, FB), sound(Cs, FD), sound(Cs, FT) -> P2 = proved ; P2 = failed ),
-    (   (FB == none) == (FD == none) -> P3 = proved ; P3 = failed ),
+    (   ( FB == none, FD == none ; FB \== none, FD \== none ) -> P3 = proved ; P3 = failed ),
     (   FB == none
     ->  ( SB =:= 1 << N -> P4 = proved(tried_all(SB)) ; P4 = failed )
     ;   P4 = not_applicable(satisfiable)

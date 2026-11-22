@@ -20,7 +20,7 @@ test(random_six) :-
     memberchk(fractional_optimum(T, shared(1)), R),
     assertion(T =:= 191 rdiv 17),
     assertion(memberchk(gains_from_trade(11), R)),
-    memberchk(proof(proof(Steps)), R),
+    memberchk(proof(Steps), R),
     assertion(Steps = [ step(1, optimal_exhaustive, proved(tried(64))),
                         step(2, team_beats_solo, proved),
                         step(3, duality_certificate, proved(weight(_))),
@@ -40,14 +40,14 @@ test(ricardo_robot_faster_everywhere) :-
     memberchk(optimal(15, _), R),
     memberchk(fractional_optimum(T, shared(6)), R),
     assertion(T =:= 103 rdiv 7),
-    memberchk(proof(proof(Steps)), R),
+    memberchk(proof(Steps), R),
     assertion(memberchk(step(6, ricardo, proved(gain(11))), Steps)),
     assertion(memberchk(step(5, rounding_bound, proved(within(8))), Steps)).
 
 test(one_task_no_gain) :-
     mnn_advantage:ca_report(1, 2, robot_better, R),
     assertion(memberchk(gains_from_trade(0), R)),
-    memberchk(proof(proof(Steps)), R),
+    memberchk(proof(Steps), R),
     assertion(memberchk(step(6, ricardo, proved(gain(0))), Steps)).
 
 test(twelve_tasks) :-
