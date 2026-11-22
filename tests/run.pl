@@ -69,5 +69,9 @@ main :-
     load_files(RiemannTests, [silent(true)]),
     directory_file_path(Directory, 'riemann_hp_tests.pl', RiemannHPTests),
     load_files(RiemannHPTests, [silent(true)]),
+    directory_file_path(Directory, 'complexity_tests.pl', ComplexityTests),
+    load_files(ComplexityTests, [silent(true)]),
+    directory_file_path(Directory, 'advantage_tests.pl', AdvantageTests),
+    load_files(AdvantageTests, [silent(true)]),
     run_tests,
     halt.

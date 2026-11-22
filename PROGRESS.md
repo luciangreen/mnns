@@ -301,6 +301,12 @@ marked complete only when its listed deliverables and acceptance criteria pass.
   arbitrary-precision fixed-point arithmetic (tested to N = 200; run to
   N = 500).
 
+- **Human and robot intelligence: initial.** `prolog/complexity/` adds a P vs NP
+  model on 3-SAT (brute force, DPLL, linear verification and human-plus-robot
+  teams, with soundness, agreement, completeness and bound proofs) and a
+  comparative-advantage scheduler (exhaustive optimum, exact LP duality
+  certificate, rounding bound and Ricardo's gain). P vs NP is left open.
+
 ## Remaining stages
 
 | Stage | Deliverable | Status |
